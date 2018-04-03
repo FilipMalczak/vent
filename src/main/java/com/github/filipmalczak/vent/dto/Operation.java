@@ -5,7 +5,7 @@ public enum Operation {
     DELETE,
     SET,
     ADD,
-    ADD_REFERENCE,
+    LINK, //semantics: add reference
     REMOVE,
     GET,
     GET_SCHEMA,

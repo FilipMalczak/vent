@@ -6,7 +6,7 @@ import lombok.Value;
 
 @Value
 @Builder
-public class VentConfirmationResponse {
+public class VentConfirmationResponse implements Response {
     private String objectId;
     private String operation;
     private String timestamp;
