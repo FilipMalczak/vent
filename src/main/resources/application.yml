@@ -1,0 +1,13 @@
+vent:
+  compacting:
+    full.schedule: 0 0 0/1 ? * * *
+    partial:
+      schedule: 0 0/15 * ? * * *
+      older_than:
+        value: 30
+#       unit should be name of java.time.temporal.ChronoUnit value
+        unit: MINUTES
+#     number of vents that need to be present in object to trigger compacting
+      vent_crowding: 100
+
+#todo: add weights to operations to control crowding
