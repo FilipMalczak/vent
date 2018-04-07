@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.github.filipmalczak.vent.helper.Struct.map;
+
 @Service
 public class SimpleVentingService implements VentingService {
     @Autowired
@@ -23,13 +25,17 @@ public class SimpleVentingService implements VentingService {
         return object.flatMap(o -> {
             //todo: we either need a deep copy utility for map-represented JSON, or we need to remember that saving the parameter will be disastrous
             Map result = o.getLastSnapshot();
+            boolean firstVent = true;
+            ventsLoop:
             for (Vent vent: o.getEvents()){
                 switch (vent.getOperation()) {
                     //fixme: magic string duplicated here and in DelegatingRequestHandlingService
                     case CREATE: {
+                        if (!firstVent)
+                            throw new IllegalStateException(); //todo
                         result = (Map) vent.
                             getPayload().
-                            getOrDefault("initialValue", new HashMap<>());
+                            getOrDefault("initialValue", map());
                         break;
                     }
                     case SET: {
@@ -61,9 +67,11 @@ public class SimpleVentingService implements VentingService {
                     }
                     case DELETE: {
                         result = null;
+                        break ventsLoop;
                     }
                     default:
                 }
+                firstVent = false;
             }
             return Mono.justOrEmpty(result);
         });

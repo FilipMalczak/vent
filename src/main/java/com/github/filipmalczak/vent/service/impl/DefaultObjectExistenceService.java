@@ -17,6 +17,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.Map;
 
+import static com.github.filipmalczak.vent.helper.Struct.pair;
+
 @Service
 public class DefaultObjectExistenceService implements ObjectExistenceService {
     @Autowired
@@ -31,7 +33,7 @@ public class DefaultObjectExistenceService implements ObjectExistenceService {
     @Override
     public Mono<ObjectId> create(Mono<Map> initialValue) {
         return initialValue.map(initVal ->
-                new Vent(Operation.CREATE, initVal, timestampService.now())
+                new Vent(Operation.CREATE, pair("initialValue", initVal), timestampService.now())
             ).
             map( vent ->
                 VentObject.builder().
