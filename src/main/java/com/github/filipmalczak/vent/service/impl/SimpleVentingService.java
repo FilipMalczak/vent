@@ -5,8 +5,6 @@ import com.github.filipmalczak.vent.helper.resolver.ResolvedPath;
 import com.github.filipmalczak.vent.model.Vent;
 import com.github.filipmalczak.vent.model.VentObject;
 import com.github.filipmalczak.vent.service.VentingService;
-import lombok.Value;
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -22,7 +20,7 @@ public class SimpleVentingService implements VentingService {
 
     @Override
     public Mono<Map> applyVents(Mono<VentObject> object) {
-        return object.map(o -> {
+        return object.flatMap(o -> {
             //todo: we either need a deep copy utility for map-represented JSON, or we need to remember that saving the parameter will be disastrous
             Map result = o.getLastSnapshot();
             for (Vent vent: o.getEvents()){
@@ -50,19 +48,15 @@ public class SimpleVentingService implements VentingService {
                         );
                         break;
                     }
-                    case LINK: {
-                        applyLink(
-                            result,
-                            (String) vent.getPayload().get("path"),
-                            vent.getPayload().get("value")
-                        );
-                        break;
-                    }
                     case REMOVE: {
                         applyRemove(
                             result,
                             (String) vent.getPayload().get("path")
                         );
+                        break;
+                    }
+                    case PUT: {
+                        result = (Map) vent.getPayload().get("newValue");
                         break;
                     }
                     case DELETE: {
@@ -71,7 +65,7 @@ public class SimpleVentingService implements VentingService {
                     default:
                 }
             }
-            return result;
+            return Mono.justOrEmpty(result);
         });
     }
 
@@ -85,10 +79,6 @@ public class SimpleVentingService implements VentingService {
         if (!(o instanceof List))
             throw new RuntimeException(); //todo
         ((List) o).add(val);
-    }
-
-    private void applyLink(Map result, String path, Object val){
-        throw new NotImplementedException("Links are not part of MVP");
     }
 
     private void applyRemove(Map result, String path){

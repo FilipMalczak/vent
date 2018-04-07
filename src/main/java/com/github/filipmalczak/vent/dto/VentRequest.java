@@ -1,14 +1,14 @@
 package com.github.filipmalczak.vent.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NonNull;
+import lombok.*;
 import org.bson.types.ObjectId;
 
 import java.util.Map;
 
 @Builder
 @Getter
+@ToString
+@EqualsAndHashCode
 public class VentRequest {
     private final ObjectId objectId;
     private @NonNull final Operation operation;

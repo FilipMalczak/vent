@@ -1,11 +1,14 @@
 package com.github.filipmalczak.vent.service.impl;
 
-import com.github.filipmalczak.vent.dto.*;
+import com.github.filipmalczak.vent.dto.Operation;
+import com.github.filipmalczak.vent.dto.VentConfirmation;
+import com.github.filipmalczak.vent.dto.VentConfirmation;
+import com.github.filipmalczak.vent.dto.VentRequest;
 import com.github.filipmalczak.vent.repository.Objects;
 import com.github.filipmalczak.vent.service.ObjectExistenceService;
 import com.github.filipmalczak.vent.service.TimestampService;
-import com.github.filipmalczak.vent.service.VentingService;
 import com.github.filipmalczak.vent.service.VentRequestHandlingService;
+import com.github.filipmalczak.vent.service.VentingService;
 import org.apache.commons.lang3.NotImplementedException;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,48 +36,35 @@ public class DelegatingRequestHandlingService implements VentRequestHandlingServ
     private VentingService ventingService;
 
     @Override
-    public Mono<OperationResult> handle(VentRequest request) {
+    public Mono<VentConfirmation> handle(VentRequest request) {
         switch(request.getOperation()){
             case CREATE: return handleCreate(request);
-            case GET: return handleGet(request);
             case DELETE: return handleDelete(request);
             default: throw new NotImplementedException("Operation "+request.getOperation()+" is not ready yet!");
         }
     }
 
-    private Mono<OperationResult> handleCreate(VentRequest request){
+    private Mono<VentConfirmation> handleCreate(VentRequest request){
         return objectExistenceService.
             create(
-                fromCallable(request::getObjectId),
                 fromCallable(request::getPayload).
                     map(m -> (Map) m.getOrDefault("initialValue", new HashMap<>()))
             ).
+            log().
             flatMap( id -> confirm(id, request.getOperation()));
     }
 
-    private Mono<OperationResult> handleDelete(VentRequest request){
+    private Mono<VentConfirmation> handleDelete(VentRequest request){
         return objectExistenceService.
             delete(fromCallable(request::getObjectId)).
             then( confirmRequest(request) );
     }
 
-    private Mono<OperationResult> handleGet(VentRequest request){
-        //todo add support for custom schema
-        return ventingService.applyVents(
-                objectExistenceService.find(fromCallable(request::getObjectId))
-            ).
-            map( m -> VentedObject.builder().
-                object(m).
-                timestamp(timestampService.now()).
-                build()
-            );
-    }
-
-    private Mono<OperationResult> confirmRequest(VentRequest request){
+    private Mono<VentConfirmation> confirmRequest(VentRequest request){
         return confirm(request.getObjectId(), request.getOperation());
     }
 
-    private Mono<OperationResult> confirm(ObjectId objectId, Operation operation){
+    private Mono<VentConfirmation> confirm(ObjectId objectId, Operation operation){
         return just(VentConfirmation.of(objectId, operation, timestampService.now()));
     }
 }

@@ -1,6 +1,5 @@
 package com.github.filipmalczak.vent.web.request;
 
-import com.github.filipmalczak.vent.dto.Operation;
 import lombok.*;
 
 import java.util.Map;
@@ -10,6 +9,7 @@ import java.util.Map;
 @Getter
 @Setter
 @ToString
+@EqualsAndHashCode
 public class RawVentRequest {
     private String objectId;
     private String operation; //fixme looks ugly, model in request

@@ -1,6 +1,7 @@
 package com.github.filipmalczak.vent.service.impl;
 
 import com.github.filipmalczak.vent.dto.Operation;
+import com.github.filipmalczak.vent.dto.VentedObject;
 import com.github.filipmalczak.vent.model.Vent;
 import com.github.filipmalczak.vent.model.VentObject;
 import com.github.filipmalczak.vent.repository.Objects;
@@ -9,6 +10,8 @@ import com.github.filipmalczak.vent.service.ObjectExistenceService;
 import com.github.filipmalczak.vent.service.TimestampService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -26,22 +29,20 @@ public class DefaultObjectExistenceService implements ObjectExistenceService {
     private CompactingService compactingService;
 
     @Override
-    public Mono<ObjectId> create(Mono<ObjectId> objectId, Mono<Map> initialValue) {
+    public Mono<ObjectId> create(Mono<Map> initialValue) {
         return initialValue.map(initVal ->
-            new Vent(Operation.CREATE, initVal, timestampService.now())
-        ).flatMap(
-            vent -> objectId.flatMap( id ->
-                    objects.save(
-                        VentObject.builder().
-                            objectId(id).
-                            event(vent).
-                            lastCompacted(vent.getTimestamp()).
-                            build()
-                    )
-            )
-        ).map( o ->
-            o.getObjectId()
-        );
+                new Vent(Operation.CREATE, initVal, timestampService.now())
+            ).
+            map( vent ->
+                VentObject.builder().
+                    event(vent).
+                    lastCompacted(vent.getTimestamp()).
+                    build()
+            ).
+            flatMap(objects::save).
+            map( o ->
+                o.getObjectId()
+            );
     }
 
     @Override

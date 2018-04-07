@@ -6,5 +6,6 @@ import reactor.core.publisher.Mono;
 import java.util.Map;
 
 public interface VentingService {
+    //todo decouple from VentObject - will be needed to GET at <date>
     Mono<Map> applyVents(Mono<VentObject> object);
 }

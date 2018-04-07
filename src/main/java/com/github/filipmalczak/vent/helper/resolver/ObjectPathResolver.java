@@ -7,6 +7,7 @@ import java.util.Map;
 
 @Component
 public class ObjectPathResolver {
+    //todo: add negative indexing, python-like
     public ResolvedPath resolve(Object target, String path){
         Map root = new HashMap();
         String key = "__root_dummy_key";

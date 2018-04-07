@@ -1,7 +1,5 @@
 package com.github.filipmalczak.vent.helper.resolver;
 
-import com.github.filipmalczak.vent.service.impl.SimpleVentingService;
-
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +29,7 @@ public interface ResolvedPath {
         int firstDotIdx = path.indexOf('.');
         String firstPart = firstDotIdx > 0 ? path.substring(0, firstDotIdx) : path;
         Object o = get();
-        if (o instanceof Map)
+        if (!(o instanceof Map))
             throw new UnsupportedOperationException("Paths resolving possible only for maps!");
         ResolvedPath result = resolvePathPart((Map) o, firstPart);
         return firstDotIdx > 0 ? result.resolve(path.substring(firstDotIdx+1)) : result;

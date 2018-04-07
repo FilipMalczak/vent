@@ -13,7 +13,7 @@ import java.util.List;
 @Setter
 @ToString
 @EqualsAndHashCode
-@Document(collection = "history")
+@Document(collection = "history") //todo support for collections - see VentObject
 public class Memory {
     @Id
     private ObjectId _id;

@@ -16,7 +16,7 @@ import java.util.Map;
 @ToString
 @EqualsAndHashCode
 @Builder
-@Document(collection = "ventObjects")
+@Document(collection = "ventObjects")//todo suppport for collections https://stackoverflow.com/questions/12274019/how-to-configure-mongodb-collection-name-for-a-class-in-spring-data
 public class VentObject {
     @Id
     private ObjectId objectId;
