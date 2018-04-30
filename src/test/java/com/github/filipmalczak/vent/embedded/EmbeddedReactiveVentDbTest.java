@@ -87,50 +87,48 @@ class EmbeddedReactiveVentDbTest {
     }
 
     @Test
-    @SneakyThrows
-    public void defaultCreateThenGetMomentLater(){
+    public void defaultCreateThenGetInTheFuture(){
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime now2 = now.plus(Duration.ofSeconds(3));
+        LocalDateTime future = now.plus(Duration.ofSeconds(3));
         temporalService.addResult(now);
 
         StepVerifier.create(
             ventDb.getCollection(TEST_COLLECTION).create().
-                flatMap(ventId -> ventDb.getCollection(TEST_COLLECTION).get(ventId, now2)).
-                log("XXX")
+                flatMap(ventId -> ventDb.getCollection(TEST_COLLECTION).get(ventId, future))
         ).expectNext(
             ObjectSnapshot.builder().
                 state(new HashMap<>()).
                 version(0).
                 lastUpdate(now).
-                queryTime(now2).
+                queryTime(future).
                 build()
-        );
+        ).verifyComplete();
     }
 
 
     @Test
-    public void createExplicitlyEmptyThenGetMomentLater(){
+    public void createExplicitlyEmptyThenGetInTheFuture(){
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime now2 = now.plus(Duration.ofSeconds(3));
+        LocalDateTime future = now.plus(Duration.ofSeconds(3));
         temporalService.addResult(now);
 
         StepVerifier.create(
             ventDb.getCollection(TEST_COLLECTION).create(new HashMap()).
-                flatMap(ventId -> ventDb.getCollection(TEST_COLLECTION).get(ventId, now2))
+                flatMap(ventId -> ventDb.getCollection(TEST_COLLECTION).get(ventId, future))
         ).expectNext(
             ObjectSnapshot.builder().
                 state(new HashMap<>()).
                 version(0).
                 lastUpdate(now).
-                queryTime(now2).
+                queryTime(future).
                 build()
-        );
+        ).verifyComplete();
     }
 
     @Test
-    public void createNonEmptyThenGetMomentLater(){
+    public void createNonEmptyThenGetInTheFuture(){
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime now2 = now.plus(Duration.ofSeconds(3));
+        LocalDateTime future = now.plus(Duration.ofSeconds(3));
         temporalService.addResult(now);
 
         Map data = new HashMap<>();
@@ -139,14 +137,56 @@ class EmbeddedReactiveVentDbTest {
 
         StepVerifier.create(
             ventDb.getCollection(TEST_COLLECTION).create(data).
-                flatMap(ventId -> ventDb.getCollection(TEST_COLLECTION).get(ventId, now2))
+                flatMap(ventId -> ventDb.getCollection(TEST_COLLECTION).get(ventId, future))
         ).expectNext(
             ObjectSnapshot.builder().
                 state(data).
                 version(0).
                 lastUpdate(now).
-                queryTime(now2).
+                queryTime(future).
                 build()
-        );
+        ).verifyComplete();
+    }
+
+
+    @Test
+    public void defaultCreateThenGetInThePast(){
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime past = now.minus(Duration.ofSeconds(3));
+        temporalService.addResult(now);
+
+        StepVerifier.create(
+            ventDb.getCollection(TEST_COLLECTION).create().
+                flatMap(ventId -> ventDb.getCollection(TEST_COLLECTION).get(ventId, past))
+        ).verifyComplete();
+    }
+
+
+    @Test
+    public void createExplicitlyEmptyThenGetInThePast(){
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime past = now.minus(Duration.ofSeconds(3));
+        temporalService.addResult(now);
+
+        StepVerifier.create(
+            ventDb.getCollection(TEST_COLLECTION).create(new HashMap()).
+                flatMap(ventId -> ventDb.getCollection(TEST_COLLECTION).get(ventId, past))
+        ).verifyComplete();
+    }
+
+    @Test
+    public void createNonEmptyThenGetInThePast(){
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime past = now.minus(Duration.ofSeconds(3));
+        temporalService.addResult(now);
+
+        Map data = new HashMap<>();
+        data.put("a", 1);
+        data.put("b", asList("x", "y"));
+
+        StepVerifier.create(
+            ventDb.getCollection(TEST_COLLECTION).create(data).
+                flatMap(ventId -> ventDb.getCollection(TEST_COLLECTION).get(ventId, past))
+        ).verifyComplete();
     }
 }

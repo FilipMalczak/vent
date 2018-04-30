@@ -22,20 +22,16 @@ public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
     public Mono<VentId> create(Map initialState) {
         return pageService.
             createFirstPage(collectionName, initialState).
-            log("CREATED PAGE").
             map(Page::getObjectId).
-            map(VentId::fromMongoId).
-            log("FROM MONGO ID");
+            map(VentId::fromMongoId);
     }
 
     @Override
     public Mono<ObjectSnapshot> get(VentId id, LocalDateTime queryAt) {
         return pageService.
             pageAtTimestamp(collectionName, id, queryAt).
-            log("PAGES").
             flatMap(p ->
                 p.snapshotAt(queryAt)
-            ).
-            log("SNAPSHOT");
+            );
     }
 }
