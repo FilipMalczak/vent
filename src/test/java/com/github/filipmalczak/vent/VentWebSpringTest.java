@@ -16,6 +16,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target(TYPE)
 @SpringJUnitConfig({VentApplication.class, TestConfiguration.class})
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
-public @interface VentSpringTest {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public @interface VentWebSpringTest {
 }

@@ -1,5 +1,7 @@
+
+#deprecated, leftover from first version; seems legit for now though
 vent:
-  compacting:
+  paging:
     full.schedule: 0 0 0/1 ? * * *
     partial:
       schedule: 0 0/15 * ? * * *
@@ -11,3 +13,4 @@ vent:
       vent_crowding: 100
 
 #todo: add weights to operations to control crowding
+#todo: rethink and implement paging
