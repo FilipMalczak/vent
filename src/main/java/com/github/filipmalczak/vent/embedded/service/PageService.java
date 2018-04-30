@@ -1,8 +1,10 @@
 package com.github.filipmalczak.vent.embedded.service;
 
+import com.github.filipmalczak.vent.api.EventConfirmation;
 import com.github.filipmalczak.vent.api.VentId;
 import com.github.filipmalczak.vent.embedded.model.Page;
-import com.github.filipmalczak.vent.embedded.model.events.Create;
+import com.github.filipmalczak.vent.embedded.model.events.Event;
+import com.github.filipmalczak.vent.embedded.model.events.EventFactory;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
@@ -21,19 +23,23 @@ import java.util.Comparator;
 import java.util.Map;
 
 import static java.util.Arrays.asList;
+import static reactor.core.publisher.Mono.just;
 
 @Service
 @Getter @Setter @AllArgsConstructor
 public class PageService {
     @Autowired
-    private @NonNull
-    TemporalService temporalService;
+    private @NonNull TemporalService temporalService;
 
     @Autowired
     private @NonNull ReactiveMongoTemplate mongoTemplate;
 
+    @Autowired
+    private @NonNull EventFactory eventFactory;
+
     public Mono<Page> createFirstPage(@NonNull String collectionName, @NonNull Map initialState){
-        LocalDateTime now = temporalService.now();
+        Event create = eventFactory.create(initialState);
+        LocalDateTime now = create.getOccuredOn();
         Page page = new Page(
             null,
             new ObjectId(temporalService.toDate(now)),
@@ -43,7 +49,7 @@ public class PageService {
             now,
             null,
             null,
-            asList(new Create(initialState, now))
+            asList(create)
         );
         return mongoTemplate.insert(page, collectionName);
     }
@@ -73,10 +79,21 @@ public class PageService {
                         Criteria.where("nextPageFrom").is(null)
                     )
             ).
-            log("PRE_SORT").
             sort(Comparator.comparing(Page::getStartingFrom)).
             next();
     }
 
-//    public Mono<Page> nextPage()
+    public Mono<Page> currentPage(@NonNull String collectionName, @NonNull VentId id){
+        return query(
+            collectionName,
+            Criteria.where("objectId").is(id.toMongoId()).
+                and("nextPageFrom").is(null)
+        ).next();
+    }
+
+    public Mono<EventConfirmation> addEvent(@NonNull String collectionName, @NonNull Page page, @NonNull Event event){
+        EventConfirmation confirmation = page.addEvent(event);
+        return mongoTemplate.save(page, collectionName).then(just(confirmation));
+
+    }
 }

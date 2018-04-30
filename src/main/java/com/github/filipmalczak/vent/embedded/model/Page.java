@@ -1,5 +1,7 @@
 package com.github.filipmalczak.vent.embedded.model;
 
+import com.github.filipmalczak.vent.api.EventConfirmation;
+import com.github.filipmalczak.vent.api.VentId;
 import com.github.filipmalczak.vent.embedded.model.events.Event;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -60,5 +62,10 @@ public class Page {
                     ).
                     build()
             );
+    }
+
+    public EventConfirmation addEvent(Event event){
+        events.add(event);
+        return new EventConfirmation(VentId.fromMongoId(objectId), event.getOccuredOn());
     }
 }

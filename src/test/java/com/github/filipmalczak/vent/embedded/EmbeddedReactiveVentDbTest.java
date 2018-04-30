@@ -14,6 +14,9 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.github.filipmalczak.vent.helper.Struct.list;
+import static com.github.filipmalczak.vent.helper.Struct.map;
+import static com.github.filipmalczak.vent.helper.Struct.pair;
 import static java.util.Arrays.asList;
 
 @VentSpringTest
@@ -37,7 +40,7 @@ class EmbeddedReactiveVentDbTest {
             flatMap(ventId -> ventDb.getCollection(TEST_COLLECTION).get(ventId, now))
         ).expectNext(
             ObjectSnapshot.builder().
-                state(new HashMap<>()).
+                state(map()).
                 version(0).
                 lastUpdate(now).
                 queryTime(now).
@@ -51,11 +54,11 @@ class EmbeddedReactiveVentDbTest {
         temporalService.addResult(now);
 
         StepVerifier.create(
-            ventDb.getCollection(TEST_COLLECTION).create(new HashMap()).
+            ventDb.getCollection(TEST_COLLECTION).create(map()).
                 flatMap(ventId -> ventDb.getCollection(TEST_COLLECTION).get(ventId, now))
         ).expectNext(
             ObjectSnapshot.builder().
-                state(new HashMap<>()).
+                state(map()).
                 version(0).
                 lastUpdate(now).
                 queryTime(now).
@@ -69,7 +72,7 @@ class EmbeddedReactiveVentDbTest {
         LocalDateTime now = LocalDateTime.now();
         temporalService.addResult(now);
 
-        Map data = new HashMap<>();
+        Map data = map();
         data.put("a", 1);
         data.put("b", asList("x", "y"));
 
@@ -97,7 +100,7 @@ class EmbeddedReactiveVentDbTest {
                 flatMap(ventId -> ventDb.getCollection(TEST_COLLECTION).get(ventId, future))
         ).expectNext(
             ObjectSnapshot.builder().
-                state(new HashMap<>()).
+                state(map()).
                 version(0).
                 lastUpdate(now).
                 queryTime(future).
@@ -113,11 +116,11 @@ class EmbeddedReactiveVentDbTest {
         temporalService.addResult(now);
 
         StepVerifier.create(
-            ventDb.getCollection(TEST_COLLECTION).create(new HashMap()).
+            ventDb.getCollection(TEST_COLLECTION).create(map()).
                 flatMap(ventId -> ventDb.getCollection(TEST_COLLECTION).get(ventId, future))
         ).expectNext(
             ObjectSnapshot.builder().
-                state(new HashMap<>()).
+                state(map()).
                 version(0).
                 lastUpdate(now).
                 queryTime(future).
@@ -131,7 +134,7 @@ class EmbeddedReactiveVentDbTest {
         LocalDateTime future = now.plus(Duration.ofSeconds(3));
         temporalService.addResult(now);
 
-        Map data = new HashMap<>();
+        Map data = map();
         data.put("a", 1);
         data.put("b", asList("x", "y"));
 
@@ -169,7 +172,7 @@ class EmbeddedReactiveVentDbTest {
         temporalService.addResult(now);
 
         StepVerifier.create(
-            ventDb.getCollection(TEST_COLLECTION).create(new HashMap()).
+            ventDb.getCollection(TEST_COLLECTION).create(map()).
                 flatMap(ventId -> ventDb.getCollection(TEST_COLLECTION).get(ventId, past))
         ).verifyComplete();
     }
@@ -180,13 +183,85 @@ class EmbeddedReactiveVentDbTest {
         LocalDateTime past = now.minus(Duration.ofSeconds(3));
         temporalService.addResult(now);
 
-        Map data = new HashMap<>();
-        data.put("a", 1);
-        data.put("b", asList("x", "y"));
+        Map data = map(pair("a", 1), pair("x", "y"), pair("b", pair("c", "d")));
 
         StepVerifier.create(
             ventDb.getCollection(TEST_COLLECTION).create(data).
                 flatMap(ventId -> ventDb.getCollection(TEST_COLLECTION).get(ventId, past))
+        ).verifyComplete();
+    }
+
+
+    @Test
+    public void putTopLevelAndGetInTheFuture(){
+        LocalDateTime createNow = LocalDateTime.now();
+        LocalDateTime putNow = LocalDateTime.now();
+        LocalDateTime future = putNow.plus(Duration.ofSeconds(3));
+        temporalService.addResult(createNow, putNow);
+
+        StepVerifier.create(
+            ventDb.getCollection(TEST_COLLECTION).create().
+                flatMap(ventId -> ventDb.getCollection(TEST_COLLECTION).putValue(ventId, "a", 1)).
+                flatMap(eventConfirmation -> ventDb.getCollection(TEST_COLLECTION).get(eventConfirmation.getVentId(), future))
+        ).expectNext(
+            ObjectSnapshot.builder().
+                state(pair("a", 1)).
+                version(1).
+                lastUpdate(putNow).
+                queryTime(future).
+                build()
+        ).verifyComplete();
+    }
+
+    @Test
+    public void putTopLevelAndGetBeforePut(){
+        LocalDateTime createNow = LocalDateTime.now();
+        LocalDateTime putNow = createNow.plus(Duration.ofSeconds(2));
+        LocalDateTime beforePut = putNow.minus(Duration.ofSeconds(1));
+        temporalService.addResult(createNow, putNow);
+
+        StepVerifier.create(
+            ventDb.getCollection(TEST_COLLECTION).create().
+                flatMap(ventId -> ventDb.getCollection(TEST_COLLECTION).putValue(ventId, "a", 1)).
+                flatMap(eventConfirmation -> ventDb.getCollection(TEST_COLLECTION).get(eventConfirmation.getVentId(), beforePut))
+        ).expectNext(
+            ObjectSnapshot.builder().
+                state(map()).
+                version(0).
+                lastUpdate(createNow).
+                queryTime(beforePut).
+                build()
+        ).verifyComplete();
+    }
+
+    @Test
+    public void putTopLevelListAndChangeByIndex(){
+        LocalDateTime createNow = LocalDateTime.now();
+        LocalDateTime putNow = createNow.plus(Duration.ofSeconds(1));
+        LocalDateTime put2Now = putNow.plus(Duration.ofSeconds(1));
+        LocalDateTime queryTime = put2Now.plus(Duration.ofSeconds(1));
+        temporalService.addResult(createNow, putNow, put2Now);
+
+        StepVerifier.create(
+            ventDb.getCollection(TEST_COLLECTION).create().
+                flatMap(ventId->
+                    ventDb.getCollection(TEST_COLLECTION).
+                        putValue(ventId, "a", list(1, 2, 3))
+                ).
+                flatMap(eventConfirmation ->
+                    ventDb.getCollection(TEST_COLLECTION).
+                        putValue(eventConfirmation.getVentId(), "a[1]", 5)
+                ).
+                flatMap(eventConfirmation ->
+                    ventDb.getCollection(TEST_COLLECTION).get(eventConfirmation.getVentId(), queryTime)
+                )
+        ).expectNext(
+            ObjectSnapshot.builder().
+                state(map(pair("a", list(1, 5, 3)))).
+                version(2).
+                lastUpdate(put2Now).
+                queryTime(queryTime).
+                build()
         ).verifyComplete();
     }
 }

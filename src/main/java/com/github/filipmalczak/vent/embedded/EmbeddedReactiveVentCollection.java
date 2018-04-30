@@ -1,9 +1,11 @@
 package com.github.filipmalczak.vent.embedded;
 
+import com.github.filipmalczak.vent.api.EventConfirmation;
 import com.github.filipmalczak.vent.api.VentId;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentCollection;
 import com.github.filipmalczak.vent.embedded.model.ObjectSnapshot;
 import com.github.filipmalczak.vent.embedded.model.Page;
+import com.github.filipmalczak.vent.embedded.model.events.EventFactory;
 import com.github.filipmalczak.vent.embedded.service.PageService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -18,6 +20,8 @@ public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
 
     private @NonNull PageService pageService;
 
+    private @NonNull EventFactory eventFactory;
+
     @Override
     public Mono<VentId> create(Map initialState) {
         return pageService.
@@ -27,11 +31,16 @@ public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
     }
 
     @Override
+    public Mono<EventConfirmation> putValue(VentId id, String path, Object value){
+        return pageService.
+            currentPage(collectionName, id).
+            flatMap(p -> pageService.addEvent(collectionName, p, eventFactory.putValue(path, value)));
+    }
+
+    @Override
     public Mono<ObjectSnapshot> get(VentId id, LocalDateTime queryAt) {
         return pageService.
             pageAtTimestamp(collectionName, id, queryAt).
-            flatMap(p ->
-                p.snapshotAt(queryAt)
-            );
+            flatMap(p ->p.snapshotAt(queryAt));
     }
 }

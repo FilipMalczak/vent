@@ -17,7 +17,7 @@ public class Create implements Event{
     @Override
     public Mono<Map> apply(Mono<Map> map) {
         return map.
-            <Map>flatMap(x -> error(new RuntimeException("Create must happen first!"))).
+            <Map>flatMap(x -> error(new RuntimeException("Create must happen first!"))). //todo
             switchIfEmpty(just(initialState));
     }
 }
