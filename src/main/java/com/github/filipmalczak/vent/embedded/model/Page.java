@@ -65,6 +65,7 @@ public class Page {
     }
 
     public EventConfirmation addEvent(Event event){
+        //todo: add validation, e.g. check on this stage whether PutValue will be succesful; same with DeleteValue
         events.add(event);
         return new EventConfirmation(VentId.fromMongoId(objectId), event.getOccuredOn());
     }

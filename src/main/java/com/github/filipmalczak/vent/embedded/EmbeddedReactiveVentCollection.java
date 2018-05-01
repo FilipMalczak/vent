@@ -5,6 +5,7 @@ import com.github.filipmalczak.vent.api.VentId;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentCollection;
 import com.github.filipmalczak.vent.embedded.model.ObjectSnapshot;
 import com.github.filipmalczak.vent.embedded.model.Page;
+import com.github.filipmalczak.vent.embedded.model.events.Event;
 import com.github.filipmalczak.vent.embedded.model.events.EventFactory;
 import com.github.filipmalczak.vent.embedded.service.PageService;
 import lombok.AllArgsConstructor;
@@ -30,12 +31,22 @@ public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
             map(VentId::fromMongoId);
     }
 
-    @Override
-    public Mono<EventConfirmation> putValue(VentId id, String path, Object value){
+    private Mono<EventConfirmation> addEvent(VentId id, Event event){
         return pageService.
             currentPage(collectionName, id).
-            flatMap(p -> pageService.addEvent(collectionName, p, eventFactory.putValue(path, value)));
+            flatMap(p -> pageService.addEvent(collectionName, p, event));
     }
+
+    @Override
+    public Mono<EventConfirmation> putValue(VentId id, String path, Object value){
+        return addEvent(id, eventFactory.putValue(path, value));
+    }
+
+    @Override
+    public Mono<EventConfirmation> deleteValue(VentId id, String path) {
+        return addEvent(id, eventFactory.deleteValue(path));
+    }
+
 
     @Override
     public Mono<ObjectSnapshot> get(VentId id, LocalDateTime queryAt) {

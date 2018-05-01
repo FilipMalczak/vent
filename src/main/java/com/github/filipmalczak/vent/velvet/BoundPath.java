@@ -7,4 +7,5 @@ public interface BoundPath {
     boolean exists();
     void set(Object value);
     Object get();
+    void delete();
 }

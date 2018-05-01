@@ -34,4 +34,9 @@ public class ByNameSelector extends AbstractSelector<Map>{
     protected Object getImpl(Map target) {
         return target.get(part);
     }
+
+    @Override
+    protected void deleteImpl(Map target) {
+        target.remove(part);
+    }
 }

@@ -19,5 +19,7 @@ public interface ReactiveVentCollection {
 
     Mono<EventConfirmation> putValue(VentId id, String path, Object value);
 
+    Mono<EventConfirmation> deleteValue(VentId id, String path);
+
     Mono<ObjectSnapshot> get(VentId id, LocalDateTime queryAt);
 }

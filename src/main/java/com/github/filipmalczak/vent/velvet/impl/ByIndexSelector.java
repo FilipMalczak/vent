@@ -39,4 +39,9 @@ public class ByIndexSelector extends AbstractSelector<List>{
     protected Object getImpl(List target) {
         return target.get(index);
     }
+
+    @Override
+    protected void deleteImpl(List target) {
+        target.remove(index);
+    }
 }

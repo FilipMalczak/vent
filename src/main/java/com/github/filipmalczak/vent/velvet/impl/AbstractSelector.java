@@ -44,4 +44,12 @@ public abstract class AbstractSelector<Applyable> implements Selector{
     }
 
     protected abstract Object getImpl(Applyable target);
+
+    @Override
+    public void delete(Object target) {
+        onlyApplyableTo(applyableTo(), target);
+        deleteImpl(applyableTo().cast(target));
+    }
+
+    protected abstract void deleteImpl(Applyable target);
 }

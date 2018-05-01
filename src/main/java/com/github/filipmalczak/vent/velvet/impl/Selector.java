@@ -11,6 +11,7 @@ public interface Selector {
     boolean exists(Object target);
     void set(Object target, Object value);
     Object get(Object target);
+    void delete(Object target);
 
     //todo: introduce null check on child
 

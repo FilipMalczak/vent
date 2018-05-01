@@ -18,4 +18,8 @@ public class EventFactory {
     public PutValue putValue(String path, Object value){
         return new PutValue(path, value, temporalService.now());
     }
+
+    public DeleteValue deleteValue(String path){
+        return new DeleteValue(path, temporalService.now());
+    }
 }

@@ -16,6 +16,10 @@ public interface UnboundPath {
         return bind(target).get();
     }
 
+    default void delete(Object target){
+        bind(target).delete();
+    }
+
     Selector getRootSelector();
 
     default BoundPath bind(Object target){
@@ -86,6 +90,38 @@ public interface UnboundPath {
                         currentSelector = currentSelector.getChild();
                     }
                     return currentTarget;
+                } catch (SelectorNotApplyableException e){
+                    throw new UnresolvablePathException(e, getPath(), target);
+                }
+            }
+
+            @Override
+            public void delete(){
+                //fixme raw copypaste from set() - proper refactor is in place
+                //fixme delete for non-existent - what should happen?
+                //todo test delete
+                try {
+                    Selector parentSelector = null;
+                    Selector currentSelector = rootSelector;
+                    Object parentTarget = null;
+                    Object currentTarget = target;
+                    while (currentSelector != null) { // go to the end of the chain
+                        boolean lastOne = false;
+                        if (!currentSelector.exists(currentTarget)) // is allowed not to exist only for last selector
+                            if (currentSelector.getChild() != null) // and only the last one will have no child
+                                throw new UnresolvablePathException(getPath(), target);
+                            else
+                                lastOne = true;
+                        parentTarget = currentTarget;
+                        currentTarget = lastOne ? null : currentSelector.get(currentTarget);
+                        parentSelector = currentSelector;
+                        currentSelector = currentSelector.getChild();
+                    }
+                    //go back a level, currentSelector = null, so we need parents
+                    //at this point currentTarget is the value that will be replaced (possibly null)
+                    currentSelector = parentSelector;
+                    currentTarget = parentTarget;
+                    currentSelector.delete(currentTarget);
                 } catch (SelectorNotApplyableException e){
                     throw new UnresolvablePathException(e, getPath(), target);
                 }
