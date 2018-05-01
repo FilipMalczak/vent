@@ -3,7 +3,7 @@ package com.github.filipmalczak.vent.velvet.impl;
 
 import java.util.List;
 
-public class ByIndexSelector extends AbstractSelector{
+public class ByIndexSelector extends AbstractSelector<List>{
     private int index;
 
     public ByIndexSelector(Selector parent, Selector child, int index) {
@@ -12,20 +12,27 @@ public class ByIndexSelector extends AbstractSelector{
     }
 
     @Override
-    public boolean exists(Object target) {
-        onlyApplyableTo(List.class, target);
-        return ((List)target).size() > index;
+    public String getUnparsedSelector() {
+        return "["+index+"]";
     }
 
     @Override
-    public void set(Object target, Object value) {
-        onlyApplyableTo(List.class, target);
-        ((List)target).set(index, value);
+    protected Class<List> applyableTo() {
+        return List.class;
     }
 
     @Override
-    public Object get(Object target) {
-        onlyApplyableTo(List.class, target);
-        return ((List)target).get(index);
+    protected boolean existsImpl(List target) {
+        return target.size() > index;
+    }
+
+    @Override
+    protected void setImpl(List target, Object value) {
+        target.set(index, value);
+    }
+
+    @Override
+    protected Object getImpl(List target) {
+        return target.get(index);
     }
 }

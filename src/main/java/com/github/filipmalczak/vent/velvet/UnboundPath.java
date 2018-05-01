@@ -1,6 +1,7 @@
 package com.github.filipmalczak.vent.velvet;
 
 import com.github.filipmalczak.vent.velvet.impl.Selector;
+import com.github.filipmalczak.vent.velvet.impl.SelectorNotApplyableException;
 
 public interface UnboundPath {
     String getPath();
@@ -46,40 +47,48 @@ public interface UnboundPath {
 
             @Override
             public void set(Object value) {
-                Selector parentSelector = null;
-                Selector currentSelector = rootSelector;
-                Object parentTarget = null;
-                Object currentTarget = target;
-                while (currentSelector != null){ // go to the end of the chain
-                    boolean lastOne = false;
-                    if (!currentSelector.exists(currentTarget)) // is allowed not to exist only for last selector
-                        if (currentSelector.getChild() != null) // and only the last one will have no child
-                            throw new RuntimeException("");//todo
-                        else
-                            lastOne = true;
-                    parentTarget = currentTarget;
-                    currentTarget = lastOne ? null : currentSelector.get(currentTarget);
-                    parentSelector = currentSelector;
-                    currentSelector = currentSelector.getChild();
+                try {
+                    Selector parentSelector = null;
+                    Selector currentSelector = rootSelector;
+                    Object parentTarget = null;
+                    Object currentTarget = target;
+                    while (currentSelector != null) { // go to the end of the chain
+                        boolean lastOne = false;
+                        if (!currentSelector.exists(currentTarget)) // is allowed not to exist only for last selector
+                            if (currentSelector.getChild() != null) // and only the last one will have no child
+                                throw new UnresolvablePathException(getPath(), target);
+                            else
+                                lastOne = true;
+                        parentTarget = currentTarget;
+                        currentTarget = lastOne ? null : currentSelector.get(currentTarget);
+                        parentSelector = currentSelector;
+                        currentSelector = currentSelector.getChild();
+                    }
+                    //go back a level, currentSelector = null, so we need parents
+                    //at this point currentTarget is the value that will be replaced (possibly null)
+                    currentSelector = parentSelector;
+                    currentTarget = parentTarget;
+                    currentSelector.set(currentTarget, value);
+                } catch (SelectorNotApplyableException e){
+                    throw new UnresolvablePathException(e, getPath(), target);
                 }
-                //go back a level, currentSelector = null, so we need parents
-                //at this point currentTarget is the value that will be replaced (possibly null)
-                currentSelector = parentSelector;
-                currentTarget = parentTarget;
-                currentSelector.set(currentTarget, value);
             }
 
             @Override
             public Object get() {
-                Selector currentSelector = rootSelector;
-                Object currentTarget = target;
-                while (currentSelector != null){
-                    if (!currentSelector.exists(currentTarget))
-                        throw new RuntimeException("");//todo
-                    currentTarget = currentSelector.get(currentTarget);
-                    currentSelector = currentSelector.getChild();
+                try {
+                    Selector currentSelector = rootSelector;
+                    Object currentTarget = target;
+                    while (currentSelector != null) {
+                        if (!currentSelector.exists(currentTarget))
+                            throw new UnresolvablePathException(getPath(), target);
+                        currentTarget = currentSelector.get(currentTarget);
+                        currentSelector = currentSelector.getChild();
+                    }
+                    return currentTarget;
+                } catch (SelectorNotApplyableException e){
+                    throw new UnresolvablePathException(e, getPath(), target);
                 }
-                return currentTarget;
             }
         };
     }

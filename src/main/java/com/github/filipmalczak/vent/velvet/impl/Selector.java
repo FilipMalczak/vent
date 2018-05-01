@@ -2,8 +2,11 @@ package com.github.filipmalczak.vent.velvet.impl;
 
 public interface Selector {
     Selector getParent();
+    //todo: if we keep all selectors in a SelectorList instead of keeping double linked list, we'll be able to do mkdir, mkdirs, etc
     Selector getChild();
     void setChild(Selector child);
+
+    String getUnparsedSelector();
 
     boolean exists(Object target);
     void set(Object target, Object value);
