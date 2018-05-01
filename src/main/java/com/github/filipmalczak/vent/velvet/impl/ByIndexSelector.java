@@ -1,6 +1,8 @@
 package com.github.filipmalczak.vent.velvet.impl;
 
 
+import com.github.filipmalczak.vent.velvet.UnresolvablePathException;
+
 import java.util.List;
 
 public class ByIndexSelector extends AbstractSelector<List>{
@@ -28,6 +30,8 @@ public class ByIndexSelector extends AbstractSelector<List>{
 
     @Override
     protected void setImpl(List target, Object value) {
+        if (!existsImpl(target))
+            throw new SelectorNotApplyableException(getUnparsedSelector(), target);
         target.set(index, value);
     }
 
