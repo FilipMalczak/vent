@@ -22,4 +22,12 @@ public class EventFactory {
     public DeleteValue deleteValue(String path){
         return new DeleteValue(path, temporalService.now());
     }
+
+    public Update update(Map newValue){
+        return new Update(newValue, temporalService.now());
+    }
+
+    //todo: merge: update, but does not remove non-overriding fields in argument; doable with batch PUT too; which is better?
+    //todo delete: should "close" a page, for fast access of the past and faster access to "not found anymore"
+    //todo: transaction: something like batch, but with links to same kind of event in other objects (possibly cross-collection)
 }

@@ -54,4 +54,10 @@ public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
             pageAtTimestamp(collectionName, id, queryAt).
             flatMap(p ->p.snapshotAt(queryAt));
     }
+
+    @Override
+    public Mono<EventConfirmation> update(VentId id, Map newState) {
+        //todo right after adding UPDATE event, new snapshot should be created (with state from right after event)
+        return addEvent(id, eventFactory.update(newState));
+    }
 }

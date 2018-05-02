@@ -1,6 +1,7 @@
 package com.github.filipmalczak.vent.embedded.model.events;
 
 import com.github.filipmalczak.vent.velvet.Velvet;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import reactor.core.publisher.Mono;
@@ -8,7 +9,7 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
 public class PutValue implements Event{
     private String path;
     private Object value;

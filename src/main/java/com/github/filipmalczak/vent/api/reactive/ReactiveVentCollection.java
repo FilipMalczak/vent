@@ -22,4 +22,6 @@ public interface ReactiveVentCollection {
     Mono<EventConfirmation> deleteValue(VentId id, String path);
 
     Mono<ObjectSnapshot> get(VentId id, LocalDateTime queryAt);
+
+    Mono<EventConfirmation> update(VentId id, Map newState);
 }

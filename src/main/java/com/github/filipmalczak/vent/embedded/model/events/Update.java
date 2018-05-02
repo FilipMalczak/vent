@@ -8,17 +8,15 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.just;
 
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
-public class Create implements Event{
-    private Map initialState;
+public class Update implements Event {
+    private Map newValue;
     @Getter private LocalDateTime occuredOn;
+
     @Override
-    public Mono<Map> apply(Mono<Map> map) {
-        return map.
-            <Map>flatMap(x -> error(new RuntimeException("Create must happen first!"))). //todo
-            switchIfEmpty(just(initialState));
+    public Mono<Map> apply(Mono<Map> mapMono) {
+        return mapMono.then(just(newValue));
     }
 }
