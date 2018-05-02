@@ -1,25 +1,21 @@
 package com.github.filipmalczak.vent.embedded.model.events;
 
+import com.github.filipmalczak.vent.embedded.model.events.helper.InPlaceEvent;
 import com.github.filipmalczak.vent.velvet.Velvet;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
-public class DeleteValue implements Event {
-    private String path;
-    @Getter
-    private LocalDateTime occuredOn;
+public class DeleteValue extends InPlaceEvent {
+    private final String path;
+
+    DeleteValue(String path, LocalDateTime occuredOn) {
+        super(occuredOn);
+        this.path = path;
+    }
 
     @Override
-    public Mono<Map> apply(Mono<Map> mapMono) {
-        return mapMono.map(m -> {
-            Velvet.parse(path).bind(m).delete();
-            return m;
-        });
+    protected void modify(Map map) {
+        Velvet.parse(path).bind(map).delete();
     }
 }

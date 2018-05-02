@@ -1,8 +1,6 @@
 package com.github.filipmalczak.vent.velvet.impl;
 
 
-import com.github.filipmalczak.vent.velvet.UnresolvablePathException;
-
 import java.util.List;
 
 public class ByIndexSelector extends AbstractSelector<List>{

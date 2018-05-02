@@ -3,23 +3,17 @@ package com.github.filipmalczak.vent.embedded.model;
 import com.github.filipmalczak.vent.api.EventConfirmation;
 import com.github.filipmalczak.vent.api.VentId;
 import com.github.filipmalczak.vent.embedded.model.events.Event;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NonNull;
+import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static java.util.function.Function.identity;
-import static reactor.core.publisher.Mono.empty;
-import static reactor.core.publisher.Mono.justOrEmpty;
+import static java.util.stream.Collectors.toList;
 
 @Document
 @Data
@@ -36,37 +30,41 @@ public class Page {
     private Map initialState;
     private List<Event> events;
 
-    public Mono<ObjectSnapshot> snapshotAt(@NonNull LocalDateTime localDateTime){
-        if (localDateTime.isBefore(startingFrom))
-            return empty();
-        if (nextPageFrom != null && localDateTime.isAfter(nextPageFrom))
-            return empty();
-        List<Event> qualifyingEvents = events.stream().
-            filter(event ->
-                event.getOccuredOn().isBefore(localDateTime) || event.getOccuredOn().isEqual(localDateTime)
-            ).collect(Collectors.toList());
-        Function<Mono<Map>, Mono<Map>> reducedEvents = qualifyingEvents.stream().
-            map(x -> (Function<Mono<Map>, Mono<Map>>) x).
-            reduce(Function::andThen).
-            orElse(identity());
-        return reducedEvents.apply(justOrEmpty(initialState)).
-            map(m ->
-                ObjectSnapshot.builder().
-                    state(m).
-                    version(fromVersion+qualifyingEvents.size()).
-                    queryTime(localDateTime).
-                    lastUpdate(
-                        qualifyingEvents.isEmpty() ?
-                            startingFrom :
-                            qualifyingEvents.get(qualifyingEvents.size()-1).getOccuredOn()
-                    ).
-                    build()
-            );
+    /**
+     * Returns stream of events in chronological order, ending with last event that happens before argument or exactly
+     * at that moment, or empty stream if queried timestamp is outside of this page.
+     */
+    //todo: should this be public?
+    public Stream<Event> getEventsForSnapshotAt(@NonNull LocalDateTime snapshotAt){
+        if (snapshotAt.isBefore(startingFrom))
+            return Stream.empty();
+        if (nextPageFrom != null && snapshotAt.isAfter(nextPageFrom))
+            return Stream.empty();
+        return events.stream().filter(event ->
+            event.getOccuredOn().isBefore(snapshotAt) || event.getOccuredOn().isEqual(snapshotAt)
+        );
+    }
+
+    public SnapshotInstructions getInstructionsForSnapshotAt(@NonNull LocalDateTime snapshotAt){
+        //todo deep copy of initialState
+        //if persistence would cache retrieved pages and we'd pass initialState for rendering, its object tree
+        //would probably change, so cached page would have different state than persisted one
+        return new SnapshotInstructions(initialState, getEventsForSnapshotAt(snapshotAt).collect(toList()));
     }
 
     public EventConfirmation addEvent(Event event){
         //todo: add validation, e.g. check on this stage whether PutValue will be succesful; same with DeleteValue
         events.add(event);
         return new EventConfirmation(VentId.fromMongoId(objectId), event.getOccuredOn());
+    }
+
+    /**
+     * Simple one-shot DTO for transferring needed data between Page and SnapshotRenderer.
+     */
+    @Value
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class SnapshotInstructions {
+        private final Map initialSnapshot;
+        private final List<Event> events;
     }
 }

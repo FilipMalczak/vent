@@ -3,7 +3,6 @@ package com.github.filipmalczak.vent.embedded;
 import com.github.filipmalczak.vent.VentSpringTest;
 import com.github.filipmalczak.vent.embedded.model.ObjectSnapshot;
 import com.github.filipmalczak.vent.embedded.service.TestingTemporalService;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,12 +10,9 @@ import reactor.test.StepVerifier;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
 
-import static com.github.filipmalczak.vent.helper.Struct.list;
-import static com.github.filipmalczak.vent.helper.Struct.map;
-import static com.github.filipmalczak.vent.helper.Struct.pair;
+import static com.github.filipmalczak.vent.helper.Struct.*;
 import static java.util.Arrays.asList;
 
 @VentSpringTest

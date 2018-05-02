@@ -8,6 +8,7 @@ import com.github.filipmalczak.vent.embedded.model.Page;
 import com.github.filipmalczak.vent.embedded.model.events.Event;
 import com.github.filipmalczak.vent.embedded.model.events.EventFactory;
 import com.github.filipmalczak.vent.embedded.service.PageService;
+import com.github.filipmalczak.vent.embedded.service.SnapshotService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import reactor.core.publisher.Mono;
@@ -23,18 +24,14 @@ public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
 
     private @NonNull EventFactory eventFactory;
 
+    private @NonNull SnapshotService snapshotService;
+
     @Override
     public Mono<VentId> create(Map initialState) {
         return pageService.
             createFirstPage(collectionName, initialState).
             map(Page::getObjectId).
             map(VentId::fromMongoId);
-    }
-
-    private Mono<EventConfirmation> addEvent(VentId id, Event event){
-        return pageService.
-            currentPage(collectionName, id).
-            flatMap(p -> pageService.addEvent(collectionName, p, event));
     }
 
     @Override
@@ -50,14 +47,18 @@ public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
 
     @Override
     public Mono<ObjectSnapshot> get(VentId id, LocalDateTime queryAt) {
-        return pageService.
-            pageAtTimestamp(collectionName, id, queryAt).
-            flatMap(p ->p.snapshotAt(queryAt));
+        return snapshotService.getSnapshot(collectionName, id, queryAt);
     }
 
     @Override
     public Mono<EventConfirmation> update(VentId id, Map newState) {
-        //todo right after adding UPDATE event, new snapshot should be created (with state from right after event)
+        //todo right after adding UPDATE event, new page should be created (with snapshot from right after UPDATE)
         return addEvent(id, eventFactory.update(newState));
+    }
+
+    private Mono<EventConfirmation> addEvent(VentId id, Event event){
+        return pageService.
+            currentPage(collectionName, id).
+            flatMap(p -> pageService.addEvent(collectionName, p, event));
     }
 }

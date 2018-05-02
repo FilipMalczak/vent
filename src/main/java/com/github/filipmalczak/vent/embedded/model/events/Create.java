@@ -1,24 +1,22 @@
 package com.github.filipmalczak.vent.embedded.model.events;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import reactor.core.publisher.Mono;
+import com.github.filipmalczak.vent.embedded.model.events.helper.TimestampedEvent;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 
-import static reactor.core.publisher.Mono.error;
-import static reactor.core.publisher.Mono.just;
-
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
-public class Create implements Event{
+public class Create extends TimestampedEvent{
     private Map initialState;
-    @Getter private LocalDateTime occuredOn;
+
+    Create(Map initialState, LocalDateTime occuredOn) {
+        super(occuredOn);
+        this.initialState = initialState;
+    }
+
     @Override
-    public Mono<Map> apply(Mono<Map> map) {
-        return map.
-            <Map>flatMap(x -> error(new RuntimeException("Create must happen first!"))). //todo
-            switchIfEmpty(just(initialState));
+    public Map apply(Map map) {
+        if (map != null)
+            throw new RuntimeException("Create must happen first!"); //todo
+        return initialState;
     }
 }

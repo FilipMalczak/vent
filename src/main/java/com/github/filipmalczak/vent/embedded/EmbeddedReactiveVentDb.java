@@ -4,6 +4,7 @@ import com.github.filipmalczak.vent.api.reactive.ReactiveVentCollection;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentDb;
 import com.github.filipmalczak.vent.embedded.model.events.EventFactory;
 import com.github.filipmalczak.vent.embedded.service.PageService;
+import com.github.filipmalczak.vent.embedded.service.SnapshotService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +17,10 @@ public class EmbeddedReactiveVentDb implements ReactiveVentDb {
 
     private @NonNull EventFactory eventFactory;
 
+    private @NonNull SnapshotService snapshotService;
+
     @Override
     public ReactiveVentCollection getCollection(String collectionName) {
-        return new EmbeddedReactiveVentCollection(collectionName, pageService, eventFactory);
+        return new EmbeddedReactiveVentCollection(collectionName, pageService, eventFactory, snapshotService);
     }
 }

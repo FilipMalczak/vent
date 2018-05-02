@@ -1,22 +1,20 @@
 package com.github.filipmalczak.vent.embedded.model.events;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import reactor.core.publisher.Mono;
+import com.github.filipmalczak.vent.embedded.model.events.helper.TimestampedEvent;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 
-import static reactor.core.publisher.Mono.just;
-
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
-public class Update implements Event {
+public class Update extends TimestampedEvent {
     private Map newValue;
-    @Getter private LocalDateTime occuredOn;
+
+    Update(Map newValue, LocalDateTime occuredOn) {
+        super(occuredOn);
+        this.newValue = newValue;
+    }
 
     @Override
-    public Mono<Map> apply(Mono<Map> mapMono) {
-        return mapMono.then(just(newValue));
+    public Map apply(Map map) {
+        return newValue;
     }
 }

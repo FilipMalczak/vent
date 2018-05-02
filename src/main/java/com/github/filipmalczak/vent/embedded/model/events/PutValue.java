@@ -1,27 +1,23 @@
 package com.github.filipmalczak.vent.embedded.model.events;
 
+import com.github.filipmalczak.vent.embedded.model.events.helper.InPlaceEvent;
 import com.github.filipmalczak.vent.velvet.Velvet;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
-public class PutValue implements Event{
-    private String path;
-    private Object value;
-    @Getter private LocalDateTime occuredOn;
+public class PutValue extends InPlaceEvent {
+    private final String path;
+    private final Object value;
 
-    @Override
-    public Mono<Map> apply(Mono<Map> mapMono) {
-        return mapMono.map(m -> {
-            Velvet.parse(path).bind(m).set(value);
-            return m;
-        });
+    PutValue(String path, Object value, LocalDateTime occuredOn) {
+        super(occuredOn);
+        this.path = path;
+        this.value = value;
     }
 
-
+    @Override
+    protected void modify(Map map) {
+        Velvet.parse(path).bind(map).set(value);
+    }
 }
