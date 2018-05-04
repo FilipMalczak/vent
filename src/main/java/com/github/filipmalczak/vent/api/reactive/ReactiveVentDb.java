@@ -1,10 +1,10 @@
 package com.github.filipmalczak.vent.api.reactive;
 
 import com.github.filipmalczak.vent.api.EventConfirmation;
+import com.github.filipmalczak.vent.api.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.VentId;
 import com.github.filipmalczak.vent.api.blocking.BlockingVentCollection;
 import com.github.filipmalczak.vent.api.blocking.BlockingVentDb;
-import com.github.filipmalczak.vent.embedded.model.ObjectSnapshot;
 
 import java.time.LocalDateTime;
 import java.util.Map;

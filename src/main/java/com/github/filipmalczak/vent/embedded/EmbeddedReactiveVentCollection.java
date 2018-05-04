@@ -1,9 +1,9 @@
 package com.github.filipmalczak.vent.embedded;
 
 import com.github.filipmalczak.vent.api.EventConfirmation;
+import com.github.filipmalczak.vent.api.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.VentId;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentCollection;
-import com.github.filipmalczak.vent.embedded.model.ObjectSnapshot;
 import com.github.filipmalczak.vent.embedded.model.Page;
 import com.github.filipmalczak.vent.embedded.model.events.Event;
 import com.github.filipmalczak.vent.embedded.model.events.EventFactory;

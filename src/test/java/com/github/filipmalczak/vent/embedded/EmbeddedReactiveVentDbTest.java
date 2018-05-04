@@ -1,8 +1,10 @@
 package com.github.filipmalczak.vent.embedded;
 
 import com.github.filipmalczak.vent.VentSpringTest;
-import com.github.filipmalczak.vent.embedded.model.ObjectSnapshot;
+import com.github.filipmalczak.vent.api.ObjectSnapshot;
+import com.github.filipmalczak.vent.api.VentId;
 import com.github.filipmalczak.vent.embedded.service.TestingTemporalService;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import java.util.Map;
 
 import static com.github.filipmalczak.vent.helper.Struct.*;
 import static java.util.Arrays.asList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @VentSpringTest
 @Slf4j
@@ -26,21 +29,37 @@ class EmbeddedReactiveVentDbTest {
 
     private static final String TEST_COLLECTION = "test_collection";
 
+    //sorta ugly, but it gets the work done, so why not?
+    private static class Holder<T> {
+        @Getter private T value;
+
+        public T hold(T val){
+            value = val;
+            return val;
+        }
+    }
+
     @Test
     public void defaultCreateThenGetAtCreationTime(){
         LocalDateTime now = LocalDateTime.now();
         temporalService.addResult(now);
 
+        Holder<VentId> holder = new Holder<>();
         StepVerifier.create(
-        ventDb.getCollection(TEST_COLLECTION).create().
-            flatMap(ventId -> ventDb.getCollection(TEST_COLLECTION).get(ventId, now))
-        ).expectNext(
-            ObjectSnapshot.builder().
-                state(map()).
-                version(0).
-                lastUpdate(now).
-                queryTime(now).
-                build()
+            ventDb.getCollection(TEST_COLLECTION).create().
+                map(holder::hold).
+                flatMap(ventId -> ventDb.getCollection(TEST_COLLECTION).get(ventId, now))
+        ).assertNext( o ->
+            assertEquals(
+                ObjectSnapshot.builder().
+                    ventId(holder.getValue()).
+                    state(map()).
+                    version(0).
+                    lastUpdate(now).
+                    queryTime(now).
+                    build(),
+                o
+            )
         ).verifyComplete();
     }
 
@@ -49,16 +68,22 @@ class EmbeddedReactiveVentDbTest {
         LocalDateTime now = LocalDateTime.now();
         temporalService.addResult(now);
 
+        Holder<VentId> holder = new Holder<>();
         StepVerifier.create(
             ventDb.getCollection(TEST_COLLECTION).create(map()).
+                map(holder::hold).
                 flatMap(ventId -> ventDb.getCollection(TEST_COLLECTION).get(ventId, now))
-        ).expectNext(
-            ObjectSnapshot.builder().
-                state(map()).
-                version(0).
-                lastUpdate(now).
-                queryTime(now).
-                build()
+        ).assertNext( o ->
+            assertEquals(
+                ObjectSnapshot.builder().
+                    ventId(holder.getValue()).
+                    state(map()).
+                    version(0).
+                    lastUpdate(now).
+                    queryTime(now).
+                    build(),
+                o
+            )
         ).verifyComplete();
     }
 
@@ -72,16 +97,22 @@ class EmbeddedReactiveVentDbTest {
         data.put("a", 1);
         data.put("b", asList("x", "y"));
 
+        Holder<VentId> holder = new Holder<>();
         StepVerifier.create(
             ventDb.getCollection(TEST_COLLECTION).create(data).
+                map(holder::hold).
                 flatMap(ventId -> ventDb.getCollection(TEST_COLLECTION).get(ventId, now))
-        ).expectNext(
-            ObjectSnapshot.builder().
-                state(data).
-                version(0).
-                lastUpdate(now).
-                queryTime(now).
-                build()
+        ).assertNext( o ->
+            assertEquals(
+                ObjectSnapshot.builder().
+                    ventId(holder.getValue()).
+                    state(data).
+                    version(0).
+                    lastUpdate(now).
+                    queryTime(now).
+                    build(),
+                o
+            )
         ).verifyComplete();
     }
 
@@ -91,16 +122,22 @@ class EmbeddedReactiveVentDbTest {
         LocalDateTime future = now.plus(Duration.ofSeconds(3));
         temporalService.addResult(now);
 
+        Holder<VentId> holder = new Holder<>();
         StepVerifier.create(
             ventDb.getCollection(TEST_COLLECTION).create().
+                map(holder::hold).
                 flatMap(ventId -> ventDb.getCollection(TEST_COLLECTION).get(ventId, future))
-        ).expectNext(
-            ObjectSnapshot.builder().
-                state(map()).
-                version(0).
-                lastUpdate(now).
-                queryTime(future).
-                build()
+        ).assertNext( o ->
+            assertEquals(
+                ObjectSnapshot.builder().
+                    ventId(holder.getValue()).
+                    state(map()).
+                    version(0).
+                    lastUpdate(now).
+                    queryTime(future).
+                    build(),
+                o
+            )
         ).verifyComplete();
     }
 
@@ -111,16 +148,22 @@ class EmbeddedReactiveVentDbTest {
         LocalDateTime future = now.plus(Duration.ofSeconds(3));
         temporalService.addResult(now);
 
+        Holder<VentId> holder = new Holder<>();
         StepVerifier.create(
             ventDb.getCollection(TEST_COLLECTION).create(map()).
+                map(holder::hold).
                 flatMap(ventId -> ventDb.getCollection(TEST_COLLECTION).get(ventId, future))
-        ).expectNext(
-            ObjectSnapshot.builder().
-                state(map()).
-                version(0).
-                lastUpdate(now).
-                queryTime(future).
-                build()
+        ).assertNext( o ->
+            assertEquals(
+                ObjectSnapshot.builder().
+                    ventId(holder.getValue()).
+                    state(map()).
+                    version(0).
+                    lastUpdate(now).
+                    queryTime(future).
+                    build(),
+                o
+            )
         ).verifyComplete();
     }
 
@@ -134,16 +177,22 @@ class EmbeddedReactiveVentDbTest {
         data.put("a", 1);
         data.put("b", asList("x", "y"));
 
+        Holder<VentId> holder = new Holder<>();
         StepVerifier.create(
             ventDb.getCollection(TEST_COLLECTION).create(data).
+                map(holder::hold).
                 flatMap(ventId -> ventDb.getCollection(TEST_COLLECTION).get(ventId, future))
-        ).expectNext(
-            ObjectSnapshot.builder().
-                state(data).
-                version(0).
-                lastUpdate(now).
-                queryTime(future).
-                build()
+        ).assertNext( o ->
+            assertEquals(
+                ObjectSnapshot.builder().
+                    ventId(holder.getValue()).
+                    state(data).
+                    version(0).
+                    lastUpdate(now).
+                    queryTime(future).
+                    build(),
+                o
+            )
         ).verifyComplete();
     }
 
@@ -195,17 +244,23 @@ class EmbeddedReactiveVentDbTest {
         LocalDateTime future = putNow.plus(Duration.ofSeconds(3));
         temporalService.addResult(createNow, putNow);
 
+        Holder<VentId> holder = new Holder<>();
         StepVerifier.create(
             ventDb.getCollection(TEST_COLLECTION).create().
+                map(holder::hold).
                 flatMap(ventId -> ventDb.getCollection(TEST_COLLECTION).putValue(ventId, "a", 1)).
                 flatMap(eventConfirmation -> ventDb.getCollection(TEST_COLLECTION).get(eventConfirmation.getVentId(), future))
-        ).expectNext(
-            ObjectSnapshot.builder().
-                state(pair("a", 1)).
-                version(1).
-                lastUpdate(putNow).
-                queryTime(future).
-                build()
+        ).assertNext( o ->
+            assertEquals(
+                ObjectSnapshot.builder().
+                    ventId(holder.getValue()).
+                    state(pair("a", 1)).
+                    version(1).
+                    lastUpdate(putNow).
+                    queryTime(future).
+                    build(),
+                o
+            )
         ).verifyComplete();
     }
 
@@ -216,17 +271,23 @@ class EmbeddedReactiveVentDbTest {
         LocalDateTime beforePut = putNow.minus(Duration.ofSeconds(1));
         temporalService.addResult(createNow, putNow);
 
+        Holder<VentId> holder = new Holder<>();
         StepVerifier.create(
             ventDb.getCollection(TEST_COLLECTION).create().
+                map(holder::hold).
                 flatMap(ventId -> ventDb.getCollection(TEST_COLLECTION).putValue(ventId, "a", 1)).
                 flatMap(eventConfirmation -> ventDb.getCollection(TEST_COLLECTION).get(eventConfirmation.getVentId(), beforePut))
-        ).expectNext(
-            ObjectSnapshot.builder().
-                state(map()).
-                version(0).
-                lastUpdate(createNow).
-                queryTime(beforePut).
-                build()
+        ).assertNext( o ->
+            assertEquals(
+                ObjectSnapshot.builder().
+                    ventId(holder.getValue()).
+                    state(map()).
+                    version(0).
+                    lastUpdate(createNow).
+                    queryTime(beforePut).
+                    build(),
+                o
+            )
         ).verifyComplete();
     }
 
@@ -238,8 +299,10 @@ class EmbeddedReactiveVentDbTest {
         LocalDateTime queryTime = put2Now.plus(Duration.ofSeconds(1));
         temporalService.addResult(createNow, putNow, put2Now);
 
+        Holder<VentId> holder = new Holder<>();
         StepVerifier.create(
             ventDb.getCollection(TEST_COLLECTION).create().
+                map(holder::hold).
                 flatMap(ventId->
                     ventDb.getCollection(TEST_COLLECTION).
                         putValue(ventId, "a", list(1, 2, 3))
@@ -251,13 +314,17 @@ class EmbeddedReactiveVentDbTest {
                 flatMap(eventConfirmation ->
                     ventDb.getCollection(TEST_COLLECTION).get(eventConfirmation.getVentId(), queryTime)
                 )
-        ).expectNext(
-            ObjectSnapshot.builder().
-                state(map(pair("a", list(1, 5, 3)))).
-                version(2).
-                lastUpdate(put2Now).
-                queryTime(queryTime).
-                build()
+        ).assertNext( o ->
+            assertEquals(
+                ObjectSnapshot.builder().
+                    ventId(holder.getValue()).
+                    state(map(pair("a", list(1, 5, 3)))).
+                    version(2).
+                    lastUpdate(put2Now).
+                    queryTime(queryTime).
+                    build(),
+                o
+            )
         ).verifyComplete();
     }
 }

@@ -1,7 +1,7 @@
 package com.github.filipmalczak.vent.embedded.service;
 
+import com.github.filipmalczak.vent.api.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.VentId;
-import com.github.filipmalczak.vent.embedded.model.ObjectSnapshot;
 import com.github.filipmalczak.vent.embedded.model.Page;
 import com.github.filipmalczak.vent.embedded.model.events.Event;
 import lombok.NonNull;
@@ -33,6 +33,7 @@ public class SnapshotService {
             pageAtTimestamp(collectionName, ventId, queryAt).
             map(p ->
                 render(
+                    ventId,
                     p.getFromVersion(),
                     p.getStartingFrom(),
                     p.getInstructionsForSnapshotAt(queryAt),
@@ -41,10 +42,11 @@ public class SnapshotService {
             );
     }
 
-    private ObjectSnapshot render(long pageFromVersion, LocalDateTime pageFrom, Page.SnapshotInstructions instructions, LocalDateTime queryAt){
+    private ObjectSnapshot render(VentId ventId, long pageFromVersion, LocalDateTime pageFrom, Page.SnapshotInstructions instructions, LocalDateTime queryAt){
         Map object = snapshotRenderer.render(instructions);
         List<Event> events = instructions.getEvents();
         return ObjectSnapshot.builder().
+            ventId(ventId).
             state(object).
             version(pageFromVersion + events.size()).
             queryTime(queryAt).
