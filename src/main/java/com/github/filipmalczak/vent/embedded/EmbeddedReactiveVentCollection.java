@@ -53,6 +53,7 @@ public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
     @Override
     public Mono<EventConfirmation> update(VentId id, Map newState) {
         //todo right after adding UPDATE event, new page should be created (with snapshot from right after UPDATE)
+        //this will impact criteria for Equals, see com.github.filipmalczak.vent.api.query.operator.EqualsOperator
         return addEvent(id, eventFactory.update(newState));
     }
 

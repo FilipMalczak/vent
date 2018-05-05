@@ -12,6 +12,7 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class SnapshotService {
@@ -31,15 +32,20 @@ public class SnapshotService {
     public Mono<ObjectSnapshot> getSnapshot(@NonNull String collectionName, @NonNull VentId ventId, @NonNull LocalDateTime queryAt){
         return pageService.
             pageAtTimestamp(collectionName, ventId, queryAt).
-            map(p ->
-                render(
-                    ventId,
-                    p.getFromVersion(),
-                    p.getStartingFrom(),
-                    p.getInstructionsForSnapshotAt(queryAt),
-                    queryAt
-                )
-            );
+            map(p -> render(p, queryAt));
+    }
+
+    public ObjectSnapshot render(Page page, LocalDateTime queryAt){
+        return render(
+            VentId.fromMongoId(page.getObjectId()),
+            page.getFromVersion(),
+            page.getStartingFrom(),
+            //todo
+            page.
+                getInstructionsForSnapshotAt(queryAt).
+                orElseThrow(() -> new RuntimeException("This page in not renderable at that timestamp!")),
+            queryAt
+        );
     }
 
     private ObjectSnapshot render(VentId ventId, long pageFromVersion, LocalDateTime pageFrom, Page.SnapshotInstructions instructions, LocalDateTime queryAt){

@@ -11,6 +11,10 @@ This is very early stage of development. No need for a proper README.
 Long story short - this will be an event sourcing wrapper over MongoDB that will allow for querying DB with timestamp,
 in which case result will correspond to object (document) at that moment in time.
 
+General idea for deployment is that the user should provide MongoDB instance and wrap it with Vent - either
+with embedded instance (used in-memory) or exposed via some protocol (e.g. HTTP) - which enables usage
+of Vent in other languages.
+
 ## MVP
 
 > MVP is under development. I'm gonna try to keep done things ticked, but don't trust it 100%, better read the code.
@@ -29,14 +33,13 @@ state, but it can be easily optimized for that use case)
 
 - fetching some time period (instead of object state at timestamp)
 - factory for Spring Data-like repositories based on Vent
-- modularization (API, embedded, web.server, web.client)
 - better configurability (better pointing to underlying Mongo instance, working 
 properties for compacting)
 
 ## Organizational work
 
 > will be done once the MVP is ready
-- modularization
+- modularization (API, embedded, web.server, web.client, velvet; maybe split core/blocking/reactive API)
 
 ## Other ideas:
 

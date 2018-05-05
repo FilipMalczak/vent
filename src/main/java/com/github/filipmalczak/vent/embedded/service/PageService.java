@@ -54,12 +54,16 @@ public class PageService {
         return mongoTemplate.insert(page, collectionName);
     }
 
-    private Flux<Page> query(String collectionName, Criteria criteria){
+    private Flux<Page> query(String collectionName, Query query){
         return mongoTemplate.find(
-            Query.query(criteria),
+            query,
             Page.class,
             collectionName
         );
+    }
+
+    private Flux<Page> query(String collectionName, Criteria criteria){
+        return query(collectionName, Query.query(criteria));
     }
 
     public Flux<Page> allPages(@NonNull String collectionName, @NonNull VentId id){

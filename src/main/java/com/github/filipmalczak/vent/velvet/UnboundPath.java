@@ -12,10 +12,10 @@ public interface UnboundPath {
     default void set(Object target, Object value){
         bind(target).set(value);
     }
+    //it just begs to return Optional from here, but we want to differentiate between missing path and null value
     default Object get(Object target){
         return bind(target).get();
     }
-
     default void delete(Object target){
         bind(target).delete();
     }

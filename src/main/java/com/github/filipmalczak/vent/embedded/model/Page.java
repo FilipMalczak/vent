@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -30,26 +31,36 @@ public class Page {
     private Map initialState;
     private List<Event> events;
 
+    public boolean describesStateAt(LocalDateTime at){
+        return (at.isAfter(startingFrom) || at.isEqual(startingFrom)) && (nextPageFrom == null || nextPageFrom.isAfter(at));
+    }
+
     /**
      * Returns stream of events in chronological order, ending with last event that happens before argument or exactly
      * at that moment, or empty stream if queried timestamp is outside of this page.
      */
     //todo: should this be public?
     public Stream<Event> getEventsForSnapshotAt(@NonNull LocalDateTime snapshotAt){
-        if (snapshotAt.isBefore(startingFrom))
-            return Stream.empty();
-        if (nextPageFrom != null && snapshotAt.isAfter(nextPageFrom))
+        if (!describesStateAt(snapshotAt))
             return Stream.empty();
         return events.stream().filter(event ->
             event.getOccuredOn().isBefore(snapshotAt) || event.getOccuredOn().isEqual(snapshotAt)
         );
     }
 
-    public SnapshotInstructions getInstructionsForSnapshotAt(@NonNull LocalDateTime snapshotAt){
+    public Optional<SnapshotInstructions> getInstructionsForSnapshotAt(@NonNull LocalDateTime snapshotAt){
+        if (!describesStateAt(snapshotAt))
+            return Optional.empty();
         //todo deep copy of initialState
         //if persistence would cache retrieved pages and we'd pass initialState for rendering, its object tree
         //would probably change, so cached page would have different state than persisted one
-        return new SnapshotInstructions(initialState, getEventsForSnapshotAt(snapshotAt).collect(toList()));
+        return Optional.of(
+            new SnapshotInstructions(
+                initialState,
+                getEventsForSnapshotAt(snapshotAt).
+                    collect(toList())
+            )
+        );
     }
 
     public EventConfirmation addEvent(Event event){
