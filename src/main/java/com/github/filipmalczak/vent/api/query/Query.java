@@ -9,6 +9,7 @@ import com.github.filipmalczak.vent.embedded.service.TemporalService;
 import lombok.*;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.CriteriaDefinition;
 import reactor.core.publisher.Flux;
@@ -33,8 +34,11 @@ import static java.util.stream.Collectors.toList;
  * Second step is creating snapshots for all candidate pages and then filtering them out in runtime. This happens with
  * simple Predicate obtained from Operator by toRuntimeCriteria.
  *
- * todo should this be API? operators are quite implementation-specific ; probably provide factory method in DB/collection and abstract Query from impl
  * todo whole thing can probably be done with some smart MongoDB query, but for MVP lets use this approach
+ * development plan:
+ * todo abstract ReactiveQuery/BlockingQuery interfaces
+ * todo provide query builder interface
+ * todo vent collections should have become factories for builders (impl matching vent impl, e.g. embedded reactive collection should return embedded reactive query)
  */
 @AllArgsConstructor
 public class Query {
@@ -55,13 +59,20 @@ public class Query {
                 ))
             ))
         );
+        //todo once you provide enough tests, remove reactive logs
         return Flux.from(
-                mongoTemplate.
-                    getCollection(collectionName).
-                    find(new Document(candidatePagesMongoQuery), Page.class)
+                mongoTemplate.find(new BasicQuery(new Document(candidatePagesMongoQuery)), Page.class, collectionName)
             ).
+            log("RAW_PAGES").
+            //fixme I think that this is redundant
             filter(p -> p.describesStateAt(queryAt)).
+            log("MATCHING_TIMESTAMP").
             map(p -> snapshotService.render(p, queryAt)).
-            filter(rootOperator.toRuntimeCriteria());
+            log("RENDERED").
+            filter(x -> {
+                boolean r = rootOperator.toRuntimeCriteria().test(x.getState());
+                return r;
+            }).
+            log("RUNTIME_FILTERED");
     }
 }

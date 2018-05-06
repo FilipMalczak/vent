@@ -1,5 +1,6 @@
-package com.github.filipmalczak.vent.embedded.service;
+package com.github.filipmalczak.vent.testimpl;
 
+import com.github.filipmalczak.vent.embedded.service.TemporalService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -10,13 +11,17 @@ import java.util.List;
 import static java.util.Arrays.asList;
 
 @Slf4j
-public class TestingTemporalService implements TemporalService{
+public class TestingTemporalService implements TemporalService {
     private List<LocalDateTime> queueToReturn = new ArrayList<>();
     @Autowired(required = false)
     private StackTracer stackTracer;
 
-    public void addResult(LocalDateTime... localDateTime){
-        queueToReturn.addAll(asList(localDateTime));
+    public void addResults(List<LocalDateTime> times){
+        queueToReturn.addAll(times);
+    }
+
+    public void addResults(LocalDateTime... times){
+        addResults(asList(times));
     }
 
     @Override

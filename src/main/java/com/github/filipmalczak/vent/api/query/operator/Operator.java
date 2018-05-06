@@ -17,5 +17,5 @@ public interface Operator {
      * Should not check timestamps (orchestration of operators will take care of that).
      */
     Map<String, Object> toMongoEventCriteria();
-    Predicate<ObjectSnapshot> toRuntimeCriteria();
+    Predicate<Map> toRuntimeCriteria();
 }

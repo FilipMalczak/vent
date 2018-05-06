@@ -1,4 +1,4 @@
-package com.github.filipmalczak.vent.embedded.service;
+package com.github.filipmalczak.vent.testimpl;
 
 import lombok.*;
 

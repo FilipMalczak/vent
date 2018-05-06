@@ -3,7 +3,7 @@ package com.github.filipmalczak.vent.embedded;
 import com.github.filipmalczak.vent.VentSpringTest;
 import com.github.filipmalczak.vent.api.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.VentId;
-import com.github.filipmalczak.vent.embedded.service.TestingTemporalService;
+import com.github.filipmalczak.vent.testimpl.TestingTemporalService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,12 @@ class EmbeddedReactiveVentDbTest {
 
     private static final String TEST_COLLECTION = "test_collection";
 
-    //sorta ugly, but it gets the work done, so why not?
+    //todo: move Holder init to setup
+    /**
+     * Sorta ugly, but it gets the work done, so why not?
+     * Just a reference wrapper that provides one method T -> T that stores argument inside the wrapper and returns it.
+     * Handy for using values provided as results in assertions (like ID).
+     */
     private static class Holder<T> {
         @Getter private T value;
 
@@ -42,7 +47,7 @@ class EmbeddedReactiveVentDbTest {
     @Test
     public void defaultCreateThenGetAtCreationTime(){
         LocalDateTime now = LocalDateTime.now();
-        temporalService.addResult(now);
+        temporalService.addResults(now);
 
         Holder<VentId> holder = new Holder<>();
         StepVerifier.create(
@@ -66,7 +71,7 @@ class EmbeddedReactiveVentDbTest {
     @Test
     public void createExplicitlyEmptyThenGetAtCreationTime(){
         LocalDateTime now = LocalDateTime.now();
-        temporalService.addResult(now);
+        temporalService.addResults(now);
 
         Holder<VentId> holder = new Holder<>();
         StepVerifier.create(
@@ -91,7 +96,7 @@ class EmbeddedReactiveVentDbTest {
     @Test
     public void createNonEmptyThenGetAtCreationTime(){
         LocalDateTime now = LocalDateTime.now();
-        temporalService.addResult(now);
+        temporalService.addResults(now);
 
         Map data = map();
         data.put("a", 1);
@@ -120,7 +125,7 @@ class EmbeddedReactiveVentDbTest {
     public void defaultCreateThenGetInTheFuture(){
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime future = now.plus(Duration.ofSeconds(3));
-        temporalService.addResult(now);
+        temporalService.addResults(now);
 
         Holder<VentId> holder = new Holder<>();
         StepVerifier.create(
@@ -146,7 +151,7 @@ class EmbeddedReactiveVentDbTest {
     public void createExplicitlyEmptyThenGetInTheFuture(){
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime future = now.plus(Duration.ofSeconds(3));
-        temporalService.addResult(now);
+        temporalService.addResults(now);
 
         Holder<VentId> holder = new Holder<>();
         StepVerifier.create(
@@ -171,7 +176,7 @@ class EmbeddedReactiveVentDbTest {
     public void createNonEmptyThenGetInTheFuture(){
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime future = now.plus(Duration.ofSeconds(3));
-        temporalService.addResult(now);
+        temporalService.addResults(now);
 
         Map data = map();
         data.put("a", 1);
@@ -201,7 +206,7 @@ class EmbeddedReactiveVentDbTest {
     public void defaultCreateThenGetInThePast(){
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime past = now.minus(Duration.ofSeconds(3));
-        temporalService.addResult(now);
+        temporalService.addResults(now);
 
         StepVerifier.create(
             ventDb.getCollection(TEST_COLLECTION).create().
@@ -214,7 +219,7 @@ class EmbeddedReactiveVentDbTest {
     public void createExplicitlyEmptyThenGetInThePast(){
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime past = now.minus(Duration.ofSeconds(3));
-        temporalService.addResult(now);
+        temporalService.addResults(now);
 
         StepVerifier.create(
             ventDb.getCollection(TEST_COLLECTION).create(map()).
@@ -226,7 +231,7 @@ class EmbeddedReactiveVentDbTest {
     public void createNonEmptyThenGetInThePast(){
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime past = now.minus(Duration.ofSeconds(3));
-        temporalService.addResult(now);
+        temporalService.addResults(now);
 
         Map data = map(pair("a", 1), pair("x", "y"), pair("b", pair("c", "d")));
 
@@ -242,7 +247,7 @@ class EmbeddedReactiveVentDbTest {
         LocalDateTime createNow = LocalDateTime.now();
         LocalDateTime putNow = LocalDateTime.now();
         LocalDateTime future = putNow.plus(Duration.ofSeconds(3));
-        temporalService.addResult(createNow, putNow);
+        temporalService.addResults(createNow, putNow);
 
         Holder<VentId> holder = new Holder<>();
         StepVerifier.create(
@@ -269,7 +274,7 @@ class EmbeddedReactiveVentDbTest {
         LocalDateTime createNow = LocalDateTime.now();
         LocalDateTime putNow = createNow.plus(Duration.ofSeconds(2));
         LocalDateTime beforePut = putNow.minus(Duration.ofSeconds(1));
-        temporalService.addResult(createNow, putNow);
+        temporalService.addResults(createNow, putNow);
 
         Holder<VentId> holder = new Holder<>();
         StepVerifier.create(
@@ -297,7 +302,7 @@ class EmbeddedReactiveVentDbTest {
         LocalDateTime putNow = createNow.plus(Duration.ofSeconds(1));
         LocalDateTime put2Now = putNow.plus(Duration.ofSeconds(1));
         LocalDateTime queryTime = put2Now.plus(Duration.ofSeconds(1));
-        temporalService.addResult(createNow, putNow, put2Now);
+        temporalService.addResults(createNow, putNow, put2Now);
 
         Holder<VentId> holder = new Holder<>();
         StepVerifier.create(

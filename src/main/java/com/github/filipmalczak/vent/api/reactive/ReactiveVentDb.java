@@ -13,7 +13,7 @@ public interface ReactiveVentDb {
     ReactiveVentCollection getCollection(String collectionName);
 
     //todo: consider adding version with Duration
-    default BlockingVentDb deReactivate(){
+    default BlockingVentDb asBlocking(){
         return collectionName -> new BlockingVentCollection() {
             private ReactiveVentCollection delegate = ReactiveVentDb.this.getCollection(collectionName);
 

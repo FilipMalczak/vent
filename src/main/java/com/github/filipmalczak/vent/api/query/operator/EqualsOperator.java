@@ -67,11 +67,11 @@ public class EqualsOperator implements Operator {
     }
 
     @Override
-    public Predicate<ObjectSnapshot> toRuntimeCriteria() {
+    public Predicate<Map> toRuntimeCriteria() {
         return this::check;
     }
 
-    private boolean check(ObjectSnapshot o){
+    private boolean check(Map o){
         try {
             return Velvet.parse(path).bind(o).get().equals(value);
         } catch (UnresolvablePathException e){

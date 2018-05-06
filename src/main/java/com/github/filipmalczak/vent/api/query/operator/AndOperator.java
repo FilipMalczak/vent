@@ -31,7 +31,7 @@ public class AndOperator implements Operator {
     }
 
     @Override
-    public Predicate<ObjectSnapshot> toRuntimeCriteria() {
+    public Predicate<Map> toRuntimeCriteria() {
         //todo in case of empty operands list, should it return true or false by default?
         return operands.stream().map(Operator::toRuntimeCriteria).reduce(Predicate::and).orElse(o -> true);
     }

@@ -1,8 +1,8 @@
 package com.github.filipmalczak.vent;
 
-import com.github.filipmalczak.vent.embedded.service.StackTracer;
+import com.github.filipmalczak.vent.testimpl.StackTracer;
 import com.github.filipmalczak.vent.embedded.service.TemporalService;
-import com.github.filipmalczak.vent.embedded.service.TestingTemporalService;
+import com.github.filipmalczak.vent.testimpl.TestingTemporalService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

@@ -30,7 +30,7 @@ public class OrOperator implements Operator {
     }
 
     @Override
-    public Predicate<ObjectSnapshot> toRuntimeCriteria() {
+    public Predicate<Map> toRuntimeCriteria() {
         return operands.stream().map(Operator::toRuntimeCriteria).reduce(Predicate::or).orElse(o -> true);
     }
 }

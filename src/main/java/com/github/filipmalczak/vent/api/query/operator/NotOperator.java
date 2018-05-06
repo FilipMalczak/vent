@@ -26,7 +26,7 @@ public class NotOperator implements Operator {
     }
 
     @Override
-    public Predicate<ObjectSnapshot> toRuntimeCriteria() {
+    public Predicate<Map> toRuntimeCriteria() {
         return negated.toRuntimeCriteria().negate();
     }
 }
