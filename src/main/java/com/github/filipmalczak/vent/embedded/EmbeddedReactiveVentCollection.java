@@ -2,15 +2,17 @@ package com.github.filipmalczak.vent.embedded;
 
 import com.github.filipmalczak.vent.api.EventConfirmation;
 import com.github.filipmalczak.vent.api.ObjectSnapshot;
+import com.github.filipmalczak.vent.api.Success;
 import com.github.filipmalczak.vent.api.VentId;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentCollection;
 import com.github.filipmalczak.vent.embedded.model.Page;
 import com.github.filipmalczak.vent.embedded.model.events.Event;
-import com.github.filipmalczak.vent.embedded.model.events.EventFactory;
+import com.github.filipmalczak.vent.embedded.model.events.impl.EventFactory;
 import com.github.filipmalczak.vent.embedded.service.PageService;
 import com.github.filipmalczak.vent.embedded.service.SnapshotService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
@@ -25,6 +27,12 @@ public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
     private @NonNull EventFactory eventFactory;
 
     private @NonNull SnapshotService snapshotService;
+
+    @Override
+    public Mono<Success> drop() {
+        //fixme this is ugly, it shouldnt be pageServices responsibility, but I don't want dependency on template
+        return pageService.drop(collectionName);
+    }
 
     @Override
     public Mono<VentId> create(Map initialState) {
@@ -48,6 +56,11 @@ public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
     @Override
     public Mono<ObjectSnapshot> get(VentId id, LocalDateTime queryAt) {
         return snapshotService.getSnapshot(collectionName, id, queryAt);
+    }
+
+    @Override
+    public Flux<VentId> identifyAll(LocalDateTime queryAt) {
+        return pageService.allPages(collectionName, queryAt).map(Page::getObjectId).map(VentId::fromMongoId);
     }
 
     @Override

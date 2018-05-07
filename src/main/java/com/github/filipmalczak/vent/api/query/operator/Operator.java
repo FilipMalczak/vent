@@ -1,8 +1,5 @@
 package com.github.filipmalczak.vent.api.query.operator;
 
-import com.github.filipmalczak.vent.api.ObjectSnapshot;
-
-import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.function.Predicate;
 

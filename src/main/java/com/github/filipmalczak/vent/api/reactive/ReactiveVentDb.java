@@ -2,12 +2,14 @@ package com.github.filipmalczak.vent.api.reactive;
 
 import com.github.filipmalczak.vent.api.EventConfirmation;
 import com.github.filipmalczak.vent.api.ObjectSnapshot;
+import com.github.filipmalczak.vent.api.Success;
 import com.github.filipmalczak.vent.api.VentId;
 import com.github.filipmalczak.vent.api.blocking.BlockingVentCollection;
 import com.github.filipmalczak.vent.api.blocking.BlockingVentDb;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public interface ReactiveVentDb {
     ReactiveVentCollection getCollection(String collectionName);
@@ -16,6 +18,11 @@ public interface ReactiveVentDb {
     default BlockingVentDb asBlocking(){
         return collectionName -> new BlockingVentCollection() {
             private ReactiveVentCollection delegate = ReactiveVentDb.this.getCollection(collectionName);
+
+            @Override
+            public Success drop() {
+                return delegate.drop().block();
+            }
 
             @Override
             public VentId create(Map initialState) {
@@ -35,6 +42,11 @@ public interface ReactiveVentDb {
             @Override
             public ObjectSnapshot get(VentId id, LocalDateTime queryAt) {
                 return delegate.get(id, queryAt).block();
+            }
+
+            @Override
+            public Stream<VentId> identifyAll(LocalDateTime queryAt) {
+                return delegate.identifyAll(queryAt).toStream();
             }
 
             @Override

@@ -1,4 +1,4 @@
-package com.github.filipmalczak.vent.embedded.model.events;
+package com.github.filipmalczak.vent.embedded.model.events.impl;
 
 import com.github.filipmalczak.vent.embedded.model.events.helper.TimestampedEvent;
 

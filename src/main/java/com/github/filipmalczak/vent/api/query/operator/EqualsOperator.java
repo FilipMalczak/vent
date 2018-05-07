@@ -1,28 +1,17 @@
 package com.github.filipmalczak.vent.api.query.operator;
 
-import com.github.filipmalczak.vent.api.ObjectSnapshot;
-import com.github.filipmalczak.vent.embedded.model.events.PutValue;
-import com.github.filipmalczak.vent.embedded.model.events.Update;
+import com.github.filipmalczak.vent.embedded.model.events.impl.PutValue;
+import com.github.filipmalczak.vent.embedded.model.events.impl.Update;
 import com.github.filipmalczak.vent.helper.PathUtils;
 import com.github.filipmalczak.vent.velvet.UnresolvablePathException;
 import com.github.filipmalczak.vent.velvet.Velvet;
 import lombok.Value;
-import org.bson.Document;
-import org.springframework.data.mongodb.core.query.Criteria;
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
-import static com.github.filipmalczak.vent.helper.Struct.list;
-import static com.github.filipmalczak.vent.helper.Struct.map;
-import static com.github.filipmalczak.vent.helper.Struct.pair;
-import static java.util.Arrays.copyOfRange;
-import static java.util.stream.IntStream.range;
+import static com.github.filipmalczak.vent.helper.Struct.*;
 
 @Value(staticConstructor = "with")
 public class EqualsOperator implements Operator {

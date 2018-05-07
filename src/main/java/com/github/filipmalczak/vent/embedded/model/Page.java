@@ -30,9 +30,18 @@ public class Page {
     private LocalDateTime nextPageFrom;
     private Map initialState;
     private List<Event> events;
+    private LocalDateTime finishedOn;
 
     public boolean describesStateAt(LocalDateTime at){
         return (at.isAfter(startingFrom) || at.isEqual(startingFrom)) && (nextPageFrom == null || nextPageFrom.isAfter(at));
+    }
+
+    public boolean isFinished(){
+        return finishedOn == null;
+    }
+
+    public void finish(LocalDateTime at){
+        finishedOn = at;
     }
 
     /**

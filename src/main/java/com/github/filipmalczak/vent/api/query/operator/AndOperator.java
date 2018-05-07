@@ -1,17 +1,12 @@
 package com.github.filipmalczak.vent.api.query.operator;
 
-import com.github.filipmalczak.vent.api.ObjectSnapshot;
 import lombok.*;
-import org.bson.Document;
-import org.springframework.data.mongodb.core.query.Criteria;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
 import static com.github.filipmalczak.vent.helper.Struct.pair;
-import static java.util.stream.Collectors.toList;
 
 @Value
 @Builder

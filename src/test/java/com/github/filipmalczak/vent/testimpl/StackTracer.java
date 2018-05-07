@@ -62,8 +62,13 @@ public class StackTracer {
         return result.toString();
     }
 
+
+    public String getCurrentHierarchy(int skipNFrames){
+        return getInterestingFrames().stream().skip(skipNFrames).map(this::formatFrame).collect(joining(" -called-by-> "));
+    }
+
     public String getCurrentHierarchy(){
-        return getInterestingFrames().stream().map(this::formatFrame).collect(joining(" -called-by-> "));
+        return getCurrentHierarchy(1); // 1 frame - from method introducing default arg
     }
 
     private static class AnException extends RuntimeException {}

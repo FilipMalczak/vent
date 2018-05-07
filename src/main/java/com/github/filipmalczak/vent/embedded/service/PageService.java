@@ -1,10 +1,11 @@
 package com.github.filipmalczak.vent.embedded.service;
 
 import com.github.filipmalczak.vent.api.EventConfirmation;
+import com.github.filipmalczak.vent.api.Success;
 import com.github.filipmalczak.vent.api.VentId;
 import com.github.filipmalczak.vent.embedded.model.Page;
 import com.github.filipmalczak.vent.embedded.model.events.Event;
-import com.github.filipmalczak.vent.embedded.model.events.EventFactory;
+import com.github.filipmalczak.vent.embedded.model.events.impl.EventFactory;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
@@ -49,7 +50,8 @@ public class PageService {
             now,
             null,
             null,
-            asList(create)
+            asList(create),
+            null
         );
         return mongoTemplate.insert(page, collectionName);
     }
@@ -64,6 +66,19 @@ public class PageService {
 
     private Flux<Page> query(String collectionName, Criteria criteria){
         return query(collectionName, Query.query(criteria));
+    }
+
+    /**
+     * Actually all undeleted pages. If this will become needed, I'll refactor.
+     */
+    public Flux<Page> allPages(@NonNull String collectionName, @NonNull LocalDateTime at){
+        return query(
+            collectionName,
+            Criteria.where(null).orOperator(
+                Criteria.where("finishedOn").gt(at),
+                Criteria.where("finishedOn").is(null)
+            )
+        );
     }
 
     public Flux<Page> allPages(@NonNull String collectionName, @NonNull VentId id){
@@ -99,5 +114,10 @@ public class PageService {
         EventConfirmation confirmation = page.addEvent(event);
         return mongoTemplate.save(page, collectionName).then(just(confirmation));
 
+    }
+
+    //fixme doesnt fit the responsibility, see EmbeddedReactiveVentCollection.drop
+    public Mono<Success> drop(String collectionName){
+        return Mono.from(mongoTemplate.getCollection(collectionName).drop()).map(Success::fromMongoSuccess);
     }
 }

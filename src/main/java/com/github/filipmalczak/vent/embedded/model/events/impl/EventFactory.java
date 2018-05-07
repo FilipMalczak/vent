@@ -1,4 +1,4 @@
-package com.github.filipmalczak.vent.embedded.model.events;
+package com.github.filipmalczak.vent.embedded.model.events.impl;
 
 import com.github.filipmalczak.vent.embedded.service.TemporalService;
 import org.springframework.beans.factory.annotation.Autowired;

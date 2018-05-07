@@ -6,9 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
 public class TestingTemporalService implements TemporalService {
@@ -16,10 +18,27 @@ public class TestingTemporalService implements TemporalService {
     @Autowired(required = false)
     private StackTracer stackTracer;
 
-    public void addResults(List<LocalDateTime> times){
-        queueToReturn.addAll(times);
+    public <C extends Collection<LocalDateTime>> void withResults(C times, Runnable onCurrentNow){
+        boolean queueWasInitiallyEmpty = queueToReturn.isEmpty();
+        addResults(times);
+        try {
+            onCurrentNow.run();
+        } finally {
+            if (queueWasInitiallyEmpty) {
+                try {
+                    assertTrue(queueToReturn.isEmpty());
+                } catch (Throwable t) {
+                    throw t;
+                } finally {
+                    queueToReturn.clear();
+                }
+            }
+        }
     }
 
+    public void addResults(Collection<LocalDateTime> times){
+        queueToReturn.addAll(times);
+    }
     public void addResults(LocalDateTime... times){
         addResults(asList(times));
     }

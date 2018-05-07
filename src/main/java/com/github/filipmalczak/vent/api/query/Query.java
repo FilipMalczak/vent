@@ -3,25 +3,19 @@ package com.github.filipmalczak.vent.api.query;
 import com.github.filipmalczak.vent.api.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.query.operator.Operator;
 import com.github.filipmalczak.vent.embedded.model.Page;
-import com.github.filipmalczak.vent.embedded.service.SnapshotRenderer;
 import com.github.filipmalczak.vent.embedded.service.SnapshotService;
 import com.github.filipmalczak.vent.embedded.service.TemporalService;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.CriteriaDefinition;
 import reactor.core.publisher.Flux;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 
-import static com.github.filipmalczak.vent.helper.Struct.list;
-import static com.github.filipmalczak.vent.helper.Struct.map;
-import static com.github.filipmalczak.vent.helper.Struct.pair;
-import static java.util.stream.Collectors.toList;
+import static com.github.filipmalczak.vent.helper.Struct.*;
 
 /**
  * Querying happens in 2 steps:

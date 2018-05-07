@@ -1,8 +1,6 @@
 package com.github.filipmalczak.vent.helper;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.util.Arrays.asList;
 
@@ -29,6 +27,10 @@ public class Struct {
             for (Object k: m.keySet())
                 out.put(k, m.get(k));
         return out;
+    }
+
+    public static Set set(Object... vals){
+        return new HashSet(list(vals));
     }
 
     public static List list(Object... vals){
