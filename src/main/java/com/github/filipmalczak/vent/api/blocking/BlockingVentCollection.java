@@ -4,6 +4,9 @@ import com.github.filipmalczak.vent.api.EventConfirmation;
 import com.github.filipmalczak.vent.api.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.Success;
 import com.github.filipmalczak.vent.api.VentId;
+import com.github.filipmalczak.vent.api.reactive.ReactiveVentCollection;
+import com.github.filipmalczak.vent.api.reactive.ReactiveVentDb;
+import com.github.filipmalczak.vent.api.traits.Blocking;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -11,7 +14,7 @@ import java.util.stream.Stream;
 
 import static com.github.filipmalczak.vent.helper.Struct.map;
 
-public interface BlockingVentCollection {
+public interface BlockingVentCollection extends Blocking<ReactiveVentCollection> {
     Success drop();
 
     VentId create(Map initialState);

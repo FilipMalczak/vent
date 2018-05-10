@@ -34,9 +34,19 @@ public class LoggingDbWrapper implements ReactiveVentDb {
     public BlockingVentDb asBlocking() {
         return new BlockingVentDb() {
             @Override
+            public ReactiveVentDb asReactive() {
+                return LoggingDbWrapper.this;
+            }
+
+            @Override
             public BlockingVentCollection getCollection(String collectionName) {
                 return new BlockingVentCollection() {
                     private BlockingVentCollection delegateCollection = delegate.asBlocking().getCollection(collectionName);
+
+                    @Override
+                    public ReactiveVentCollection asReactive() {
+                        return delegateCollection.asReactive();
+                    }
 
                     @Override
                     @SneakyThrows
@@ -136,6 +146,12 @@ public class LoggingDbWrapper implements ReactiveVentDb {
     @Override
     public ReactiveVentCollection getCollection(String collectionName) {
         return new ReactiveVentCollection() {
+
+            @Override
+            public BlockingVentCollection asBlocking() {
+                return LoggingDbWrapper.this.asBlocking().getCollection(collectionName);
+            }
+
             private ReactiveVentCollection delegateCollection = delegate.getCollection(collectionName);
 
             @Override

@@ -6,52 +6,26 @@ import com.github.filipmalczak.vent.api.Success;
 import com.github.filipmalczak.vent.api.VentId;
 import com.github.filipmalczak.vent.api.blocking.BlockingVentCollection;
 import com.github.filipmalczak.vent.api.blocking.BlockingVentDb;
+import com.github.filipmalczak.vent.api.traits.Reactive;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.stream.Stream;
 
-public interface ReactiveVentDb {
+public interface ReactiveVentDb extends Reactive<BlockingVentDb> {
     ReactiveVentCollection getCollection(String collectionName);
 
     //todo: consider adding version with Duration
     default BlockingVentDb asBlocking(){
-        return collectionName -> new BlockingVentCollection() {
-            private ReactiveVentCollection delegate = ReactiveVentDb.this.getCollection(collectionName);
-
+        return new BlockingVentDb() {
             @Override
-            public Success drop() {
-                return delegate.drop().block();
+            public BlockingVentCollection getCollection(String collectionName) {
+                return asReactive().getCollection(collectionName).asBlocking();
             }
 
             @Override
-            public VentId create(Map initialState) {
-                return delegate.create(initialState).block();
-            }
-
-            @Override
-            public EventConfirmation putValue(VentId id, String path, Object value) {
-                return delegate.putValue(id, path, value).block();
-            }
-
-            @Override
-            public EventConfirmation deleteValue(VentId id, String path) {
-                return delegate.deleteValue(id, path).block();
-            }
-
-            @Override
-            public ObjectSnapshot get(VentId id, LocalDateTime queryAt) {
-                return delegate.get(id, queryAt).block();
-            }
-
-            @Override
-            public Stream<VentId> identifyAll(LocalDateTime queryAt) {
-                return delegate.identifyAll(queryAt).toStream();
-            }
-
-            @Override
-            public EventConfirmation update(VentId id, Map newState) {
-                return delegate.update(id, newState).block();
+            public ReactiveVentDb asReactive() {
+                return ReactiveVentDb.this;
             }
         };
     }

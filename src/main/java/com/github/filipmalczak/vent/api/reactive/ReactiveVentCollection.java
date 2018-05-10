@@ -4,6 +4,8 @@ import com.github.filipmalczak.vent.api.EventConfirmation;
 import com.github.filipmalczak.vent.api.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.Success;
 import com.github.filipmalczak.vent.api.VentId;
+import com.github.filipmalczak.vent.api.blocking.BlockingVentCollection;
+import com.github.filipmalczak.vent.api.traits.Reactive;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -12,7 +14,7 @@ import java.util.Map;
 
 import static com.github.filipmalczak.vent.helper.Struct.map;
 
-public interface ReactiveVentCollection {
+public interface ReactiveVentCollection extends Reactive<BlockingVentCollection> {
     Mono<Success> drop();
 
     Mono<VentId> create(Map initialState);

@@ -4,6 +4,7 @@ import com.github.filipmalczak.vent.api.EventConfirmation;
 import com.github.filipmalczak.vent.api.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.Success;
 import com.github.filipmalczak.vent.api.VentId;
+import com.github.filipmalczak.vent.api.blocking.BlockingVentCollection;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentCollection;
 import com.github.filipmalczak.vent.embedded.model.Page;
 import com.github.filipmalczak.vent.embedded.model.events.Event;
@@ -17,6 +18,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.stream.Stream;
 
 @AllArgsConstructor
 public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
@@ -74,5 +76,50 @@ public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
         return pageService.
             currentPage(collectionName, id).
             flatMap(p -> pageService.addEvent(collectionName, p, event));
+    }
+
+    @Override
+    public BlockingVentCollection asBlocking() {
+        return new BlockingVentCollection() {
+            @Override
+            public Success drop() {
+                return asReactive().drop().block();
+            }
+
+            @Override
+            public VentId create(Map initialState) {
+                return asReactive().create(initialState).block();
+            }
+
+            @Override
+            public EventConfirmation putValue(VentId id, String path, Object value) {
+                return asReactive().putValue(id, path, value).block();
+            }
+
+            @Override
+            public EventConfirmation deleteValue(VentId id, String path) {
+                return asReactive().deleteValue(id, path).block();
+            }
+
+            @Override
+            public ObjectSnapshot get(VentId id, LocalDateTime queryAt) {
+                return asReactive().get(id, queryAt).block();
+            }
+
+            @Override
+            public Stream<VentId> identifyAll(LocalDateTime queryAt) {
+                return asReactive().identifyAll(queryAt).toStream();
+            }
+
+            @Override
+            public EventConfirmation update(VentId id, Map newState) {
+                return asReactive().update(id, newState).block();
+            }
+
+            @Override
+            public ReactiveVentCollection asReactive() {
+                return EmbeddedReactiveVentCollection.this;
+            }
+        };
     }
 }
