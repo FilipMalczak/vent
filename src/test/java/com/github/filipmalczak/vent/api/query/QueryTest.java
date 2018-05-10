@@ -5,10 +5,10 @@ import com.github.filipmalczak.vent.api.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.VentId;
 import com.github.filipmalczak.vent.api.query.operator.*;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentDb;
+import com.github.filipmalczak.vent.embedded.service.MongoQueryPreparator;
 import com.github.filipmalczak.vent.embedded.service.SnapshotService;
 import com.github.filipmalczak.vent.testimpl.TestingTemporalService;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +40,8 @@ public class QueryTest {
     private ReactiveMongoTemplate mongoTemplate;
     @Autowired
     private SnapshotService snapshotService;
+    @Autowired
+    private MongoQueryPreparator mongoQueryPreparator;
 
     @Autowired
     private ReactiveVentDb reactiveVentDb;
@@ -49,7 +51,7 @@ public class QueryTest {
     private final static Duration INTERVAL = Duration.ofMinutes(5);
 
     private Query query(Operator rootOperator){
-        return new Query(COLLECTION_NAME, rootOperator, temporalService, mongoTemplate, snapshotService);
+        return new Query(COLLECTION_NAME, rootOperator, mongoQueryPreparator, mongoTemplate, snapshotService);
     }
 
     private Map<String, VentId> fixtureNameToId;
@@ -207,7 +209,6 @@ public class QueryTest {
             );
         });
     }
-
 
     @Test
     public void queryingExplicitEventResultsNestedField() {
@@ -374,6 +375,7 @@ public class QueryTest {
                     build()
 
             );
+            log.info("Query: "+query);
             Set<ObjectSnapshot> results = query.execute(temporalService.now()).toStream().collect(toSet());
             assertEquals(
                 set(
@@ -565,7 +567,7 @@ public class QueryTest {
     }
 
     @Test
-    public void queryingBySublistIndexFromLowerSuperPath() {
+    public void queryingBySublistIndexFromLowerSuperPathWhenInitialStateIndicatesCandidacy() {
         temporalService.withResults(byInterval(4), () -> {
             Map aData = person(
                 "A1", "A2",
@@ -617,7 +619,7 @@ public class QueryTest {
 
     //fixme how does it work? PathUtils have a bug, so what the hell? oO
     @Test
-    public void queryingBySublistIndexFromHigherSuperPath() {
+    public void queryingBySublistIndexFromHigherSuperPathWhenInitialStateIndicatesCandidacy() {
         temporalService.withResults(byInterval(4), () -> {
             Map aData = person(
                 "A1", "A2",

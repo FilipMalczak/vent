@@ -1,12 +1,14 @@
 package com.github.filipmalczak.vent.api.query;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.filipmalczak.vent.api.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.query.operator.Operator;
 import com.github.filipmalczak.vent.embedded.model.Page;
+import com.github.filipmalczak.vent.embedded.model.events.impl.Create;
+import com.github.filipmalczak.vent.embedded.service.MongoQueryPreparator;
 import com.github.filipmalczak.vent.embedded.service.SnapshotService;
-import com.github.filipmalczak.vent.embedded.service.TemporalService;
-import lombok.AllArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
@@ -16,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 import static com.github.filipmalczak.vent.helper.Struct.*;
+import static java.util.stream.Collectors.toList;
 
 /**
  * Querying happens in 2 steps:
@@ -35,31 +38,51 @@ import static com.github.filipmalczak.vent.helper.Struct.*;
  * todo vent collections should have become factories for builders (impl matching vent impl, e.g. embedded reactive collection should return embedded reactive query)
  */
 @AllArgsConstructor
+@Slf4j
+@ToString
+@EqualsAndHashCode
 public class Query {
     private @NonNull String collectionName;
     private @NonNull Operator rootOperator;
-    private @NonNull TemporalService temporalService;
+    private @NonNull MongoQueryPreparator mongoQueryPreparator; //todo remove
     private @NonNull ReactiveMongoTemplate mongoTemplate;
     private @NonNull SnapshotService snapshotService;
 
+    @SneakyThrows
     public Flux<ObjectSnapshot> execute(LocalDateTime queryAt){
-        long timestamp = temporalService.toTimestamp(queryAt);
+        log.info("queryAt "+queryAt);
+        log.info( new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(mongoTemplate.findAll(Page.class, collectionName).toStream().collect(toList())));
         Map<String, Object> candidatePagesMongoQuery = map(
-            pair("$and", list(
-                pair("startingFrom", pair("$lte", queryAt)),
-                pair("$or", list(
-                    pair("nextPageFrom", null),
-                    pair("nextPageFrom", pair("$gt", queryAt))
-                ))
+            pair("startingFrom", pair("$lte", queryAt)),
+            pair("$or", list(
+                pair("nextPageFrom", null),
+                pair("nextPageFrom", pair("$gt", queryAt))
+            )),
+            //todo or for objectDeletedOn
+            pair("$or", list(
+                pair("events", pair("$elemMatch", rootOperator.toMongoEventCriteria())),
+                pair("events.0", map(
+                    pair("_class", Create.class.getCanonicalName()),
+                    pair("initialState", rootOperator.toMongoInitialStateCriteria())
+                )),
+                pair("initialState", rootOperator.toMongoInitialStateCriteria())
             ))
         );
+//        log.info("Timestamp: "+temporalService.toTimestamp(queryAt));
+        log.info("unprepared query "+new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(candidatePagesMongoQuery));
         //todo once you provide enough tests, remove reactive logs
+        candidatePagesMongoQuery = mongoQueryPreparator.prepare(candidatePagesMongoQuery);
+        log.info("prepared query "+new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(candidatePagesMongoQuery));
         return Flux.from(
                 mongoTemplate.find(new BasicQuery(new Document(candidatePagesMongoQuery)), Page.class, collectionName)
             ).
             log("RAW_PAGES").
             //fixme I think that this is redundant
-            filter(p -> p.describesStateAt(queryAt)).
+            filter(p -> {
+                log.info("Page: "+p);
+                boolean result = p.describesStateAt(queryAt);
+                return result;
+            }).
             log("MATCHING_TIMESTAMP").
             map(p -> snapshotService.render(p, queryAt)).
             log("RENDERED").

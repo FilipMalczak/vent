@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import static com.github.filipmalczak.vent.helper.Struct.pair;
+import static com.github.filipmalczak.vent.helper.Struct.map;
+import static java.util.stream.Collectors.toList;
 
 @Value
 @Builder
@@ -17,12 +18,14 @@ public class AndOperator implements Operator {
 
     @Override
     public Map<String, Object> toMongoInitialStateCriteria() {
-        return pair("$and", operands.stream().map(Operator::toMongoInitialStateCriteria));
+//        return pair("$and", operands.stream().map(Operator::toMongoInitialStateCriteria));
+        return map(operands.stream().map(Operator::toMongoInitialStateCriteria).collect(toList()));
     }
 
     @Override
     public Map<String, Object> toMongoEventCriteria() {
-        return pair("$and", operands.stream().map(Operator::toMongoEventCriteria));
+        return map(operands.stream().map(Operator::toMongoEventCriteria).collect(toList()));
+//        return pair("$and", operands.stream().map(Operator::toMongoEventCriteria));
     }
 
     @Override

@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static com.github.filipmalczak.vent.helper.Cloning.deepClone;
 import static java.util.stream.Collectors.toList;
 
 @Document
@@ -30,18 +31,22 @@ public class Page {
     private LocalDateTime nextPageFrom;
     private Map initialState;
     private List<Event> events;
-    private LocalDateTime finishedOn;
+    private LocalDateTime objectDeletedOn;
+
+    public List<? extends Event> getEvents(){
+        return events;
+    }
 
     public boolean describesStateAt(LocalDateTime at){
         return (at.isAfter(startingFrom) || at.isEqual(startingFrom)) && (nextPageFrom == null || nextPageFrom.isAfter(at));
     }
 
-    public boolean isFinished(){
-        return finishedOn == null;
+    public boolean finished(){
+        return objectDeletedOn != null;
     }
 
     public void finish(LocalDateTime at){
-        finishedOn = at;
+        objectDeletedOn = at;
     }
 
     /**
@@ -49,7 +54,7 @@ public class Page {
      * at that moment, or empty stream if queried timestamp is outside of this page.
      */
     //todo: should this be public?
-    public Stream<Event> getEventsForSnapshotAt(@NonNull LocalDateTime snapshotAt){
+    public Stream<? extends Event> getEventsForSnapshotAt(@NonNull LocalDateTime snapshotAt){
         if (!describesStateAt(snapshotAt))
             return Stream.empty();
         return events.stream().filter(event ->
@@ -60,12 +65,12 @@ public class Page {
     public Optional<SnapshotInstructions> getInstructionsForSnapshotAt(@NonNull LocalDateTime snapshotAt){
         if (!describesStateAt(snapshotAt))
             return Optional.empty();
-        //todo deep copy of initialState
-        //if persistence would cache retrieved pages and we'd pass initialState for rendering, its object tree
-        //would probably change, so cached page would have different state than persisted one
         return Optional.of(
             new SnapshotInstructions(
-                initialState,
+                //if persistence would cache retrieved pages and we'd pass initialState for rendering, its object tree
+                //would probably change, so cached page would have different state than persisted one
+                //thus we deep copy the initial state; events are immutable, so each snapshot instructions are isolated
+                deepClone(initialState),
                 getEventsForSnapshotAt(snapshotAt).
                     collect(toList())
             )

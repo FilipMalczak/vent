@@ -18,9 +18,18 @@ public class EqualsOperator implements Operator {
     private final String path;
     private final Object value;
 
+    private Map initialStateQueryLevel(String[] parts, int i){
+        if (i == parts.length-1)
+            return pair(parts[i], value);
+        //todo indexing
+        return pair(parts[i], initialStateQueryLevel(parts, i+1));
+    }
+
     @Override
     public Map<String, Object> toMongoInitialStateCriteria() {
-        return null;
+        String[] parts = path.split("[.]");
+        return initialStateQueryLevel(parts, 0);
+//        return pair(path, value);
     }
 
     // https://docs.spring.io/spring-data/mongodb/docs/current/reference/html/#mongo-template.type-mapping
@@ -31,7 +40,7 @@ public class EqualsOperator implements Operator {
             "$or",
             list(
                 map(
-                    pair("_class", PutValue.class),
+                    pair("_class", PutValue.class.getCanonicalName()),
                     pair(
                         "$or",
                         list(
@@ -40,13 +49,13 @@ public class EqualsOperator implements Operator {
                             //some object (not a primitive val) was put under some superpath
                             map(
                                 pair("path", pair("$in", superPaths())),
-                                pair("$type", "object")
+                                pair("value", pair("$type", "object"))
                             )
                         )
                     )
                 ),
                 //fixme see com.github.filipmalczak.vent.embedded.EmbeddedReactiveVentCollection.update()
-                pair("_class", Update.class)
+                pair("_class", Update.class.getCanonicalName())//todo refactor ofClass(Class) -> pair("_class", canonicalname)
             )
         );
     }

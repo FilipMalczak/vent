@@ -75,8 +75,8 @@ public class PageService {
         return query(
             collectionName,
             Criteria.where(null).orOperator(
-                Criteria.where("finishedOn").gt(at),
-                Criteria.where("finishedOn").is(null)
+                Criteria.where("objectDeletedOn").gt(at),
+                Criteria.where("objectDeletedOn").is(null)
             )
         );
     }
