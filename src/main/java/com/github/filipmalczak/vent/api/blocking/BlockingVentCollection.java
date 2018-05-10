@@ -5,7 +5,6 @@ import com.github.filipmalczak.vent.api.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.Success;
 import com.github.filipmalczak.vent.api.VentId;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentCollection;
-import com.github.filipmalczak.vent.api.reactive.ReactiveVentDb;
 import com.github.filipmalczak.vent.api.traits.Blocking;
 
 import java.time.LocalDateTime;
