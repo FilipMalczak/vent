@@ -9,10 +9,16 @@ public interface Operator {
      * Should not check timestamps (orchestration of operators will take care of that).
      */
     Map<String, Object> toMongoInitialStateCriteria();
+
     /**
      * This is gonna be embedded in Page query, applying to events like { events: { $elemMatch: [result] } }
      * Should not check timestamps (orchestration of operators will take care of that).
      */
     Map<String, Object> toMongoEventCriteria();
+
+    /**
+     * Once we filter out pages on Mongo level with queries above, we choose those that really match the query
+     * with this predicate (applied to rendered snapshot state).
+     */
     Predicate<Map> toRuntimeCriteria();
 }

@@ -18,11 +18,7 @@ public class MongoQueryPreparator {
         return process(query);
     }
 
-    private Object processAnything(Object object){
-        if (object instanceof Map)
-            return process((Map) object);
-        if (object instanceof List)
-            return process((List) object);
+    private Object process(Object object){
         return object;
     }
 
@@ -30,24 +26,30 @@ public class MongoQueryPreparator {
         Map result = new HashMap();
         for (Object key: result.keySet()){
             Object value = arg.get(key);
+            //copy pairs with non-string keys as they were; shouldn't really happen, but lets leave them untouched
             if (key instanceof String){
-                Object processedValue = processAnything(value);
+                Object processedValue = process(value);
+                //if there is embedded query
                 if (processedValue instanceof Map){
                     Map childResult = (Map) processedValue;
+                    //that is not operator-based, but rather field-based
                     if (!((String) key).startsWith("$")) {
                         Set childKeys = new HashSet<>(childResult.keySet());
                         for (Object childKey: childKeys){
+                            //ignore non-string keys again
                             if (childKey instanceof String) {
                                 Object valueToPullUp = childResult.get(childKey);
                                 childResult.remove(childKey);
+                                //pull embedded query parts to upper level
                                 result.put(key+"."+childKey, valueToPullUp);
                             }
                         }
+                        //if there were non-string keys, keep them in query
                         if (!childResult.isEmpty())
                             result.put(key, childResult);
                     } else
                         result.put(key, childResult);
-                } else {
+                } else { //else - recurse and keep structure
                     result.put(key, processedValue);
                 }
             } else {
@@ -58,7 +60,7 @@ public class MongoQueryPreparator {
     }
 
     private List process(List list){
-        return (List) list.stream().map(this::processAnything).collect(toList());
+        return (List) list.stream().map(this::process).collect(toList());
     }
 
 

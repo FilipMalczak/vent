@@ -7,7 +7,8 @@ import com.github.filipmalczak.vent.api.query.operator.*;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentDb;
 import com.github.filipmalczak.vent.embedded.service.MongoQueryPreparator;
 import com.github.filipmalczak.vent.embedded.service.SnapshotService;
-import com.github.filipmalczak.vent.testimpl.TestingTemporalService;
+import com.github.filipmalczak.vent.testing.TestingTemporalService;
+import com.github.filipmalczak.vent.testing.Times;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,12 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.IntStream;
 
 import static com.github.filipmalczak.vent.helper.Struct.*;
 import static java.util.stream.Collectors.toList;
@@ -33,7 +31,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @VentSpringTest
 @Slf4j
 public class QueryTest {
-    //fixme in this case standard temporal service could be enough
     @Autowired
     private TestingTemporalService temporalService;
     @Autowired
@@ -47,15 +44,14 @@ public class QueryTest {
     private ReactiveVentDb reactiveVentDb;
 
     private final static String COLLECTION_NAME = "collection";
-    private final static LocalDateTime START_TIME = LocalDateTime.of(2000, 1, 1, 12, 0);
-    private final static Duration INTERVAL = Duration.ofMinutes(5);
+    private final static Times times = Times.defaultFromMilleniumBreak();
 
     private Query query(Operator rootOperator){
         return new Query(COLLECTION_NAME, rootOperator, mongoQueryPreparator, mongoTemplate, snapshotService);
     }
 
-    private Map<String, VentId> fixtureNameToId;
-
+    // we could do this in tearDown/@AfterEach, but its better to clean the DB up before test,
+    // so that we can investigate DB state post factum
     @BeforeEach
     public void setUp(){
         reactiveVentDb.asBlocking().getCollection(COLLECTION_NAME).drop();
@@ -64,14 +60,14 @@ public class QueryTest {
     @Test
     //todo switch to spock, unroll with many operators
     public void queryingEmptyDbShould(){
-        temporalService.withResults(list(LocalDateTime.now()), () -> {
+        temporalService.withResults(times.justNow(), () -> {
             StepVerifier.create(
                 query(EqualsOperator.with("a", 1)).
                     execute(temporalService.now())
             ).verifyComplete();
         });
 
-        temporalService.withResults(list(LocalDateTime.now()), () -> {
+        temporalService.withResults(times.justNow(), () -> {
             assertNull(
                 query(EqualsOperator.with("a", 1)).
                     execute(temporalService.now()).
@@ -82,7 +78,7 @@ public class QueryTest {
 
     @Test
     public void queryInitialStateByTopLevelField(){
-        temporalService.withResults(byInterval(3), () -> {
+        temporalService.withResults(times.byInterval(3), () -> {
             Map aData = person(
                 "A1", "A2",
                 20,
@@ -113,8 +109,8 @@ public class QueryTest {
                     ObjectSnapshot.builder().
                         ventId(a).
                         state(aData).
-                        lastUpdate(after(0)).
-                        queryTime(after(2)).
+                        lastUpdate(times.after(0)).
+                        queryTime(times.after(2)).
                         version(0).build()
                 ),
                 results
@@ -125,7 +121,7 @@ public class QueryTest {
 
     @Test
     public void queryingEventResultsByTopLevelField() {
-        temporalService.withResults(byInterval(5), () -> {
+        temporalService.withResults(times.byInterval(5), () -> {
             Map aData = person(
                 "A1", "A2",
                 20,
@@ -159,8 +155,8 @@ public class QueryTest {
                     ObjectSnapshot.builder().
                         ventId(b).
                         state(map(bData, pair("age", 35))).
-                        lastUpdate(after(3)).
-                        queryTime(after(4)).
+                        lastUpdate(times.after(3)).
+                        queryTime(times.after(4)).
                         version(1).build()
                 ),
                 results
@@ -170,7 +166,7 @@ public class QueryTest {
 
     @Test
     public void queryingInitialStateByNestedField() {
-        temporalService.withResults(byInterval(3), () -> {
+        temporalService.withResults(times.byInterval(3), () -> {
             Map aData = person(
                 "A1", "A2",
                 20,
@@ -201,8 +197,8 @@ public class QueryTest {
                     ObjectSnapshot.builder().
                         ventId(a).
                         state(aData).
-                        lastUpdate(after(0)).
-                        queryTime(after(2)).
+                        lastUpdate(times.after(0)).
+                        queryTime(times.after(2)).
                         version(0).build()
                 ),
                 results
@@ -212,7 +208,7 @@ public class QueryTest {
 
     @Test
     public void queryingExplicitEventResultsNestedField() {
-        temporalService.withResults(byInterval(5), () -> {
+        temporalService.withResults(times.byInterval(5), () -> {
             Map aData = person(
                 "A1", "A2",
                 20,
@@ -252,8 +248,8 @@ public class QueryTest {
                                 pair("last", ((Map<String, ?>)bData.get("name")).get("last"))
                             ))
                         )).
-                        lastUpdate(after(3)).
-                        queryTime(after(4)).
+                        lastUpdate(times.after(3)).
+                        queryTime(times.after(4)).
                         version(1).build()
                 ),
                 results
@@ -263,7 +259,7 @@ public class QueryTest {
 
     @Test
     public void queryingSuperpathEventResultsNestedField() {
-        temporalService.withResults(byInterval(5), () -> {
+        temporalService.withResults(times.byInterval(5), () -> {
             Map aData = person(
                 "A1", "A2",
                 20,
@@ -311,8 +307,8 @@ public class QueryTest {
                                 pair("last", "X2")
                             ))
                         )).
-                        lastUpdate(after(2)).
-                        queryTime(after(4)).
+                        lastUpdate(times.after(2)).
+                        queryTime(times.after(4)).
                         version(1).build()
                 ),
                 results
@@ -322,7 +318,7 @@ public class QueryTest {
 
     @Test
     public void queryingAnd() {
-        temporalService.withResults(byInterval(5), () -> {
+        temporalService.withResults(times.byInterval(5), () -> {
             Map aData = person(
                 "A1", "A2",
                 20,
@@ -382,14 +378,14 @@ public class QueryTest {
                     ObjectSnapshot.builder().
                         ventId(b).
                         state(bData).
-                        lastUpdate(after(1)).
-                        queryTime(after(4)).
+                        lastUpdate(times.after(1)).
+                        queryTime(times.after(4)).
                         version(0).build(),
                     ObjectSnapshot.builder().
                         ventId(c).
                         state(cData).
-                        lastUpdate(after(2)).
-                        queryTime(after(4)).
+                        lastUpdate(times.after(2)).
+                        queryTime(times.after(4)).
                         version(0).build()
                 ),
                 results
@@ -399,7 +395,7 @@ public class QueryTest {
 
     @Test
     public void queryingOr() {
-        temporalService.withResults(byInterval(5), () -> {
+        temporalService.withResults(times.byInterval(5), () -> {
             Map aData = person(
                 "A1", "A2",
                 20,
@@ -458,14 +454,14 @@ public class QueryTest {
                     ObjectSnapshot.builder().
                         ventId(b).
                         state(bData).
-                        lastUpdate(after(1)).
-                        queryTime(after(4)).
+                        lastUpdate(times.after(1)).
+                        queryTime(times.after(4)).
                         version(0).build(),
                     ObjectSnapshot.builder().
                         ventId(c).
                         state(cData).
-                        lastUpdate(after(2)).
-                        queryTime(after(4)).
+                        lastUpdate(times.after(2)).
+                        queryTime(times.after(4)).
                         version(0).build()
                 ),
                 results
@@ -475,7 +471,7 @@ public class QueryTest {
 
     @Test
     public void queryingBySublistIndexFromInitialState() {
-        temporalService.withResults(byInterval(3), () -> {
+        temporalService.withResults(times.byInterval(3), () -> {
             Map aData = person(
                 "A1", "A2",
                 20,
@@ -506,8 +502,8 @@ public class QueryTest {
                     ObjectSnapshot.builder().
                         ventId(a).
                         state(aData).
-                        lastUpdate(after(0)).
-                        queryTime(after(2)).
+                        lastUpdate(times.after(0)).
+                        queryTime(times.after(2)).
                         version(0).build()
                 ),
                 results
@@ -517,7 +513,7 @@ public class QueryTest {
 
     @Test
     public void queryingBySublistIndexFromExplicitEvent() {
-        temporalService.withResults(byInterval(4), () -> {
+        temporalService.withResults(times.byInterval(4), () -> {
             Map aData = person(
                 "A1", "A2",
                 20,
@@ -557,8 +553,8 @@ public class QueryTest {
                                 account("AA3", 300)
                             ))
                         )).
-                        lastUpdate(after(2)).
-                        queryTime(after(3)).
+                        lastUpdate(times.after(2)).
+                        queryTime(times.after(3)).
                         version(1).build()
                 ),
                 results
@@ -568,7 +564,7 @@ public class QueryTest {
 
     @Test
     public void queryingBySublistIndexFromLowerSuperPathWhenInitialStateIndicatesCandidacy() {
-        temporalService.withResults(byInterval(4), () -> {
+        temporalService.withResults(times.byInterval(4), () -> {
             Map aData = person(
                 "A1", "A2",
                 20,
@@ -608,8 +604,8 @@ public class QueryTest {
                                 account("AA3", 300)
                             ))
                         )).
-                        lastUpdate(after(2)).
-                        queryTime(after(3)).
+                        lastUpdate(times.after(2)).
+                        queryTime(times.after(3)).
                         version(1).build()
                 ),
                 results
@@ -620,7 +616,7 @@ public class QueryTest {
     //fixme how does it work? PathUtils have a bug, so what the hell? oO
     @Test
     public void queryingBySublistIndexFromHigherSuperPathWhenInitialStateIndicatesCandidacy() {
-        temporalService.withResults(byInterval(4), () -> {
+        temporalService.withResults(times.byInterval(4), () -> {
             Map aData = person(
                 "A1", "A2",
                 20,
@@ -658,8 +654,8 @@ public class QueryTest {
                                 account("AAA", 314)
                             ))
                         )).
-                        lastUpdate(after(2)).
-                        queryTime(after(3)).
+                        lastUpdate(times.after(2)).
+                        queryTime(times.after(3)).
                         version(1).build()
                 ),
                 results
@@ -669,7 +665,7 @@ public class QueryTest {
 
     @Test
     public void queryingNot() {
-        temporalService.withResults(byInterval(3), () -> {
+        temporalService.withResults(times.byInterval(3), () -> {
             Map aData = person(
                 "A1", "A2",
                 20,
@@ -700,8 +696,8 @@ public class QueryTest {
                     ObjectSnapshot.builder().
                         ventId(a).
                         state(aData).
-                        lastUpdate(after(0)).
-                        queryTime(after(2)).
+                        lastUpdate(times.after(0)).
+                        queryTime(times.after(2)).
                         version(0).build()
                 ),
                 results
@@ -709,24 +705,7 @@ public class QueryTest {
         });
     }
 
-    private List<LocalDateTime> byInterval(int size){
-        return IntStream.range(0, size).
-            mapToObj(this::after).
-            collect(toList());
-    }
-
-    private LocalDateTime after(int intervals){
-        return START_TIME.plus(INTERVAL.multipliedBy(intervals));
-    }
-
-    private Map account(String name, int balance){
-        return map(
-            pair("accountName", name),
-            pair("balance", balance)
-        );
-    }
-
-    private Map person(String firstName, String lastName, int age, String street, String city, List<Map> accounts){
+    private static Map person(String firstName, String lastName, int age, String street, String city, List<Map> accounts){
         return map(
             pair("name", map(
                 pair("first", firstName),
@@ -738,6 +717,13 @@ public class QueryTest {
                 pair("city", city)
             )),
             pair("accounts", accounts)
+        );
+    }
+
+    private static Map account(String name, int balance){
+        return map(
+            pair("accountName", name),
+            pair("balance", balance)
         );
     }
 }

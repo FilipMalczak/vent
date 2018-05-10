@@ -3,9 +3,10 @@ package com.github.filipmalczak.vent.embedded;
 import com.github.filipmalczak.vent.VentSpringTest;
 import com.github.filipmalczak.vent.api.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.VentId;
-import com.github.filipmalczak.vent.testimpl.TestingTemporalService;
+import com.github.filipmalczak.vent.testing.TestingTemporalService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.test.StepVerifier;
@@ -29,7 +30,13 @@ class EmbeddedReactiveVentDbTest {
 
     private static final String TEST_COLLECTION = "test_collection";
 
-    //todo: move Holder init to setup
+    private Holder<VentId> holder;
+
+    @BeforeEach
+    public void setUp(){
+        holder = new Holder<>();
+    }
+
     /**
      * Sorta ugly, but it gets the work done, so why not?
      * Just a reference wrapper that provides one method T -> T that stores argument inside the wrapper and returns it.
@@ -49,7 +56,6 @@ class EmbeddedReactiveVentDbTest {
         LocalDateTime now = LocalDateTime.now();
         temporalService.addResults(now);
 
-        Holder<VentId> holder = new Holder<>();
         StepVerifier.create(
             ventDb.getCollection(TEST_COLLECTION).create().
                 map(holder::hold).
@@ -73,7 +79,6 @@ class EmbeddedReactiveVentDbTest {
         LocalDateTime now = LocalDateTime.now();
         temporalService.addResults(now);
 
-        Holder<VentId> holder = new Holder<>();
         StepVerifier.create(
             ventDb.getCollection(TEST_COLLECTION).create(map()).
                 map(holder::hold).
@@ -102,7 +107,6 @@ class EmbeddedReactiveVentDbTest {
         data.put("a", 1);
         data.put("b", asList("x", "y"));
 
-        Holder<VentId> holder = new Holder<>();
         StepVerifier.create(
             ventDb.getCollection(TEST_COLLECTION).create(data).
                 map(holder::hold).
@@ -127,7 +131,6 @@ class EmbeddedReactiveVentDbTest {
         LocalDateTime future = now.plus(Duration.ofSeconds(3));
         temporalService.addResults(now);
 
-        Holder<VentId> holder = new Holder<>();
         StepVerifier.create(
             ventDb.getCollection(TEST_COLLECTION).create().
                 map(holder::hold).
@@ -153,7 +156,6 @@ class EmbeddedReactiveVentDbTest {
         LocalDateTime future = now.plus(Duration.ofSeconds(3));
         temporalService.addResults(now);
 
-        Holder<VentId> holder = new Holder<>();
         StepVerifier.create(
             ventDb.getCollection(TEST_COLLECTION).create(map()).
                 map(holder::hold).
@@ -182,7 +184,6 @@ class EmbeddedReactiveVentDbTest {
         data.put("a", 1);
         data.put("b", asList("x", "y"));
 
-        Holder<VentId> holder = new Holder<>();
         StepVerifier.create(
             ventDb.getCollection(TEST_COLLECTION).create(data).
                 map(holder::hold).
@@ -249,7 +250,6 @@ class EmbeddedReactiveVentDbTest {
         LocalDateTime future = putNow.plus(Duration.ofSeconds(3));
         temporalService.addResults(createNow, putNow);
 
-        Holder<VentId> holder = new Holder<>();
         StepVerifier.create(
             ventDb.getCollection(TEST_COLLECTION).create().
                 map(holder::hold).
@@ -276,7 +276,6 @@ class EmbeddedReactiveVentDbTest {
         LocalDateTime beforePut = putNow.minus(Duration.ofSeconds(1));
         temporalService.addResults(createNow, putNow);
 
-        Holder<VentId> holder = new Holder<>();
         StepVerifier.create(
             ventDb.getCollection(TEST_COLLECTION).create().
                 map(holder::hold).
@@ -304,7 +303,6 @@ class EmbeddedReactiveVentDbTest {
         LocalDateTime queryTime = put2Now.plus(Duration.ofSeconds(1));
         temporalService.addResults(createNow, putNow, put2Now);
 
-        Holder<VentId> holder = new Holder<>();
         StepVerifier.create(
             ventDb.getCollection(TEST_COLLECTION).create().
                 map(holder::hold).

@@ -1,4 +1,4 @@
-package com.github.filipmalczak.vent.testimpl;
+package com.github.filipmalczak.vent.testing;
 
 import com.github.filipmalczak.vent.embedded.service.TemporalService;
 import lombok.extern.slf4j.Slf4j;
@@ -18,11 +18,11 @@ public class TestingTemporalService implements TemporalService {
     @Autowired(required = false)
     private StackTracer stackTracer;
 
-    public <C extends Collection<LocalDateTime>> void withResults(C times, Runnable onCurrentNow){
+    public <C extends Collection<LocalDateTime>> void withResults(C times, Runnable runnable){
         int initialQueueSize = queueToReturn.size();
         addResults(times);
         try {
-            onCurrentNow.run();
+            runnable.run();
         } finally {
             try {
                 assertEquals(initialQueueSize, queueToReturn.size(), "All times have to be used!");

@@ -13,8 +13,4 @@ import java.util.function.Function;
  */
 public interface Event extends Function<Map, Map> {
     LocalDateTime getOccuredOn();
-
-    default String get_class(){
-        return this.getClass().getCanonicalName();
-    }
 }

@@ -7,9 +7,11 @@ import com.github.filipmalczak.vent.velvet.UnresolvablePathException;
 import com.github.filipmalczak.vent.velvet.Velvet;
 import lombok.Value;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static com.github.filipmalczak.vent.helper.Struct.*;
 
@@ -36,6 +38,21 @@ public class EqualsOperator implements Operator {
     // enforce type hints in our code, so if Spring Data changes the approach, we can still use following impl
     @Override
     public Map<String, Object> toMongoEventCriteria() {
+        List<String> superPaths = PathUtils.superPaths(path);
+        if (superPaths.isEmpty())
+            return pair(
+                "$or",
+                list(
+                    map(
+                        //exactly that value was put under exactly that path
+                        pair("_class", PutValue.class.getCanonicalName()),
+                        pair("path", path),
+                        pair("value", value)
+                    ),
+                    //fixme see com.github.filipmalczak.vent.embedded.EmbeddedReactiveVentCollection.update()
+                    pair("_class", Update.class.getCanonicalName())//todo refactor ofClass(Class) -> pair("_class", canonicalname)
+                )
+            );
         return pair(
             "$or",
             list(
@@ -48,7 +65,13 @@ public class EqualsOperator implements Operator {
                             map(pair("path", path), pair("value", value)),
                             //some object (not a primitive val) was put under some superpath
                             map(
-                                pair("path", pair("$in", superPaths())),
+                                //if path was of form a.b (2 components) then check whether there was "PUT object under a"
+                                //if path was longer like a.b.c, then check "PUT object under a or a.b"
+                                pair("path",
+                                    superPaths.size() > 1 ?
+                                        pair("$in", superPaths) :
+                                        superPaths.get(0)
+                                ),
                                 pair("value", pair("$type", "object"))
                             )
                         )
@@ -58,10 +81,6 @@ public class EqualsOperator implements Operator {
                 pair("_class", Update.class.getCanonicalName())//todo refactor ofClass(Class) -> pair("_class", canonicalname)
             )
         );
-    }
-
-    private List<String> superPaths(){
-        return PathUtils.superPaths(path);
     }
 
     @Override

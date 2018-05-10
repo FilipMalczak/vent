@@ -58,7 +58,10 @@ public class Query {
                 pair("nextPageFrom", null),
                 pair("nextPageFrom", pair("$gt", queryAt))
             )),
-            //todo or for objectDeletedOn
+            pair("$or", list(
+                pair("objectDeletedOn", null),
+                pair("objectDeletedOn", pair("$gt", queryAt))
+            )),
             pair("$or", list(
                 pair("events", pair("$elemMatch", rootOperator.toMongoEventCriteria())),
                 pair("events.0", map(
@@ -68,28 +71,13 @@ public class Query {
                 pair("initialState", rootOperator.toMongoInitialStateCriteria())
             ))
         );
-//        log.info("Timestamp: "+temporalService.toTimestamp(queryAt));
-        log.info("unprepared query "+new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(candidatePagesMongoQuery));
-        //todo once you provide enough tests, remove reactive logs
         candidatePagesMongoQuery = mongoQueryPreparator.prepare(candidatePagesMongoQuery);
-        log.info("prepared query "+new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(candidatePagesMongoQuery));
         return Flux.from(
                 mongoTemplate.find(new BasicQuery(new Document(candidatePagesMongoQuery)), Page.class, collectionName)
             ).
-            log("RAW_PAGES").
             //fixme I think that this is redundant
-            filter(p -> {
-                log.info("Page: "+p);
-                boolean result = p.describesStateAt(queryAt);
-                return result;
-            }).
-            log("MATCHING_TIMESTAMP").
+            filter(p -> p.describesStateAt(queryAt)).
             map(p -> snapshotService.render(p, queryAt)).
-            log("RENDERED").
-            filter(x -> {
-                boolean r = rootOperator.toRuntimeCriteria().test(x.getState());
-                return r;
-            }).
-            log("RUNTIME_FILTERED");
+            filter(x -> rootOperator.toRuntimeCriteria().test(x.getState()));
     }
 }

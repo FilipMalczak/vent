@@ -1,14 +1,14 @@
-package com.github.filipmalczak.vent.testimpl;
+package com.github.filipmalczak.vent.testing;
 
 import lombok.*;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.github.filipmalczak.vent.helper.Struct.set;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.joining;
 
@@ -17,7 +17,7 @@ import static java.util.stream.Collectors.joining;
 public class StackTracer {
     private Class<?> basePackageClass;
     @Builder.Default
-    private Set<String> packagesToFilterOut = new HashSet<>(asList("java.util", "java.lang", "sun.reflect", "org.junit", "com.intellij", "reactor"));
+    private Set<String> packagesToFilterOut = set("java.util", "java.lang", "sun.reflect", "org.junit", "com.intellij", "reactor");
     @Builder.Default
     private int defaultShorteningLevel = 3;
     @Builder.Default
@@ -68,7 +68,7 @@ public class StackTracer {
     }
 
     public String getCurrentHierarchy(){
-        return getCurrentHierarchy(1); // 1 frame - from method introducing default arg
+        return getCurrentHierarchy(1); // skip 1 frame - from method introducing default arg
     }
 
     private static class AnException extends RuntimeException {}
@@ -82,7 +82,8 @@ public class StackTracer {
         private final String fileName;
         private final int lineNumber;
 
-        @Getter(lazy = true, value = AccessLevel.PRIVATE) private final String[] nameParts = fullyQualifiedClassName.split("[.]");
+        @Getter(lazy = true, value = AccessLevel.PRIVATE)
+        private final String[] nameParts = fullyQualifiedClassName.split("[.]");
 
         public static Frame forStackFrame(StackTraceElement element){
             return new Frame(element.getClassName(), element.getMethodName(), element.getFileName(), element.getLineNumber());
@@ -117,9 +118,9 @@ public class StackTracer {
         /**
          * All classes lying on the same level as argument or higher will have package shortened; deeper in the tree
          * will not be shortened (e.g. relativeTo = abc.def.ghi.Klass, this = abc.def.ghi.jkl.Klass2 -> a.d.g.jkl,
-         * but if this = abc.def.ghi.Klass2 then result = a.d.f).
+         * but if this = abc.def.ghi.Klass2 then result = a.d.g).
          *
-         * Classes from different package subtree will be shortened with second argument.
+         * Classes from different package subtree will be shortened according to second argument.
          */
         public String getShortenedPackage(Class<?> relativeTo, int rest){
             if (fullyQualifiedClassName.startsWith(relativeTo.getPackage().getName()))
@@ -130,7 +131,8 @@ public class StackTracer {
 
     /**
      * Will still throw if from &lt; 0, but if to &gt; list.size() then it will just return "to the end".
-     * If from &gt; list.size(), will return empty list. If to &lt; 0, then it will be treated as list.size() + to.
+     * If from &gt; list.size(), will return empty list. If to &lt; 0, then it will be treated as
+     * list.size() + to (python style).
      */
     private static <T> List<T> safeSublist(List<T> list, int from, int to){
         if (from >= list.size())
@@ -143,7 +145,7 @@ public class StackTracer {
     }
 
     /**
-     * Same as overload, but default "to" to list.size().
+     * Same as overload, but with default to = list.size().
      */
     private static <T> List<T> safeSublist(List<T> list, int from){
         return safeSublist(list, from, list.size());

@@ -74,3 +74,4 @@ test.doLast jacocoTestReport.&execute
 //todo: split to embedded and web modules
 //todo: add wrapper config
 //todo: release to bintray, add badge to readme
+//todo migrate from travis.org to travis.com https://blog.travis-ci.com/2018-05-02-open-source-projects-on-travis-ci-com-with-github-apps?utm_source=Broadcast&utm_campaign=2may_release

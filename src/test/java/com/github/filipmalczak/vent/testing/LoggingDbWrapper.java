@@ -1,4 +1,4 @@
-package com.github.filipmalczak.vent.testimpl;
+package com.github.filipmalczak.vent.testing;
 
 import com.github.filipmalczak.vent.api.EventConfirmation;
 import com.github.filipmalczak.vent.api.ObjectSnapshot;

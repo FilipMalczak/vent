@@ -1,7 +1,7 @@
 language: java
 install: ./gradlew clean assemble
 script: ./gradlew test
-after_success: bash <(curl -s https://codecov.io/bash)
+after_success:
 env:
   global:
 #  I know that commiting a token seems ugly, but who the hell would want to exploit that?

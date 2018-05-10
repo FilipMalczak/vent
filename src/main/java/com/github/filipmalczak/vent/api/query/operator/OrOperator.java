@@ -12,7 +12,7 @@ import static com.github.filipmalczak.vent.helper.Struct.pair;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class OrOperator implements Operator {
-    @Singular
+    @Singular //todo enforce non-empty
     private final List<Operator> operands;
 
     @Override
