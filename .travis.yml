@@ -1,3 +1,8 @@
 language: java
 install: ./gradlew clean assemble
 script: ./gradlew test
+env:
+  global:
+#  I know that commiting a token seems ugly, but who the hell would want to exploit that?
+#  And what's the worst he can do? screw up with my coverage report? I'd actually like to see that kind of trolling...
+    - CODECOV_TOKEN=e00645fe-b75a-443a-9752-99539e2f5205
