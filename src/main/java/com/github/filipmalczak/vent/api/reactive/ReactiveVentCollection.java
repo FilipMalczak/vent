@@ -5,6 +5,7 @@ import com.github.filipmalczak.vent.api.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.Success;
 import com.github.filipmalczak.vent.api.VentId;
 import com.github.filipmalczak.vent.api.blocking.BlockingVentCollection;
+import com.github.filipmalczak.vent.api.query.ReactiveQueryBuilder;
 import com.github.filipmalczak.vent.api.traits.Reactive;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -36,4 +37,6 @@ public interface ReactiveVentCollection extends Reactive<BlockingVentCollection>
     }
 
     Mono<EventConfirmation> update(VentId id, Map newState);
+
+    ReactiveQueryBuilder<?, ? extends ReactiveVentQuery> queryBuilder();
 }

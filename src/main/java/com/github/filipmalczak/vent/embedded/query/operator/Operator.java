@@ -1,4 +1,4 @@
-package com.github.filipmalczak.vent.api.query.operator;
+package com.github.filipmalczak.vent.embedded.query.operator;
 
 import java.util.Map;
 import java.util.function.Predicate;

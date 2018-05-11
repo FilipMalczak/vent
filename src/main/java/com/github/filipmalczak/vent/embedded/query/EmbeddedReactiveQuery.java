@@ -1,10 +1,10 @@
-package com.github.filipmalczak.vent.api.query;
+package com.github.filipmalczak.vent.embedded.query;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.filipmalczak.vent.api.ObjectSnapshot;
-import com.github.filipmalczak.vent.api.query.operator.Operator;
+import com.github.filipmalczak.vent.api.reactive.ReactiveVentQuery;
 import com.github.filipmalczak.vent.embedded.model.Page;
 import com.github.filipmalczak.vent.embedded.model.events.impl.Create;
+import com.github.filipmalczak.vent.embedded.query.operator.Operator;
 import com.github.filipmalczak.vent.embedded.service.MongoQueryPreparator;
 import com.github.filipmalczak.vent.embedded.service.SnapshotService;
 import lombok.*;
@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 import static com.github.filipmalczak.vent.helper.Struct.*;
-import static java.util.stream.Collectors.toList;
 
 /**
  * Querying happens in 2 steps:
@@ -32,26 +31,20 @@ import static java.util.stream.Collectors.toList;
  * simple Predicate obtained from Operator by toRuntimeCriteria.
  *
  * todo whole thing can probably be done with some smart MongoDB query, but for MVP lets use this approach
- * development plan:
- * todo abstract ReactiveQuery/BlockingQuery interfaces
- * todo provide query builder interface
- * todo vent collections should have become factories for builders (impl matching vent impl, e.g. embedded reactive collection should return embedded reactive query)
  */
 @AllArgsConstructor
 @Slf4j
 @ToString
 @EqualsAndHashCode
-public class Query {
+public class EmbeddedReactiveQuery implements ReactiveVentQuery{
     private @NonNull String collectionName;
     private @NonNull Operator rootOperator;
-    private @NonNull MongoQueryPreparator mongoQueryPreparator; //todo remove
+    private @NonNull MongoQueryPreparator mongoQueryPreparator;
     private @NonNull ReactiveMongoTemplate mongoTemplate;
     private @NonNull SnapshotService snapshotService;
 
     @SneakyThrows
-    public Flux<ObjectSnapshot> execute(LocalDateTime queryAt){
-        log.info("queryAt "+queryAt);
-        log.info( new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(mongoTemplate.findAll(Page.class, collectionName).toStream().collect(toList())));
+    public Flux<ObjectSnapshot> find(LocalDateTime queryAt){
         Map<String, Object> candidatePagesMongoQuery = map(
             pair("startingFrom", pair("$lte", queryAt)),
             pair("$or", list(
@@ -72,9 +65,7 @@ public class Query {
             ))
         );
         candidatePagesMongoQuery = mongoQueryPreparator.prepare(candidatePagesMongoQuery);
-        return Flux.from(
-                mongoTemplate.find(new BasicQuery(new Document(candidatePagesMongoQuery)), Page.class, collectionName)
-            ).
+        return mongoTemplate.find(new BasicQuery(new Document(candidatePagesMongoQuery)), Page.class, collectionName).
             //fixme I think that this is redundant
             filter(p -> p.describesStateAt(queryAt)).
             map(p -> snapshotService.render(p, queryAt)).

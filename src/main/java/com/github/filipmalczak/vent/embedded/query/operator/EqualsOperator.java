@@ -1,4 +1,4 @@
-package com.github.filipmalczak.vent.api.query.operator;
+package com.github.filipmalczak.vent.embedded.query.operator;
 
 import com.github.filipmalczak.vent.embedded.model.events.impl.PutValue;
 import com.github.filipmalczak.vent.embedded.model.events.impl.Update;
@@ -7,11 +7,9 @@ import com.github.filipmalczak.vent.velvet.UnresolvablePathException;
 import com.github.filipmalczak.vent.velvet.Velvet;
 import lombok.Value;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import static com.github.filipmalczak.vent.helper.Struct.*;
 

@@ -4,6 +4,7 @@ import com.github.filipmalczak.vent.api.EventConfirmation;
 import com.github.filipmalczak.vent.api.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.Success;
 import com.github.filipmalczak.vent.api.VentId;
+import com.github.filipmalczak.vent.api.query.BlockingQueryBuilder;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentCollection;
 import com.github.filipmalczak.vent.api.traits.Blocking;
 
@@ -35,4 +36,6 @@ public interface BlockingVentCollection extends Blocking<ReactiveVentCollection>
     }
 
     EventConfirmation update(VentId id, Map newState);
+
+    BlockingQueryBuilder<?, ? extends BlockingVentQuery> queryBuilder();
 }

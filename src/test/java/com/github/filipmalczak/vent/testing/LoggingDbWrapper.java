@@ -6,14 +6,21 @@ import com.github.filipmalczak.vent.api.Success;
 import com.github.filipmalczak.vent.api.VentId;
 import com.github.filipmalczak.vent.api.blocking.BlockingVentCollection;
 import com.github.filipmalczak.vent.api.blocking.BlockingVentDb;
+import com.github.filipmalczak.vent.api.blocking.BlockingVentQuery;
+import com.github.filipmalczak.vent.api.query.BlockingQueryBuilder;
+import com.github.filipmalczak.vent.api.query.ReactiveQueryBuilder;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentCollection;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentDb;
+import com.github.filipmalczak.vent.api.reactive.ReactiveVentQuery;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Map;
@@ -138,6 +145,32 @@ public class LoggingDbWrapper implements ReactiveVentDb {
                             throw logException(t);
                         }
                     }
+
+                    @Override
+                    @SneakyThrows
+                    public BlockingQueryBuilder<?, ? extends BlockingVentQuery> queryBuilder() {
+                        try {
+                            logHierarchy();
+                            logArgs();
+                            BlockingQueryBuilder<?, ? extends BlockingVentQuery> delegateBuilder = delegateCollection.queryBuilder();
+                            BlockingQueryBuilder<?, ? extends BlockingVentQuery> result = (BlockingQueryBuilder<?, ? extends BlockingVentQuery>) Proxy.newProxyInstance(
+                                delegateCollection.getClass().getClassLoader(),
+                                new Class[]{BlockingQueryBuilder.class},
+                                new InvocationHandler() {
+                                    @Override
+                                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                                        Object result = method.invoke(delegateBuilder, args);
+                                        if (method.getName().equals("build"))
+                                            log.info("Builder "+delegateBuilder+" provided query: "+result);
+                                        return result;
+                                    }
+                                }
+                            );
+                            return logResult(result);
+                        } catch (Throwable t){
+                            throw logException(t);
+                        }
+                    }
                 };
             }
         };
@@ -239,6 +272,32 @@ public class LoggingDbWrapper implements ReactiveVentDb {
                     logHierarchy();
                     logArgs(id, newState);
                     Mono<EventConfirmation> result = delegateCollection.update(id, newState);
+                    return logResult(result);
+                } catch (Throwable t){
+                    throw logException(t);
+                }
+            }
+
+            @Override
+            @SneakyThrows
+            public ReactiveQueryBuilder<?, ? extends ReactiveVentQuery> queryBuilder() {
+                try {
+                    logHierarchy();
+                    logArgs();
+                    ReactiveQueryBuilder<?, ? extends ReactiveVentQuery> delegateBuilder = delegateCollection.queryBuilder();
+                    ReactiveQueryBuilder<?, ? extends ReactiveVentQuery> result = (ReactiveQueryBuilder<?, ? extends ReactiveVentQuery>) Proxy.newProxyInstance(
+                        delegateCollection.getClass().getClassLoader(),
+                        new Class[]{ReactiveQueryBuilder.class},
+                        new InvocationHandler() {
+                            @Override
+                            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                                Object result = method.invoke(delegateBuilder, args);
+                                if (method.getName().equals("build"))
+                                    log.info("Builder "+delegateBuilder+" provided query: "+result);
+                                return result;
+                            }
+                        }
+                    );
                     return logResult(result);
                 } catch (Throwable t){
                     throw logException(t);

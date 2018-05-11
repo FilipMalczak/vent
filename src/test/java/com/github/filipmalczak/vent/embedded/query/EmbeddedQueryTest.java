@@ -1,10 +1,10 @@
-package com.github.filipmalczak.vent.api.query;
+package com.github.filipmalczak.vent.embedded.query;
 
 import com.github.filipmalczak.vent.VentSpringTest;
 import com.github.filipmalczak.vent.api.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.VentId;
-import com.github.filipmalczak.vent.api.query.operator.*;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentDb;
+import com.github.filipmalczak.vent.embedded.query.operator.*;
 import com.github.filipmalczak.vent.embedded.service.MongoQueryPreparator;
 import com.github.filipmalczak.vent.embedded.service.SnapshotService;
 import com.github.filipmalczak.vent.testing.TestingTemporalService;
@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 //todo use nested tests
 @VentSpringTest
 @Slf4j
-public class QueryTest {
+public class EmbeddedQueryTest {
     @Autowired
     private TestingTemporalService temporalService;
     @Autowired
@@ -64,7 +64,7 @@ public class QueryTest {
             temporalService.withResults(times.justNow(), () -> {
                 StepVerifier.create(
                     query(EqualsOperator.with("a", 1)).
-                        execute(temporalService.now())
+                        find(temporalService.now())
                 ).verifyComplete();
             });
         }
@@ -75,7 +75,7 @@ public class QueryTest {
             temporalService.withResults(times.justNow(), () -> {
                 assertNull(
                     query(EqualsOperator.with("a", 1)).
-                        execute(temporalService.now()).
+                        find(temporalService.now()).
                         blockFirst()
                 );
             });
@@ -115,8 +115,8 @@ public class QueryTest {
                     );
                     VentId b = reactiveVentDb.asBlocking().getCollection(COLLECTION_NAME).create(bData);
 
-                    Query query = query(EqualsOperator.with("age", 20));
-                    List<ObjectSnapshot> results = query.execute(temporalService.now()).toStream().collect(toList());
+                    EmbeddedReactiveQuery query = query(EqualsOperator.with("age", 20));
+                    List<ObjectSnapshot> results = query.find(temporalService.now()).toStream().collect(toList());
                     assertEquals(
                         list(
                             ObjectSnapshot.builder().
@@ -159,8 +159,8 @@ public class QueryTest {
                     );
                     VentId b = reactiveVentDb.asBlocking().getCollection(COLLECTION_NAME).create(bData);
 
-                    Query query = query(EqualsOperator.with("name.last", "A2"));
-                    List<ObjectSnapshot> results = query.execute(temporalService.now()).toStream().collect(toList());
+                    EmbeddedReactiveQuery query = query(EqualsOperator.with("name.last", "A2"));
+                    List<ObjectSnapshot> results = query.find(temporalService.now()).toStream().collect(toList());
                     assertEquals(
                         list(
                             ObjectSnapshot.builder().
@@ -203,8 +203,8 @@ public class QueryTest {
                     );
                     VentId b = reactiveVentDb.asBlocking().getCollection(COLLECTION_NAME).create(bData);
 
-                    Query query = query(EqualsOperator.with("accounts[0].balance", 100));
-                    List<ObjectSnapshot> results = query.execute(temporalService.now()).toStream().collect(toList());
+                    EmbeddedReactiveQuery query = query(EqualsOperator.with("accounts[0].balance", 100));
+                    List<ObjectSnapshot> results = query.find(temporalService.now()).toStream().collect(toList());
                     assertEquals(
                         list(
                             ObjectSnapshot.builder().
@@ -255,8 +255,8 @@ public class QueryTest {
                     reactiveVentDb.asBlocking().getCollection(COLLECTION_NAME).putValue(a, "age", 30);
                     reactiveVentDb.asBlocking().getCollection(COLLECTION_NAME).putValue(b, "age", 35);
 
-                    Query query = query(EqualsOperator.with("age", 35));
-                    List<ObjectSnapshot> results = query.execute(temporalService.now()).toStream().collect(toList());
+                    EmbeddedReactiveQuery query = query(EqualsOperator.with("age", 35));
+                    List<ObjectSnapshot> results = query.find(temporalService.now()).toStream().collect(toList());
                     assertEquals(
                         list(
                             ObjectSnapshot.builder().
@@ -302,8 +302,8 @@ public class QueryTest {
                     reactiveVentDb.asBlocking().getCollection(COLLECTION_NAME).putValue(a, "name.first", "X");
                     reactiveVentDb.asBlocking().getCollection(COLLECTION_NAME).putValue(b, "name.first", "Y");
 
-                    Query query = query(EqualsOperator.with("name.first", "Y"));
-                    List<ObjectSnapshot> results = query.execute(temporalService.now()).toStream().collect(toList());
+                    EmbeddedReactiveQuery query = query(EqualsOperator.with("name.first", "Y"));
+                    List<ObjectSnapshot> results = query.find(temporalService.now()).toStream().collect(toList());
                     assertEquals(
                         list(
                             ObjectSnapshot.builder().
@@ -362,8 +362,8 @@ public class QueryTest {
                             pair("last", "Y2")
                         ));
 
-                    Query query = query(EqualsOperator.with("name.last", "X2"));
-                    List<ObjectSnapshot> results = query.execute(temporalService.now()).toStream().collect(toList());
+                    EmbeddedReactiveQuery query = query(EqualsOperator.with("name.last", "X2"));
+                    List<ObjectSnapshot> results = query.find(temporalService.now()).toStream().collect(toList());
                     assertEquals(
                         list(
                             ObjectSnapshot.builder().
@@ -413,8 +413,8 @@ public class QueryTest {
 
                     reactiveVentDb.asBlocking().getCollection(COLLECTION_NAME).putValue(a, "accounts[0].balance", 1234);
 
-                    Query query = query(EqualsOperator.with("accounts[0].balance", 1234));
-                    List<ObjectSnapshot> results = query.execute(temporalService.now()).toStream().collect(toList());
+                    EmbeddedReactiveQuery query = query(EqualsOperator.with("accounts[0].balance", 1234));
+                    List<ObjectSnapshot> results = query.find(temporalService.now()).toStream().collect(toList());
                     assertEquals(
                         list(
                             ObjectSnapshot.builder().
@@ -466,8 +466,8 @@ public class QueryTest {
 
                 reactiveVentDb.asBlocking().getCollection(COLLECTION_NAME).putValue(a, "accounts[0]", map(pair("accountName", "AAA"), pair("balance", 314)));
 
-                Query query = query(EqualsOperator.with("accounts[0].balance", 314));
-                List<ObjectSnapshot> results = query.execute(temporalService.now()).toStream().collect(toList());
+                EmbeddedReactiveQuery query = query(EqualsOperator.with("accounts[0].balance", 314));
+                List<ObjectSnapshot> results = query.find(temporalService.now()).toStream().collect(toList());
                 assertEquals(
                     list(
                         ObjectSnapshot.builder().
@@ -518,8 +518,8 @@ public class QueryTest {
 
                 reactiveVentDb.asBlocking().getCollection(COLLECTION_NAME).putValue(a, "accounts", list(map(pair("accountName", "AAA"), pair("balance", 314))));
 
-                Query query = query(EqualsOperator.with("accounts[0].balance", 314));
-                List<ObjectSnapshot> results = query.execute(temporalService.now()).toStream().collect(toList());
+                EmbeddedReactiveQuery query = query(EqualsOperator.with("accounts[0].balance", 314));
+                List<ObjectSnapshot> results = query.find(temporalService.now()).toStream().collect(toList());
                 assertEquals(
                     list(
                         ObjectSnapshot.builder().
@@ -571,8 +571,8 @@ public class QueryTest {
                 );
                 VentId b = reactiveVentDb.asBlocking().getCollection(COLLECTION_NAME).create(bData);
 
-                Query query = query(NotOperator.of(EqualsOperator.with("accounts[0].balance", 200)));
-                List<ObjectSnapshot> results = query.execute(temporalService.now()).toStream().collect(toList());
+                EmbeddedReactiveQuery query = query(NotOperator.of(EqualsOperator.with("accounts[0].balance", 200)));
+                List<ObjectSnapshot> results = query.find(temporalService.now()).toStream().collect(toList());
                 assertEquals(
                     list(
                         ObjectSnapshot.builder().
@@ -637,7 +637,7 @@ public class QueryTest {
                 );
                 VentId d = reactiveVentDb.asBlocking().getCollection(COLLECTION_NAME).create(dData);
 
-                Query query = query(
+                EmbeddedReactiveQuery query = query(
                     AndOperator.builder().
                         operand(EqualsOperator.with("address.street", "S2")).
                         operand(EqualsOperator.with("name.last", "B2")).
@@ -645,7 +645,7 @@ public class QueryTest {
 
                 );
                 log.info("Query: "+query);
-                Set<ObjectSnapshot> results = query.execute(temporalService.now()).toStream().collect(toSet());
+                Set<ObjectSnapshot> results = query.find(temporalService.now()).toStream().collect(toSet());
                 assertEquals(
                     set(
                         ObjectSnapshot.builder().
@@ -715,14 +715,14 @@ public class QueryTest {
                 );
                 VentId d = reactiveVentDb.asBlocking().getCollection(COLLECTION_NAME).create(dData);
 
-                Query query = query(
+                EmbeddedReactiveQuery query = query(
                     OrOperator.builder().
                         operand(EqualsOperator.with("name.first", "B1")).
                         operand(EqualsOperator.with("name.last", "C2")).
                         build()
 
                 );
-                Set<ObjectSnapshot> results = query.execute(temporalService.now()).toStream().collect(toSet());
+                Set<ObjectSnapshot> results = query.find(temporalService.now()).toStream().collect(toSet());
                 assertEquals(
                     set(
                         ObjectSnapshot.builder().
@@ -744,8 +744,8 @@ public class QueryTest {
         }
     }
 
-    private Query query(Operator rootOperator){
-        return new Query(COLLECTION_NAME, rootOperator, mongoQueryPreparator, mongoTemplate, snapshotService);
+    private EmbeddedReactiveQuery query(Operator rootOperator){
+        return new EmbeddedReactiveQuery(COLLECTION_NAME, rootOperator, mongoQueryPreparator, mongoTemplate, snapshotService);
     }
 
     private static Map person(String firstName, String lastName, int age, String street, String city, List<Map> accounts){

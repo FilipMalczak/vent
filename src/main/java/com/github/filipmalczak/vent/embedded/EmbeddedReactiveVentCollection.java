@@ -5,14 +5,21 @@ import com.github.filipmalczak.vent.api.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.Success;
 import com.github.filipmalczak.vent.api.VentId;
 import com.github.filipmalczak.vent.api.blocking.BlockingVentCollection;
+import com.github.filipmalczak.vent.api.blocking.BlockingVentQuery;
+import com.github.filipmalczak.vent.api.query.BlockingQueryBuilder;
+import com.github.filipmalczak.vent.api.query.ReactiveQueryBuilder;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentCollection;
+import com.github.filipmalczak.vent.api.reactive.ReactiveVentQuery;
 import com.github.filipmalczak.vent.embedded.model.Page;
 import com.github.filipmalczak.vent.embedded.model.events.Event;
 import com.github.filipmalczak.vent.embedded.model.events.impl.EventFactory;
+import com.github.filipmalczak.vent.embedded.query.AndCriteriaBuilder;
+import com.github.filipmalczak.vent.embedded.service.MongoQueryPreparator;
 import com.github.filipmalczak.vent.embedded.service.PageService;
 import com.github.filipmalczak.vent.embedded.service.SnapshotService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -21,6 +28,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 @AllArgsConstructor
+//todo builder?
 public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
     private @NonNull String collectionName;
 
@@ -29,6 +37,10 @@ public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
     private @NonNull EventFactory eventFactory;
 
     private @NonNull SnapshotService snapshotService;
+
+    private @NonNull MongoQueryPreparator mongoQueryPreparator;
+
+    private @NonNull ReactiveMongoTemplate mongoTemplate;
 
     @Override
     public Mono<Success> drop() {
@@ -70,6 +82,11 @@ public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
         //todo right after adding UPDATE event, new page should be created (with snapshot from right after UPDATE)
         //this will impact criteria for Equals, see com.github.filipmalczak.vent.api.query.operator.EqualsOperator
         return addEvent(id, eventFactory.update(newState));
+    }
+
+    @Override
+    public ReactiveQueryBuilder<?, ? extends ReactiveVentQuery> queryBuilder() {
+        return new EmbeddedReactiveQueryBuilder(collectionName, new AndCriteriaBuilder(), mongoQueryPreparator, mongoTemplate, snapshotService);
     }
 
     private Mono<EventConfirmation> addEvent(VentId id, Event event){
@@ -114,6 +131,11 @@ public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
             @Override
             public EventConfirmation update(VentId id, Map newState) {
                 return asReactive().update(id, newState).block();
+            }
+
+            @Override
+            public BlockingQueryBuilder<?, ? extends BlockingVentQuery> queryBuilder() {
+                return asReactive().queryBuilder().asBlocking();
             }
 
             @Override

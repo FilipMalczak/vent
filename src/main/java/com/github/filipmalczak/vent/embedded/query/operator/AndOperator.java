@@ -1,4 +1,4 @@
-package com.github.filipmalczak.vent.api.query.operator;
+package com.github.filipmalczak.vent.embedded.query.operator;
 
 import lombok.*;
 
