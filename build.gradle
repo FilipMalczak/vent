@@ -113,7 +113,6 @@ ext {
     publishingUser = project.hasProperty("publishingUsername") ?
             project.getProperty("publishingUsername") :
             System.getenv("PUBLISHING_USERNAME")
-    println "Publishing username: $publishingUser"
     publishingKey = project.hasProperty("publishingApiKey") ?
             project.getProperty("publishingApiKey") :
             System.getenv("PUBLISHING_API_KEY")
@@ -133,7 +132,7 @@ publishing {
 
 bintray {
     user = project.publishingUser
-    key = project.publishingApiKey
+    key = project.publishingKey
     publications = ['VentPublication']
     pkg {
         repo = bintrayRepo
@@ -150,7 +149,7 @@ artifactory {
         repository {
             repoKey = artifactoryRepo
             username = publishingUser
-            password = publishingApiKey
+            password = publishingKey
         }
         defaults {
             publications 'VentPublication'
