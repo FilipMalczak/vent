@@ -3,7 +3,7 @@ package com.github.filipmalczak.vent.api.blocking;
 import com.github.filipmalczak.vent.api.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.query.VentQuery;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentQuery;
-import com.github.filipmalczak.vent.api.traits.Blocking;
+import com.github.filipmalczak.vent.traits.Blocking;
 
 import java.time.LocalDateTime;
 import java.util.stream.Stream;

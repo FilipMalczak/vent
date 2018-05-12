@@ -6,7 +6,7 @@ import com.github.filipmalczak.vent.api.Success;
 import com.github.filipmalczak.vent.api.VentId;
 import com.github.filipmalczak.vent.api.query.BlockingQueryBuilder;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentCollection;
-import com.github.filipmalczak.vent.api.traits.Blocking;
+import com.github.filipmalczak.vent.traits.Blocking;
 
 import java.time.LocalDateTime;
 import java.util.Map;

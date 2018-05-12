@@ -15,6 +15,8 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 
 import java.util.function.Consumer;
 
+import static com.github.filipmalczak.vent.traits.adapters.Adapters.adapt;
+
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 public class EmbeddedReactiveQueryBuilder implements ReactiveQueryBuilder<EmbeddedReactiveQueryBuilder, EmbeddedReactiveQuery> {
     private @NonNull
@@ -22,7 +24,7 @@ public class EmbeddedReactiveQueryBuilder implements ReactiveQueryBuilder<Embedd
     private @NonNull
     AndCriteriaBuilder rootCriteriaBuilder;
     private @NonNull
-    MongoQueryPreparator mongoQueryPreparator; //todo remove
+    MongoQueryPreparator mongoQueryPreparator;
     private @NonNull
     ReactiveMongoTemplate mongoTemplate;
     private @NonNull
@@ -65,7 +67,6 @@ public class EmbeddedReactiveQueryBuilder implements ReactiveQueryBuilder<Embedd
 
     @Override
     public BlockingQueryBuilder<?, ?> asBlocking() {
-        //todo
-        return null;
+        return adapt(this);
     }
 }

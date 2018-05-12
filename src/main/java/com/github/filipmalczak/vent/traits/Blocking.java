@@ -1,4 +1,4 @@
-package com.github.filipmalczak.vent.api.traits;
+package com.github.filipmalczak.vent.traits;
 
 public interface Blocking<ReactiveType extends Reactive<? extends Blocking<ReactiveType>>> {
     ReactiveType asReactive();

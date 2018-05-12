@@ -2,7 +2,7 @@ package com.github.filipmalczak.vent.api.query;
 
 import com.github.filipmalczak.vent.api.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.blocking.BlockingVentQuery;
-import com.github.filipmalczak.vent.api.traits.Blocking;
+import com.github.filipmalczak.vent.traits.Blocking;
 
 import java.util.stream.Stream;
 

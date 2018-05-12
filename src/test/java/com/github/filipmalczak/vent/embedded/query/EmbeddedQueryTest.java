@@ -29,7 +29,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 //fixme these tests need a total refactor, but for now I'm just checking whether the approach will work at all
-//todo use nested tests
 @VentSpringTest
 @Slf4j
 public class EmbeddedQueryTest {
@@ -70,7 +69,7 @@ public class EmbeddedQueryTest {
         }
 
         @Test
-        @DisplayName("Query empty DB in blocking way")
+        @DisplayName("Query empty DB in adapters way")
         public void blockingQuery(){
             temporalService.withResults(times.justNow(), () -> {
                 assertNull(

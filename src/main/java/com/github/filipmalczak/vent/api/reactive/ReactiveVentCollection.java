@@ -6,7 +6,7 @@ import com.github.filipmalczak.vent.api.Success;
 import com.github.filipmalczak.vent.api.VentId;
 import com.github.filipmalczak.vent.api.blocking.BlockingVentCollection;
 import com.github.filipmalczak.vent.api.query.ReactiveQueryBuilder;
-import com.github.filipmalczak.vent.api.traits.Reactive;
+import com.github.filipmalczak.vent.traits.Reactive;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 import static com.github.filipmalczak.vent.helper.Struct.map;
+import static com.github.filipmalczak.vent.traits.adapters.Adapters.adapt;
 
 public interface ReactiveVentCollection extends Reactive<BlockingVentCollection> {
     Mono<Success> drop();
@@ -39,4 +40,9 @@ public interface ReactiveVentCollection extends Reactive<BlockingVentCollection>
     Mono<EventConfirmation> update(VentId id, Map newState);
 
     ReactiveQueryBuilder<?, ? extends ReactiveVentQuery> queryBuilder();
+
+    @Override
+    default BlockingVentCollection asBlocking() {
+        return adapt(this);
+    }
 }

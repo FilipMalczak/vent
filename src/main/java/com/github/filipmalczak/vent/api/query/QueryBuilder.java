@@ -16,7 +16,15 @@ public interface QueryBuilder
 
     QueryImpl build();
 
-    default FindResult execute(LocalDateTime queryAt){
+    default FindResult find(LocalDateTime queryAt){
         return build().find(queryAt);
+    }
+
+    default CountResult count(LocalDateTime queryAt){
+        return build().count(queryAt);
+    }
+
+    default ExistsResult exists(LocalDateTime queryAt){
+        return build().exists(queryAt);
     }
 }
