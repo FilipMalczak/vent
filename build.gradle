@@ -10,20 +10,56 @@ buildscript {
 	}
 }
 
+plugins {
+    id "com.jfrog.bintray" version "1.7.3"
+    id "com.jfrog.artifactory" version "4.7.2"
+    id "org.unbroken-dome.gitversion" version "0.10.0"
+}
+//todo align plugins to one convention (apply/plugins section)
+
 apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'jacoco'
+apply plugin: 'maven-publish'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
 group = 'com.github.filipmalczak'
-version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+ext {
+    currentVersion = "0.1.0"
+}
+
+gitVersion {
+    rules {
+        before {
+            version = "$currentVersion-$branchName-SNAPSHOT"
+            project.ext {
+                currentState = "FEATURE"
+            }
+        }
+        onBranch("master"){
+            version = currentVersion
+            project.ext {
+                currentState = "RELEASE"
+            }
+        }
+        onBranch("dev"){
+            version = "$currentVersion-SNAPSHOT"
+            project.ext {
+                currentState = "SNAPSHOT"
+            }
+        }
+    }
+}
+
+version = gitVersion.determineVersion()
 
 repositories {
 	mavenCentral()
 }
-
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-actuator')
@@ -71,7 +107,88 @@ jacocoTestReport {
 
 test.doLast jacocoTestReport.&execute
 
+ext {
+    bintrayRepo = 'maven'
+    artifactoryRepo = currentState == "RELEASE" ? 'oss-release-local' : 'oss-snapshot-local'
+    publishingUser = project.hasProperty("publishingUsername") ?
+            project.getProperty("publishingUsername") :
+            System.getenv("PUBLISHING_USERNAME")
+    publishingKey = project.hasProperty("publishingApiKey") ?
+            project.getProperty("publishingApiKey") :
+            System.getenv("PUBLISHING_API_KEY")
+}
+
+publishing {
+    publications {
+        VentPublication(MavenPublication) {
+            from components.java
+            artifact jar
+            groupId project.group
+            artifactId project.name
+            version project.version
+        }
+    }
+}
+
+bintray {
+    user = publishingUser
+    key = publishingApiKey
+    publications = ['VentPublication']
+    pkg {
+        repo = bintrayRepo
+        name = 'vent'
+        licenses = ['MIT']
+        vcsUrl = 'https://github.com/FilipMalczak/vent.git'
+        githubRepo = "FilipMalczak/vent"
+    }
+}
+
+artifactory {
+    contextUrl = artifactory_url
+    publish {
+        repository {
+            repoKey = artifactoryRepo
+            username = publishingUser
+            password = publishingApiKey
+        }
+        defaults {
+            publications 'VentPublication'
+            publishArtifacts = true
+            publishPom = true
+        }
+    }
+    clientConfig.setIncludeEnvVars(false)
+    if (System.getenv("TRAVIS") == "true") {
+        clientConfig.info.setBuildName("TRAVIS"+System.getenv("TRAVIS_BUILD_ID"))
+        clientConfig.info.setBuildNumber("TRAVIS"+System.getenv("TRAVIS_BUILD_NUMBER"))
+    }
+}
+
+bootJar.enabled = false
+jar.enabled = true
+
+task assertPublishingIsPossible {
+    doFirst {
+        assert publishingUser != null
+        assert publishingKey != null
+    }
+}
+
+task publishArtifacts(group: "publishing") {
+    dependsOn assertPublishingIsPossible
+    dependsOn artifactoryPublish
+    if (currentState == "RELEASE")
+        dependsOn bintrayUpload
+}
+
+artifactoryPublish.shouldRunAfter(assertPublishingIsPossible)
+bintrayUpload.shouldRunAfter(assertPublishingIsPossible)
+
+wrapper {
+    distributionType = Wrapper.DistributionType.ALL
+    gradleVersion = '4.7'
+}
+
 //todo: split to embedded and web modules
-//todo: add wrapper config
-//todo: release to bintray, add badge to readme
 //todo migrate from travis.org to travis.com https://blog.travis-ci.com/2018-05-02-open-source-projects-on-travis-ci-com-with-github-apps?utm_source=Broadcast&utm_campaign=2may_release
+
