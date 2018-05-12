@@ -113,6 +113,7 @@ ext {
     publishingUser = project.hasProperty("publishingUsername") ?
             project.getProperty("publishingUsername") :
             System.getenv("PUBLISHING_USERNAME")
+    println "Publishing username: $publishingUser"
     publishingKey = project.hasProperty("publishingApiKey") ?
             project.getProperty("publishingApiKey") :
             System.getenv("PUBLISHING_API_KEY")
@@ -131,8 +132,8 @@ publishing {
 }
 
 bintray {
-    user = publishingUser
-    key = publishingApiKey
+    user = project.publishingUser
+    key = project.publishingApiKey
     publications = ['VentPublication']
     pkg {
         repo = bintrayRepo
