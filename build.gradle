@@ -148,6 +148,14 @@ bintray {
         licenses = ['MIT']
         vcsUrl = 'https://github.com/FilipMalczak/vent.git'
         githubRepo = "FilipMalczak/vent"
+        if (System.getenv("TRAVIS") == "true") {
+            attributes = [
+                buildNo: "TRAVIS_"+System.getenv("TRAVIS_BUILD_NUMBER"),
+                buildUrl: "https://travis-ci.org/FilipMalczak/vent/builds/"+System.getenv("TRAVIS_BUILD_NUMBER"),
+                ciUrl: "https://travis-ci.org/"+System.getenv("TRAVIS_REPO_SLUG"),
+                gitCommit: System.getenv("TRAVIS_COMMIT")
+            ]
+        }
     }
 }
 
@@ -166,9 +174,13 @@ artifactory {
         }
     }
     clientConfig.setIncludeEnvVars(false)
+    clientConfig.info.setBuildName("vent")
+    clientConfig.info.setVcsUrl("https://github.com/FilipMalczak/vent.git")
     if (System.getenv("TRAVIS") == "true") {
-        clientConfig.info.setBuildName("TRAVIS_"+System.getenv("TRAVIS_BUILD_ID"))
         clientConfig.info.setBuildNumber("TRAVIS_"+System.getenv("TRAVIS_BUILD_NUMBER"))
+        clientConfig.info.setBuildUrl("https://travis-ci.org/FilipMalczak/vent/builds/"+System.getenv("TRAVIS_BUILD_NUMBER"))
+        clientConfig.info.setPrincipal("https://travis-ci.org/"+System.getenv("TRAVIS_REPO_SLUG"))
+        clientConfig.info.setVcsRevision(System.getenv("TRAVIS_COMMIT"))
     }
 }
 
