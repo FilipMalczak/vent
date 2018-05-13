@@ -11,6 +11,10 @@
 [![Artifactory snapshot](https://img.shields.io/badge/artifactory-snapshot-brightgreen.svg)](https://oss.jfrog.org/artifactory/webapp/#/artifacts/browse/tree/General/oss-snapshot-local/com/github/filipmalczak/vent) 
 [![Artifactory builds](https://img.shields.io/badge/artifactory-builds-yellow.svg)](https://oss.jfrog.org/artifactory/webapp/#/builds/vent) 
  
+> Currently Bintray is misconfigured and artifacts are not deployed there.
+> Until I fix it, use JFrog OSS Artifactory.
+> https://docs.travis-ci.com/user/deployment/bintray/ will probably be the way to do this
+ 
 Vent - evented DB
 
 Status:
