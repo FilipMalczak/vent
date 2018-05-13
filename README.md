@@ -9,6 +9,7 @@
  Artifactory: 
  [snapshot](https://oss.jfrog.org/artifactory/webapp/#/artifacts/browse/tree/General/oss-snapshot-local/com/github/filipmalczak/vent)
  [release](https://oss.jfrog.org/artifactory/webapp/#/artifacts/browse/tree/General/oss-release-local/com/github/filipmalczak/vent)
+ [builds](https://oss.jfrog.org/artifactory/webapp/#/builds/vent)
  
 Snapshots are published per-commit. See gradle config for details.
 
