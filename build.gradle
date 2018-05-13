@@ -130,10 +130,6 @@ publishing {
     publications {
         VentPublication(MavenPublication) {
             from components.java
-            artifact jar
-            groupId project.group
-            artifactId project.name
-            version project.version
         }
     }
 }
