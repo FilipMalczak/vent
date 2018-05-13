@@ -1,4 +1,4 @@
 language: java
 install: ./gradlew clean assemble
 script: ./gradlew test
-after_success: ./gradlew publishArtifacts
+after_success: ./gradlew publishArtifactsFromCI

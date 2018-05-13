@@ -33,6 +33,8 @@ ext {
 }
 
 gitVersion {
+    // we only override branch for pushes, because version is effectively important only when publishing artifacts;
+    // see publishArtifactsFromCI task
     if (System.getenv("TRAVIS_EVENT_TYPE") == "push") {
         overrideBranchName = System.getenv("TRAVIS_BRANCH")
     }
@@ -165,8 +167,8 @@ artifactory {
     }
     clientConfig.setIncludeEnvVars(false)
     if (System.getenv("TRAVIS") == "true") {
-        clientConfig.info.setBuildName("TRAVIS"+System.getenv("TRAVIS_BUILD_ID"))
-        clientConfig.info.setBuildNumber("TRAVIS"+System.getenv("TRAVIS_BUILD_NUMBER"))
+        clientConfig.info.setBuildName("TRAVIS_"+System.getenv("TRAVIS_BUILD_ID"))
+        clientConfig.info.setBuildNumber("TRAVIS_"+System.getenv("TRAVIS_BUILD_NUMBER"))
     }
 }
 
@@ -180,11 +182,20 @@ task assertPublishingIsPossible {
     }
 }
 
-task publishArtifacts(group: "publishing") {
+task publishArtifacts(group: "publishing",
+        description: "Published artifacts to Artifactory and, in case of master branch, to Bintray") {
     dependsOn assertPublishingIsPossible
     dependsOn artifactoryPublish
     if (currentState == "RELEASE")
         dependsOn bintrayUpload
+}
+
+//todo introduce nightly builds
+task publishArtifactsFromCI(group: "publishing",
+        description: "If this is executed by Travis because of git push (and not pull request, etc), " +
+                "publish artifacts; else - no-op"){
+    if (System.getenv("TRAVIS_EVENT_TYPE") == "push")
+        dependsOn publishArtifacts
 }
 
 artifactoryPublish.shouldRunAfter(assertPublishingIsPossible)
