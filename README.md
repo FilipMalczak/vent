@@ -1,20 +1,16 @@
 # vent
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 [![Insight.io](https://www.insight.io/repoBadge/github.com/FilipMalczak/vent)](https://insight.io/github.com/FilipMalczak/vent)
-[![Dependabot enabled](https://img.shields.io/badge/dependabot-enabled-blue.svg)](https://dependabot.com)
+[![Dependabot enabled](https://img.shields.io/badge/dependabot-enabled-yellow.svg)](https://dependabot.com)
 [![BCH compliance](https://bettercodehub.com/edge/badge/FilipMalczak/vent?branch=dev)](https://bettercodehub.com/)
-[ ![Download](https://api.bintray.com/packages/filipmalczak/maven/vent/images/download.svg) ](https://bintray.com/filipmalczak/maven/vent/_latestVersion)
- 
- Artifactory: 
- [snapshot](https://oss.jfrog.org/artifactory/webapp/#/artifacts/browse/tree/General/oss-snapshot-local/com/github/filipmalczak/vent)
- [release](https://oss.jfrog.org/artifactory/webapp/#/artifacts/browse/tree/General/oss-release-local/com/github/filipmalczak/vent)
- [builds](https://oss.jfrog.org/artifactory/webapp/#/builds/vent)
- 
-Snapshots are published per-commit. See gradle config for details.
 
->todo figure out artifactory badge
-
+[![Bintray release](https://img.shields.io/badge/bintray-release-blue.svg) ](https://bintray.com/filipmalczak/maven/vent/_latestVersion)
+[![Artifactory release](https://img.shields.io/badge/artifactory-release-blue.svg)](https://oss.jfrog.org/artifactory/webapp/#/artifacts/browse/tree/General/oss-release-local/com/github/filipmalczak/vent) 
+[![Artifactory snapshot](https://img.shields.io/badge/artifactory-snapshot-brightgreen.svg)](https://oss.jfrog.org/artifactory/webapp/#/artifacts/browse/tree/General/oss-snapshot-local/com/github/filipmalczak/vent) 
+[![Artifactory builds](https://img.shields.io/badge/artifactory-builds-yellow.svg)](https://oss.jfrog.org/artifactory/webapp/#/artifacts/browse/tree/General/oss-release-local/com/github/filipmalczak/vent) 
+ 
 Vent - evented DB
 
 Status:
