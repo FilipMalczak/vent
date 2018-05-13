@@ -9,7 +9,7 @@
 [![Bintray release](https://img.shields.io/badge/bintray-release-blue.svg) ](https://bintray.com/filipmalczak/maven/vent/_latestVersion)
 [![Artifactory release](https://img.shields.io/badge/artifactory-release-blue.svg)](https://oss.jfrog.org/artifactory/webapp/#/artifacts/browse/tree/General/oss-release-local/com/github/filipmalczak/vent) 
 [![Artifactory snapshot](https://img.shields.io/badge/artifactory-snapshot-brightgreen.svg)](https://oss.jfrog.org/artifactory/webapp/#/artifacts/browse/tree/General/oss-snapshot-local/com/github/filipmalczak/vent) 
-[![Artifactory builds](https://img.shields.io/badge/artifactory-builds-yellow.svg)](https://oss.jfrog.org/artifactory/webapp/#/artifacts/browse/tree/General/oss-release-local/com/github/filipmalczak/vent) 
+[![Artifactory builds](https://img.shields.io/badge/artifactory-builds-yellow.svg)](https://oss.jfrog.org/artifactory/webapp/#/builds/vent) 
  
 Vent - evented DB
 
