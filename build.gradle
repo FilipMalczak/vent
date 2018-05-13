@@ -33,6 +33,9 @@ ext {
 }
 
 gitVersion {
+    if (System.getenv("TRAVIS_EVENT_TYPE") == "push") {
+        overrideBranchName = System.getenv("TRAVIS_BRANCH")
+    }
     rules {
         before {
             version = "$currentVersion-$branchName-SNAPSHOT"
