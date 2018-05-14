@@ -1,8 +1,8 @@
 package com.github.filipmalczak.vent.traits.adapters;
 
-import com.github.filipmalczak.vent.api.ObjectSnapshot;
-import com.github.filipmalczak.vent.api.blocking.BlockingVentQuery;
-import com.github.filipmalczak.vent.api.reactive.ReactiveVentQuery;
+import com.github.filipmalczak.vent.api.blocking.query.BlockingVentQuery;
+import com.github.filipmalczak.vent.api.model.ObjectSnapshot;
+import com.github.filipmalczak.vent.api.reactive.query.ReactiveVentQuery;
 import lombok.Value;
 
 import java.time.LocalDateTime;

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Component;
 
+//todo define API status for embedded stuff; probably provide single factory-like entry point
 @Component
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public class EmbeddedReactiveVentDb implements ReactiveVentDb {

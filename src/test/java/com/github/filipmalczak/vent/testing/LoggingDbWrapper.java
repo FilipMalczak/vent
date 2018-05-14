@@ -1,17 +1,17 @@
 package com.github.filipmalczak.vent.testing;
 
-import com.github.filipmalczak.vent.api.EventConfirmation;
-import com.github.filipmalczak.vent.api.ObjectSnapshot;
-import com.github.filipmalczak.vent.api.Success;
-import com.github.filipmalczak.vent.api.VentId;
 import com.github.filipmalczak.vent.api.blocking.BlockingVentCollection;
 import com.github.filipmalczak.vent.api.blocking.BlockingVentDb;
-import com.github.filipmalczak.vent.api.blocking.BlockingVentQuery;
-import com.github.filipmalczak.vent.api.query.BlockingQueryBuilder;
-import com.github.filipmalczak.vent.api.query.ReactiveQueryBuilder;
+import com.github.filipmalczak.vent.api.blocking.query.BlockingQueryBuilder;
+import com.github.filipmalczak.vent.api.blocking.query.BlockingVentQuery;
+import com.github.filipmalczak.vent.api.model.EventConfirmation;
+import com.github.filipmalczak.vent.api.model.ObjectSnapshot;
+import com.github.filipmalczak.vent.api.model.Success;
+import com.github.filipmalczak.vent.api.model.VentId;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentCollection;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentDb;
-import com.github.filipmalczak.vent.api.reactive.ReactiveVentQuery;
+import com.github.filipmalczak.vent.api.reactive.query.ReactiveQueryBuilder;
+import com.github.filipmalczak.vent.api.reactive.query.ReactiveVentQuery;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;

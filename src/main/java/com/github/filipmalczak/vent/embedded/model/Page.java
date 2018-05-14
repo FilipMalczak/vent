@@ -1,7 +1,7 @@
 package com.github.filipmalczak.vent.embedded.model;
 
-import com.github.filipmalczak.vent.api.EventConfirmation;
-import com.github.filipmalczak.vent.api.VentId;
+import com.github.filipmalczak.vent.api.model.EventConfirmation;
+import com.github.filipmalczak.vent.api.model.VentId;
 import com.github.filipmalczak.vent.embedded.model.events.Event;
 import lombok.*;
 import org.bson.types.ObjectId;
@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static com.github.filipmalczak.vent.embedded.utils.MongoTranslator.fromMongo;
 import static com.github.filipmalczak.vent.helper.Cloning.deepClone;
 import static java.util.stream.Collectors.toList;
 
@@ -80,7 +81,7 @@ public class Page {
     public EventConfirmation addEvent(Event event){
         //todo: add validation, e.g. check on this stage whether PutValue will be succesful; same with DeleteValue
         events.add(event);
-        return new EventConfirmation(VentId.fromMongoId(objectId), event.getOccuredOn());
+        return new EventConfirmation(fromMongo(objectId), event.getOccuredOn());
     }
 
     /**

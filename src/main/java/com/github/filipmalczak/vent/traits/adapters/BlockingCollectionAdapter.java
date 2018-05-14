@@ -1,12 +1,12 @@
 package com.github.filipmalczak.vent.traits.adapters;
 
-import com.github.filipmalczak.vent.api.EventConfirmation;
-import com.github.filipmalczak.vent.api.ObjectSnapshot;
-import com.github.filipmalczak.vent.api.Success;
-import com.github.filipmalczak.vent.api.VentId;
 import com.github.filipmalczak.vent.api.blocking.BlockingVentCollection;
-import com.github.filipmalczak.vent.api.blocking.BlockingVentQuery;
-import com.github.filipmalczak.vent.api.query.BlockingQueryBuilder;
+import com.github.filipmalczak.vent.api.blocking.query.BlockingQueryBuilder;
+import com.github.filipmalczak.vent.api.blocking.query.BlockingVentQuery;
+import com.github.filipmalczak.vent.api.model.EventConfirmation;
+import com.github.filipmalczak.vent.api.model.ObjectSnapshot;
+import com.github.filipmalczak.vent.api.model.Success;
+import com.github.filipmalczak.vent.api.model.VentId;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentCollection;
 import lombok.Value;
 

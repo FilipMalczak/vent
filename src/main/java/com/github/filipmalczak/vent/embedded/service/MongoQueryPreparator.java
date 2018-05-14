@@ -1,5 +1,6 @@
 package com.github.filipmalczak.vent.embedded.service;
 
+
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -12,6 +13,7 @@ import static java.util.stream.Collectors.toList;
  *
  * todo fold aternative of "equals" conditions with the same key to single "in" operator
  */
+
 @Component
 public class MongoQueryPreparator {
     public Map prepare(Map query){

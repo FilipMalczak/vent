@@ -1,6 +1,6 @@
 package com.github.filipmalczak.vent.web.integration;
 
-import com.github.filipmalczak.vent.api.VentId;
+import com.github.filipmalczak.vent.api.model.VentId;
 import com.github.filipmalczak.vent.web.model.IdView;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.ConfigurableMapper;

@@ -1,8 +1,8 @@
 package com.github.filipmalczak.vent.embedded;
 
 import com.github.filipmalczak.vent.VentSpringTest;
-import com.github.filipmalczak.vent.api.ObjectSnapshot;
-import com.github.filipmalczak.vent.api.VentId;
+import com.github.filipmalczak.vent.api.model.ObjectSnapshot;
+import com.github.filipmalczak.vent.api.model.VentId;
 import com.github.filipmalczak.vent.testing.TestingTemporalService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;

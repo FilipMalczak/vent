@@ -1,7 +1,10 @@
-package com.github.filipmalczak.vent.api.query;
+package com.github.filipmalczak.vent.api.general.query;
+
+
 
 import java.time.LocalDateTime;
 import java.util.function.Consumer;
+
 
 public interface QueryBuilder
     <This extends QueryBuilder<This, QueryImpl, FindResult, CountResult, ExistsResult>,

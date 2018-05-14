@@ -1,15 +1,15 @@
 package com.github.filipmalczak.vent.embedded;
 
-import com.github.filipmalczak.vent.api.EventConfirmation;
-import com.github.filipmalczak.vent.api.ObjectSnapshot;
-import com.github.filipmalczak.vent.api.Success;
-import com.github.filipmalczak.vent.api.VentId;
 import com.github.filipmalczak.vent.api.blocking.BlockingVentCollection;
-import com.github.filipmalczak.vent.api.blocking.BlockingVentQuery;
-import com.github.filipmalczak.vent.api.query.BlockingQueryBuilder;
-import com.github.filipmalczak.vent.api.query.ReactiveQueryBuilder;
+import com.github.filipmalczak.vent.api.blocking.query.BlockingQueryBuilder;
+import com.github.filipmalczak.vent.api.blocking.query.BlockingVentQuery;
+import com.github.filipmalczak.vent.api.model.EventConfirmation;
+import com.github.filipmalczak.vent.api.model.ObjectSnapshot;
+import com.github.filipmalczak.vent.api.model.Success;
+import com.github.filipmalczak.vent.api.model.VentId;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentCollection;
-import com.github.filipmalczak.vent.api.reactive.ReactiveVentQuery;
+import com.github.filipmalczak.vent.api.reactive.query.ReactiveQueryBuilder;
+import com.github.filipmalczak.vent.api.reactive.query.ReactiveVentQuery;
 import com.github.filipmalczak.vent.embedded.model.Page;
 import com.github.filipmalczak.vent.embedded.model.events.Event;
 import com.github.filipmalczak.vent.embedded.model.events.impl.EventFactory;
@@ -17,6 +17,7 @@ import com.github.filipmalczak.vent.embedded.query.AndCriteriaBuilder;
 import com.github.filipmalczak.vent.embedded.service.MongoQueryPreparator;
 import com.github.filipmalczak.vent.embedded.service.PageService;
 import com.github.filipmalczak.vent.embedded.service.SnapshotService;
+import com.github.filipmalczak.vent.embedded.utils.MongoTranslator;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -53,17 +54,17 @@ public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
         return pageService.
             createFirstPage(collectionName, initialState).
             map(Page::getObjectId).
-            map(VentId::fromMongoId);
+            map(MongoTranslator::fromMongo);
     }
 
     @Override
     public Mono<EventConfirmation> putValue(VentId id, String path, Object value){
-        return addEvent(id, eventFactory.putValue(path, value));
+        return addEventToCurrentPage(id, eventFactory.putValue(path, value));
     }
 
     @Override
     public Mono<EventConfirmation> deleteValue(VentId id, String path) {
-        return addEvent(id, eventFactory.deleteValue(path));
+        return addEventToCurrentPage(id, eventFactory.deleteValue(path));
     }
 
 
@@ -74,14 +75,14 @@ public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
 
     @Override
     public Flux<VentId> identifyAll(LocalDateTime queryAt) {
-        return pageService.allPages(collectionName, queryAt).map(Page::getObjectId).map(VentId::fromMongoId);
+        return pageService.allPages(collectionName, queryAt).map(Page::getObjectId).map(MongoTranslator::fromMongo);
     }
 
     @Override
     public Mono<EventConfirmation> update(VentId id, Map newState) {
         //todo right after adding UPDATE event, new page should be created (with snapshot from right after UPDATE)
         //this will impact criteria for Equals, see com.github.filipmalczak.vent.api.query.operator.EqualsOperator
-        return addEvent(id, eventFactory.update(newState));
+        return addEventToCurrentPage(id, eventFactory.update(newState));
     }
 
     @Override
@@ -89,7 +90,7 @@ public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
         return new EmbeddedReactiveQueryBuilder(collectionName, new AndCriteriaBuilder(), mongoQueryPreparator, mongoTemplate, snapshotService);
     }
 
-    private Mono<EventConfirmation> addEvent(VentId id, Event event){
+    private Mono<EventConfirmation> addEventToCurrentPage(VentId id, Event event){
         return pageService.
             currentPage(collectionName, id).
             flatMap(p -> pageService.addEvent(collectionName, p, event));

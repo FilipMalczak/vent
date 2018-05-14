@@ -1,11 +1,12 @@
 package com.github.filipmalczak.vent.embedded.service;
 
-import com.github.filipmalczak.vent.api.EventConfirmation;
-import com.github.filipmalczak.vent.api.Success;
-import com.github.filipmalczak.vent.api.VentId;
+import com.github.filipmalczak.vent.api.model.EventConfirmation;
+import com.github.filipmalczak.vent.api.model.Success;
+import com.github.filipmalczak.vent.api.model.VentId;
 import com.github.filipmalczak.vent.embedded.model.Page;
 import com.github.filipmalczak.vent.embedded.model.events.Event;
 import com.github.filipmalczak.vent.embedded.model.events.impl.EventFactory;
+import com.github.filipmalczak.vent.embedded.utils.MongoTranslator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
@@ -23,6 +24,8 @@ import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.Map;
 
+import static com.github.filipmalczak.vent.embedded.utils.MongoTranslator.fromMongo;
+import static com.github.filipmalczak.vent.embedded.utils.MongoTranslator.toMongo;
 import static java.util.Arrays.asList;
 import static reactor.core.publisher.Mono.just;
 
@@ -84,14 +87,14 @@ public class PageService {
     public Flux<Page> allPages(@NonNull String collectionName, @NonNull VentId id){
         return query(
             collectionName,
-            Criteria.where("objectId").is(id.toMongoId())
+            Criteria.where("objectId").is(toMongo(id))
         );
     }
 
     public Mono<Page> pageAtTimestamp(@NonNull String collectionName, @NonNull VentId id, @NonNull LocalDateTime at){
         return query(
                 collectionName,
-                Criteria.where("objectId").is(id.toMongoId()).
+                Criteria.where("objectId").is(toMongo(id)).
                     and("startingFrom").lte(at).
                     orOperator(
                         Criteria.where("nextPageFrom").gt(at),
@@ -105,7 +108,7 @@ public class PageService {
     public Mono<Page> currentPage(@NonNull String collectionName, @NonNull VentId id){
         return query(
             collectionName,
-            Criteria.where("objectId").is(id.toMongoId()).
+            Criteria.where("objectId").is(toMongo(id)).
                 and("nextPageFrom").is(null)
         ).next();
     }
@@ -118,6 +121,6 @@ public class PageService {
 
     //fixme doesnt fit the responsibility, see EmbeddedReactiveVentCollection.drop
     public Mono<Success> drop(String collectionName){
-        return Mono.from(mongoTemplate.getCollection(collectionName).drop()).map(Success::fromMongoSuccess);
+        return Mono.from(mongoTemplate.getCollection(collectionName).drop()).map(MongoTranslator::fromMongo);
     }
 }

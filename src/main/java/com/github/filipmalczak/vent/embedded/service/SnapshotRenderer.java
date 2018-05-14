@@ -6,6 +6,7 @@ import com.github.filipmalczak.vent.embedded.model.events.Event;
 import java.util.List;
 import java.util.Map;
 
+
 public interface SnapshotRenderer {
 
     Map render(Map initialSnapshot, List<Event> events);

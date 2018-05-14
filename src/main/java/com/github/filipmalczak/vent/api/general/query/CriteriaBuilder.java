@@ -1,8 +1,9 @@
-package com.github.filipmalczak.vent.api.query;
+package com.github.filipmalczak.vent.api.general.query;
 
 import com.github.filipmalczak.vent.embedded.query.operator.Operator;
 
 import java.util.function.Consumer;
+
 
 public interface CriteriaBuilder {
     default CriteriaBuilder and(Consumer<CriteriaBuilder> andScope){

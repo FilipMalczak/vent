@@ -1,6 +1,9 @@
-package com.github.filipmalczak.vent.api.query;
+package com.github.filipmalczak.vent.api.general.query;
+
+
 
 import java.time.LocalDateTime;
+
 
 public interface VentQuery<FindResult, CountResult, ExistsResult> {
     FindResult find(LocalDateTime queryAt);

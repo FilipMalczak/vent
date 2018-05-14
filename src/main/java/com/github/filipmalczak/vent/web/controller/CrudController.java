@@ -1,6 +1,6 @@
 package com.github.filipmalczak.vent.web.controller;
 
-import com.github.filipmalczak.vent.api.VentId;
+import com.github.filipmalczak.vent.api.model.VentId;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentDb;
 import com.github.filipmalczak.vent.embedded.service.TemporalService;
 import com.github.filipmalczak.vent.web.model.CreateRequest;

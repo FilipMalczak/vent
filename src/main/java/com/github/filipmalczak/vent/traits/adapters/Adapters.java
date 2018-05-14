@@ -2,12 +2,12 @@ package com.github.filipmalczak.vent.traits.adapters;
 
 import com.github.filipmalczak.vent.api.blocking.BlockingVentCollection;
 import com.github.filipmalczak.vent.api.blocking.BlockingVentDb;
-import com.github.filipmalczak.vent.api.blocking.BlockingVentQuery;
-import com.github.filipmalczak.vent.api.query.BlockingQueryBuilder;
-import com.github.filipmalczak.vent.api.query.ReactiveQueryBuilder;
+import com.github.filipmalczak.vent.api.blocking.query.BlockingQueryBuilder;
+import com.github.filipmalczak.vent.api.blocking.query.BlockingVentQuery;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentCollection;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentDb;
-import com.github.filipmalczak.vent.api.reactive.ReactiveVentQuery;
+import com.github.filipmalczak.vent.api.reactive.query.ReactiveQueryBuilder;
+import com.github.filipmalczak.vent.api.reactive.query.ReactiveVentQuery;
 
 public class Adapters {
     private Adapters(){}

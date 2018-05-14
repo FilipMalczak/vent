@@ -1,10 +1,11 @@
-package com.github.filipmalczak.vent.api;
+package com.github.filipmalczak.vent.api.model;
 
 import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+
 
 @Builder
 @Data

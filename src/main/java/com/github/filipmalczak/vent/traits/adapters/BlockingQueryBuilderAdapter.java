@@ -1,9 +1,9 @@
 package com.github.filipmalczak.vent.traits.adapters;
 
-import com.github.filipmalczak.vent.api.blocking.BlockingVentQuery;
-import com.github.filipmalczak.vent.api.query.BlockingQueryBuilder;
-import com.github.filipmalczak.vent.api.query.CriteriaBuilder;
-import com.github.filipmalczak.vent.api.query.ReactiveQueryBuilder;
+import com.github.filipmalczak.vent.api.blocking.query.BlockingQueryBuilder;
+import com.github.filipmalczak.vent.api.blocking.query.BlockingVentQuery;
+import com.github.filipmalczak.vent.api.general.query.CriteriaBuilder;
+import com.github.filipmalczak.vent.api.reactive.query.ReactiveQueryBuilder;
 import com.github.filipmalczak.vent.embedded.query.operator.Operator;
 import lombok.Value;
 

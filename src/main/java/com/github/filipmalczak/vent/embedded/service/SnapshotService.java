@@ -1,7 +1,7 @@
 package com.github.filipmalczak.vent.embedded.service;
 
-import com.github.filipmalczak.vent.api.ObjectSnapshot;
-import com.github.filipmalczak.vent.api.VentId;
+import com.github.filipmalczak.vent.api.model.ObjectSnapshot;
+import com.github.filipmalczak.vent.api.model.VentId;
 import com.github.filipmalczak.vent.embedded.model.Page;
 import com.github.filipmalczak.vent.embedded.model.events.Event;
 import lombok.NonNull;
@@ -12,6 +12,9 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+
+import static com.github.filipmalczak.vent.embedded.utils.MongoTranslator.fromMongo;
+
 
 @Service
 public class SnapshotService {
@@ -36,7 +39,7 @@ public class SnapshotService {
 
     public ObjectSnapshot render(Page page, LocalDateTime queryAt){
         return render(
-            VentId.fromMongoId(page.getObjectId()),
+            fromMongo(page.getObjectId()),
             page.getFromVersion(),
             page.getStartingFrom(),
             //todo

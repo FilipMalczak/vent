@@ -1,6 +1,6 @@
 package com.github.filipmalczak.vent.embedded.query;
 
-import com.github.filipmalczak.vent.api.query.CriteriaBuilder;
+import com.github.filipmalczak.vent.api.general.query.CriteriaBuilder;
 import com.github.filipmalczak.vent.embedded.query.operator.EqualsOperator;
 import com.github.filipmalczak.vent.embedded.query.operator.Operator;
 

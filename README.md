@@ -23,6 +23,10 @@ Status:
 
 This is very early stage of development. No need for a proper README.
 
+I'm doing my best to comply with Semver, but until I reach at least v0.5.0 (or better yet, 1.0.0), I allow
+myself to evolve the API. I don't intend to make any drastic changes though - mostly they will be package
+structure changes.
+
 Long story short - this will be an event sourcing wrapper over MongoDB that will allow for querying DB with timestamp,
 in which case result will correspond to object (document) at that moment in time.
 
@@ -40,8 +44,6 @@ of Vent in other languages.
 - [ ] compacting (creating new page)
 - [x] querying
 - [ ] deleting an object
-- [ ] querying whether an object exists at given point in time (this can be done simply by getting the whole object 
-state, but it can be easily optimized for that use case)
 - [ ] full HTTP API (partially done, though untested)
 
 ## Further features

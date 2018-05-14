@@ -1,7 +1,7 @@
 package com.github.filipmalczak.vent.embedded.query;
 
-import com.github.filipmalczak.vent.api.ObjectSnapshot;
-import com.github.filipmalczak.vent.api.reactive.ReactiveVentQuery;
+import com.github.filipmalczak.vent.api.model.ObjectSnapshot;
+import com.github.filipmalczak.vent.api.reactive.query.ReactiveVentQuery;
 import com.github.filipmalczak.vent.embedded.model.Page;
 import com.github.filipmalczak.vent.embedded.model.events.impl.Create;
 import com.github.filipmalczak.vent.embedded.query.operator.Operator;

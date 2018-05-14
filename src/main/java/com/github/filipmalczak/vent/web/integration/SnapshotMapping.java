@@ -1,6 +1,6 @@
 package com.github.filipmalczak.vent.web.integration;
 
-import com.github.filipmalczak.vent.api.ObjectSnapshot;
+import com.github.filipmalczak.vent.api.model.ObjectSnapshot;
 import com.github.filipmalczak.vent.web.model.ObjectView;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.ConfigurableMapper;
