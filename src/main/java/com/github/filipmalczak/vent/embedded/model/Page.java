@@ -30,6 +30,7 @@ public class Page {
     private long fromVersion;
     private LocalDateTime startingFrom;
     private LocalDateTime nextPageFrom;
+    //can be null if first event is setting complete state, like Create or Update
     private Map initialState;
     private List<Event> events;
     private LocalDateTime objectDeletedOn;

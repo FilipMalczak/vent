@@ -43,6 +43,8 @@ public class EmbeddedReactiveQuery implements ReactiveVentQuery{
     private @NonNull ReactiveMongoTemplate mongoTemplate;
     private @NonNull SnapshotService snapshotService;
 
+    //fixme count(...) and exists(...) can be implemented with mongo count and exists
+
     @SneakyThrows
     public Flux<ObjectSnapshot> find(LocalDateTime queryAt){
         Map<String, Object> candidatePagesMongoQuery = map(

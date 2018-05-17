@@ -4,6 +4,7 @@ import com.github.filipmalczak.vent.api.blocking.BlockingVentCollection;
 import com.github.filipmalczak.vent.api.blocking.BlockingVentDb;
 import com.github.filipmalczak.vent.api.blocking.query.BlockingQueryBuilder;
 import com.github.filipmalczak.vent.api.blocking.query.BlockingVentQuery;
+import com.github.filipmalczak.vent.api.general.VentDb;
 import com.github.filipmalczak.vent.api.model.EventConfirmation;
 import com.github.filipmalczak.vent.api.model.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.model.Success;
@@ -28,6 +29,8 @@ import java.util.stream.Stream;
 
 import static com.github.filipmalczak.vent.helper.Struct.list;
 
+//fixme while DB API grew, this was not updated; it should probably be deleted
+//todo rethink, probably decorate with JDK proxy instead of this moloch of a flustercuck
 @AllArgsConstructor
 @Slf4j
 public class LoggingDbWrapper implements ReactiveVentDb {
@@ -53,6 +56,11 @@ public class LoggingDbWrapper implements ReactiveVentDb {
                     @Override
                     public ReactiveVentCollection asReactive() {
                         return delegateCollection.asReactive();
+                    }
+
+                    @Override
+                    public String getName() {
+                        return delegateCollection.getName();
                     }
 
                     @Override
@@ -177,6 +185,11 @@ public class LoggingDbWrapper implements ReactiveVentDb {
     }
 
     @Override
+    public void initialize() {
+        delegate.initialize();
+    }
+
+    @Override
     public ReactiveVentCollection getCollection(String collectionName) {
         return new ReactiveVentCollection() {
 
@@ -186,6 +199,11 @@ public class LoggingDbWrapper implements ReactiveVentDb {
             }
 
             private ReactiveVentCollection delegateCollection = delegate.getCollection(collectionName);
+
+            @Override
+            public String getName() {
+                return delegateCollection.getName();
+            }
 
             @Override
             @SneakyThrows
@@ -304,6 +322,21 @@ public class LoggingDbWrapper implements ReactiveVentDb {
                 }
             }
         };
+    }
+
+    @Override
+    public Mono<Success> optimizePages(SuggestionStrength strength, OptimizationType type) {
+        return delegate.optimizePages(strength, type);
+    }
+
+    @Override
+    public Flux<String> getManagedCollections() {
+        return null;
+    }
+
+    @Override
+    public Mono<Success> manage(String collectionName) {
+        return null;
     }
 
     public static LoggingDbWrapper defaultWrapper(StackTracer stackTracer, ReactiveVentDb delegate){

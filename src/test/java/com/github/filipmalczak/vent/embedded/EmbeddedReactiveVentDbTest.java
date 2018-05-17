@@ -35,6 +35,7 @@ class EmbeddedReactiveVentDbTest {
     @BeforeEach
     public void setUp(){
         holder = new Holder<>();
+        ventDb.initialize();
     }
 
     /**

@@ -1,8 +1,6 @@
 package com.github.filipmalczak.vent.embedded;
 
 import com.github.filipmalczak.vent.api.blocking.BlockingVentCollection;
-import com.github.filipmalczak.vent.api.blocking.query.BlockingQueryBuilder;
-import com.github.filipmalczak.vent.api.blocking.query.BlockingVentQuery;
 import com.github.filipmalczak.vent.api.model.EventConfirmation;
 import com.github.filipmalczak.vent.api.model.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.model.Success;
@@ -19,6 +17,7 @@ import com.github.filipmalczak.vent.embedded.service.PageService;
 import com.github.filipmalczak.vent.embedded.service.SnapshotService;
 import com.github.filipmalczak.vent.embedded.utils.MongoTranslator;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NonNull;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import reactor.core.publisher.Flux;
@@ -26,12 +25,13 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.stream.Stream;
+
+import static com.github.filipmalczak.vent.traits.adapters.Adapters.adapt;
 
 @AllArgsConstructor
 //todo builder?
 public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
-    private @NonNull String collectionName;
+    @Getter private @NonNull String name;
 
     private @NonNull PageService pageService;
 
@@ -46,13 +46,13 @@ public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
     @Override
     public Mono<Success> drop() {
         //fixme this is ugly, it shouldnt be pageServices responsibility, but I don't want dependency on template
-        return pageService.drop(collectionName);
+        return pageService.drop(name);
     }
 
     @Override
     public Mono<VentId> create(Map initialState) {
         return pageService.
-            createFirstPage(collectionName, initialState).
+            createFirstPage(name, initialState).
             map(Page::getObjectId).
             map(MongoTranslator::fromMongo);
     }
@@ -70,79 +70,41 @@ public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
 
     @Override
     public Mono<ObjectSnapshot> get(VentId id, LocalDateTime queryAt) {
-        return snapshotService.getSnapshot(collectionName, id, queryAt);
+        return snapshotService.getSnapshot(name, id, queryAt);
     }
 
     @Override
     public Flux<VentId> identifyAll(LocalDateTime queryAt) {
-        return pageService.allPages(collectionName, queryAt).map(Page::getObjectId).map(MongoTranslator::fromMongo);
+        return pageService.allPages(name, queryAt).map(Page::getObjectId).map(MongoTranslator::fromMongo);
     }
 
     @Override
     public Mono<EventConfirmation> update(VentId id, Map newState) {
-        //todo right after adding UPDATE event, new page should be created (with snapshot from right after UPDATE)
-        //this will impact criteria for Equals, see com.github.filipmalczak.vent.api.query.operator.EqualsOperator
-        return addEventToCurrentPage(id, eventFactory.update(newState));
+        //todo analyse impact to criteria for Equals, see com.github.filipmalczak.vent.api.query.operator.EqualsOperator
+        //todo check whether query can be optimized with this approach
+        //todo once crowding is implemented, test this properly
+        return addEventToNewPage(id, eventFactory.update(newState));
     }
 
     @Override
     public ReactiveQueryBuilder<?, ? extends ReactiveVentQuery> queryBuilder() {
-        return new EmbeddedReactiveQueryBuilder(collectionName, new AndCriteriaBuilder(), mongoQueryPreparator, mongoTemplate, snapshotService);
+        return new EmbeddedReactiveQueryBuilder(name, new AndCriteriaBuilder(), mongoQueryPreparator, mongoTemplate, snapshotService);
+    }
+
+    private Mono<EventConfirmation> addEventToNewPage(VentId id, Event event){
+        return pageService.
+            createEmptyNextPage(name, id).
+            flatMap(p -> pageService.addEvent(name, p, event));
     }
 
     private Mono<EventConfirmation> addEventToCurrentPage(VentId id, Event event){
         return pageService.
-            currentPage(collectionName, id).
-            flatMap(p -> pageService.addEvent(collectionName, p, event));
+            currentPage(name, id).
+            flatMap(p -> pageService.addEvent(name, p, event));
     }
 
     @Override
     public BlockingVentCollection asBlocking() {
-        return new BlockingVentCollection() {
-            @Override
-            public Success drop() {
-                return asReactive().drop().block();
-            }
-
-            @Override
-            public VentId create(Map initialState) {
-                return asReactive().create(initialState).block();
-            }
-
-            @Override
-            public EventConfirmation putValue(VentId id, String path, Object value) {
-                return asReactive().putValue(id, path, value).block();
-            }
-
-            @Override
-            public EventConfirmation deleteValue(VentId id, String path) {
-                return asReactive().deleteValue(id, path).block();
-            }
-
-            @Override
-            public ObjectSnapshot get(VentId id, LocalDateTime queryAt) {
-                return asReactive().get(id, queryAt).block();
-            }
-
-            @Override
-            public Stream<VentId> identifyAll(LocalDateTime queryAt) {
-                return asReactive().identifyAll(queryAt).toStream();
-            }
-
-            @Override
-            public EventConfirmation update(VentId id, Map newState) {
-                return asReactive().update(id, newState).block();
-            }
-
-            @Override
-            public BlockingQueryBuilder<?, ? extends BlockingVentQuery> queryBuilder() {
-                return asReactive().queryBuilder().asBlocking();
-            }
-
-            @Override
-            public ReactiveVentCollection asReactive() {
-                return EmbeddedReactiveVentCollection.this;
-            }
-        };
+        return adapt(this);
     }
 }

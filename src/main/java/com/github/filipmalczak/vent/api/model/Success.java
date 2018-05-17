@@ -3,10 +3,17 @@ package com.github.filipmalczak.vent.api.model;
 
 
 /**
- * Equivalent of com.mongodb.reactivestreams.client.Success, to isolate Vent from MongoDB API.
- * fixme VentId and this still expose mongo-related results from methods, so isolation is broken
+ * Similiar to com.mongodb.reactivestreams.client.Success, to isolate Vent from MongoDB API.
  */
-
 public enum Success {
-    SUCCESS;
+    /**
+     * Operation was performed and finished successfully.
+     * Example usage: result of createIfAbsent(...) in "if absent" case.
+     */
+    SUCCESS,
+    /**
+     * No operation was performed, but this should still be treated as success.
+     * Example usage: result of createIfAbsent(...) in "present" case.
+     */
+    NO_OP_SUCCESS;
 }

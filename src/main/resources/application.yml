@@ -1,16 +1,17 @@
-
-#deprecated, leftover from first version; seems legit for now though
 vent:
-  paging:
-    full.schedule: 0 0 0/1 ? * * *
+  pageOptimization:
+#    how many workers should pool used for optimization contain?; todo: unused yet
+    threads: 4
+    full:
+      schedule: 0 0 0/1 ? * * *
+      crowding: -1
     partial:
       schedule: 0 0/15 * ? * * *
-      older_than:
-        value: 30
+      olderThan:
+        value: 12
 #       unit should be name of java.time.temporal.ChronoUnit value
-        unit: MINUTES
-#     number of vents that need to be present in object to trigger compacting
-      vent_crowding: 100
+        unit: HOURS
+#     number of events that need to be present in object to trigger optimization
+      crowding: 100
 
 #todo: add weights to operations to control crowding
-#todo: rethink and implement paging

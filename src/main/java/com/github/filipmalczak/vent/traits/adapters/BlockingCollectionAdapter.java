@@ -19,6 +19,11 @@ class BlockingCollectionAdapter implements BlockingVentCollection {
     private ReactiveVentCollection ventCollection;
 
     @Override
+    public String getName() {
+        return ventCollection.getName();
+    }
+
+    @Override
     public Success drop() {
         return ventCollection.drop().block();
     }

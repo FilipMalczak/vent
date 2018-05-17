@@ -11,6 +11,8 @@ public interface VentCollection<
     SingleSuccess, SingleId, SingleConfirmation, SingleSnapshot,
     ManyIds, ManySnapshots,
     QueryBuilderImpl extends QueryBuilder> {
+    String getName();
+
     SingleSuccess drop();
 
     SingleId create(Map initialState);

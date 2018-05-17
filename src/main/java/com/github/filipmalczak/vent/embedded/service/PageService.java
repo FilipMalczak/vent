@@ -105,6 +105,34 @@ public class PageService {
             next();
     }
 
+    public Mono<Page> createEmptyNextPage(@NonNull String collectionName, @NonNull VentId id){
+        return currentPage(collectionName, id).flatMap(p -> createEmptyNextPage(collectionName, p));
+    }
+
+    public Mono<Page> createEmptyNextPage(@NonNull String collectionName, @NonNull Page previousPage){
+        Page newPage = new Page(
+            null,
+            previousPage.getObjectId(),
+            previousPage.getPageId(),
+            null,
+            previousPage.getFromVersion() + previousPage.getEvents().size(),
+            temporalService.now(),
+            null,
+            null,
+            asList(),
+            null
+        );
+        return mongoTemplate.
+            insert(newPage, collectionName).
+            flatMap(p -> {
+                previousPage.setNextPageFrom(p.getStartingFrom());
+                previousPage.setNextPageId(p.getPageId());
+                return mongoTemplate.
+                    save(previousPage, collectionName).
+                    then(just(p));
+            });
+    }
+
     public Mono<Page> currentPage(@NonNull String collectionName, @NonNull VentId id){
         return query(
             collectionName,

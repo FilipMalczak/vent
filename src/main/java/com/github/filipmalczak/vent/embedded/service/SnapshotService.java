@@ -24,13 +24,6 @@ public class SnapshotService {
     @Autowired
     private PageService pageService;
 
-    @Autowired
-    private TemporalService temporalService;
-
-    public Mono<ObjectSnapshot> getSnapshot(@NonNull String collectionName, @NonNull VentId ventId){
-        return getSnapshot(collectionName, ventId, temporalService.now());
-    }
-
     public Mono<ObjectSnapshot> getSnapshot(@NonNull String collectionName, @NonNull VentId ventId, @NonNull LocalDateTime queryAt){
         return pageService.
             pageAtTimestamp(collectionName, ventId, queryAt).
