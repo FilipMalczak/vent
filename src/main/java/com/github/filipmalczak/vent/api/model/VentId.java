@@ -1,7 +1,6 @@
 package com.github.filipmalczak.vent.api.model;
 
 import lombok.Value;
-import org.bson.types.ObjectId;
 
 
 @Value

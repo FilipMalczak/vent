@@ -1,7 +1,6 @@
 package com.github.filipmalczak.vent.embedded.model;
 
 import com.github.filipmalczak.vent.api.model.EventConfirmation;
-import com.github.filipmalczak.vent.api.model.VentId;
 import com.github.filipmalczak.vent.embedded.model.events.Event;
 import lombok.*;
 import org.bson.types.ObjectId;

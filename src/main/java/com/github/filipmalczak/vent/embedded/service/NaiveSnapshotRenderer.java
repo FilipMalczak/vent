@@ -1,7 +1,6 @@
 package com.github.filipmalczak.vent.embedded.service;
 
 import com.github.filipmalczak.vent.embedded.model.events.Event;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

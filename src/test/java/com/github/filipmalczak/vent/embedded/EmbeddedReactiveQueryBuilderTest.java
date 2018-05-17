@@ -1,6 +1,5 @@
 package com.github.filipmalczak.vent.embedded;
 
-import com.github.filipmalczak.vent.VentSpringTest;
 import com.github.filipmalczak.vent.embedded.model.VentDbDescriptor;
 import com.github.filipmalczak.vent.embedded.model.events.impl.EventFactory;
 import com.github.filipmalczak.vent.embedded.query.EmbeddedReactiveQuery;
@@ -13,15 +12,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import reactor.core.publisher.Flux;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static reactor.core.publisher.Mono.just;
 

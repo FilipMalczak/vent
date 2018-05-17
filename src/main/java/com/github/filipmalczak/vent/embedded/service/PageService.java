@@ -24,7 +24,6 @@ import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.Map;
 
-import static com.github.filipmalczak.vent.embedded.utils.MongoTranslator.fromMongo;
 import static com.github.filipmalczak.vent.embedded.utils.MongoTranslator.toMongo;
 import static java.util.Arrays.asList;
 import static reactor.core.publisher.Mono.just;

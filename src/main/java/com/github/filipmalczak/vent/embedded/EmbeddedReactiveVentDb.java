@@ -1,10 +1,8 @@
 package com.github.filipmalczak.vent.embedded;
 
-import com.github.filipmalczak.vent.api.general.VentDb;
 import com.github.filipmalczak.vent.api.model.Success;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentCollection;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentDb;
-import com.github.filipmalczak.vent.embedded.exception.MoreThanOneVentDbDescriptorException;
 import com.github.filipmalczak.vent.embedded.model.VentDbDescriptor;
 import com.github.filipmalczak.vent.embedded.model.events.impl.EventFactory;
 import com.github.filipmalczak.vent.embedded.service.MongoQueryPreparator;
@@ -12,29 +10,17 @@ import com.github.filipmalczak.vent.embedded.service.PageService;
 import com.github.filipmalczak.vent.embedded.service.SnapshotService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
-import org.springframework.data.mongodb.core.query.BasicQuery;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
-import java.util.List;
-import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static com.github.filipmalczak.vent.api.model.Success.NO_OP_SUCCESS;
 import static com.github.filipmalczak.vent.api.model.Success.SUCCESS;
-import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
 
 //todo define API status for embedded stuff; probably provide single factory-like entry point

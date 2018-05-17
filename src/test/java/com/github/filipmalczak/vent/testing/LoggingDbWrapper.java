@@ -4,7 +4,6 @@ import com.github.filipmalczak.vent.api.blocking.BlockingVentCollection;
 import com.github.filipmalczak.vent.api.blocking.BlockingVentDb;
 import com.github.filipmalczak.vent.api.blocking.query.BlockingQueryBuilder;
 import com.github.filipmalczak.vent.api.blocking.query.BlockingVentQuery;
-import com.github.filipmalczak.vent.api.general.VentDb;
 import com.github.filipmalczak.vent.api.model.EventConfirmation;
 import com.github.filipmalczak.vent.api.model.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.model.Success;
