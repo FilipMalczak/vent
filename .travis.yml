@@ -1,4 +1,6 @@
 language: java
 install: ./gradlew clean assemble
 script: ./gradlew test
-after_success: ./gradlew publishArtifactsFromCI
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+  - ./gradlew publishArtifactsFromCI
