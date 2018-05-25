@@ -163,7 +163,7 @@ subprojects {
         clientConfig.info.setBuildName("vent")
         clientConfig.info.setVcsUrl("https://github.com/FilipMalczak/vent.git")
         if (System.getenv("TRAVIS") == "true") {
-            clientConfig.info.setBuildNumber("TRAVIS_"+System.getenv("TRAVIS_BUILD_NUMBER"))
+            clientConfig.info.setBuildNumber("TRAVIS_"+System.getenv("TRAVIS_BUILD_NUMBER")+"_"+project.name)
             println("TRAVIS_BUILD_NUMBER: "+System.getenv("TRAVIS_BUILD_NUMBER"))
             clientConfig.info.setBuildUrl("https://travis-ci.org/FilipMalczak/vent/builds/"+System.getenv("TRAVIS_BUILD_NUMBER"))
             println("build.url: https://travis-ci.org/FilipMalczak/vent/builds/"+System.getenv("TRAVIS_BUILD_NUMBER"))
