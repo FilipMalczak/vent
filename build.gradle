@@ -159,6 +159,7 @@ subprojects {
                 publishPom = true
             }
         }
+        //fixme fix build numbers
         clientConfig.setIncludeEnvVars(false)
         clientConfig.info.setBuildName("vent")
         clientConfig.info.setVcsUrl("https://github.com/FilipMalczak/vent.git")
