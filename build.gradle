@@ -11,27 +11,14 @@ buildscript {
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         classpath "gradle.plugin.org.unbroken-dome.gradle-plugins:gradle-gitversion-plugin:0.10.0"
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.7.3"
 	}
 }
 
-//plugins {
-//    id "com.jfrog.bintray" version "1.7.3"
-//    id "com.jfrog.artifactory" version "4.7.2"
-//}
-//todo align plugins to one convention (apply/plugins section)
-
-subprojects {
-    apply plugin: 'java-library'
-    apply plugin: 'groovy'
-    apply plugin: 'jacoco'
-//    apply plugin: 'maven-publish'
-//    apply plugin: 'org.springframework.boot'
-    apply plugin: 'io.spring.dependency-management'
+allprojects {
     apply plugin: 'org.unbroken-dome.gitversion'
 
     group = 'com.github.filipmalczak'
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
 
     ext {
         currentVersion = "0.2.0"
@@ -66,6 +53,28 @@ subprojects {
     }
 
     version = gitVersion.determineVersion()
+}
+
+task echoGroupAndVersion(group: "help", description: "Figures out project group and current version and prints them") {
+    doLast {
+        println "Project group:   ${group}"
+        println "Project version: ${version}"
+    }
+}
+
+//todo fix bintray
+
+subprojects {
+    apply plugin: 'java-library'
+    apply plugin: 'groovy'
+    apply plugin: 'jacoco'
+    apply plugin: 'maven-publish'
+    apply plugin: "com.jfrog.artifactory"
+    apply plugin: 'io.spring.dependency-management'
+
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
 
     repositories {
         mavenCentral()
@@ -73,7 +82,6 @@ subprojects {
 
     dependencyManagement {
         imports {
-//            mavenBom "io.projectreactor:reactor-bom:Bismuth-SR9"
             mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
         }
     }
@@ -129,14 +137,65 @@ subprojects {
                 System.getenv("ARTIFACTORY_URL")
     }
 
+    publishing {
+        publications {
+            VentPublication(MavenPublication) {
+                from components.java
+            }
+        }
+    }
+
+    artifactory {
+        contextUrl = artifactoryUrl
+        publish {
+            repository {
+                repoKey = artifactoryRepo
+                username = publishingUser
+                password = publishingKey
+            }
+            defaults {
+                publications 'VentPublication'
+                publishArtifacts = true
+                publishPom = true
+            }
+        }
+        clientConfig.setIncludeEnvVars(false)
+        clientConfig.info.setBuildName("vent")
+        clientConfig.info.setVcsUrl("https://github.com/FilipMalczak/vent.git")
+        if (System.getenv("TRAVIS") == "true") {
+            clientConfig.info.setBuildNumber("TRAVIS_"+System.getenv("TRAVIS_BUILD_NUMBER"))
+            clientConfig.info.setBuildUrl("https://travis-ci.org/FilipMalczak/vent/builds/"+System.getenv("TRAVIS_BUILD_NUMBER"))
+            clientConfig.info.setPrincipal("https://travis-ci.org/"+System.getenv("TRAVIS_REPO_SLUG"))
+            clientConfig.info.setVcsRevision(System.getenv("TRAVIS_COMMIT"))
+        }
+    }
+
+    task assertPublishingIsPossible {
+        doFirst {
+            assert publishingUser != null
+            assert publishingKey != null
+        }
+    }
+
+    task publishArtifacts(group: "publishing",
+            description: "Published artifacts to Artifactory and, in case of master branch, to Bintray") {
+        dependsOn assertPublishingIsPossible
+        dependsOn artifactoryPublish
+//        if (currentState == "RELEASE")
+//            dependsOn bintrayUpload
+    }
+
+    //todo introduce nightly builds
+    task publishArtifactsFromCI(group: "publishing",
+            description: "If this is executed by Travis because of git push (and not pull request, etc), " +
+                    "publish artifacts; else - no-op"){
+        if (System.getenv("TRAVIS_EVENT_TYPE") == "push")
+            dependsOn publishArtifacts
+    }
+
+    artifactoryPublish.shouldRunAfter(assertPublishingIsPossible)
+//    bintrayUpload.shouldRunAfter(assertPublishingIsPossible)
 }
-//publishing {
-//    publications {
-//        VentPublication(MavenPublication) {
-//            from components.java
-//        }
-//    }
-//}
 //
 //bintray {
 //    user = project.publishingUser
@@ -158,60 +217,7 @@ subprojects {
 //        }
 //    }
 //}
-//
-//artifactory {
-//    contextUrl = artifactoryUrl
-//    publish {
-//        repository {
-//            repoKey = artifactoryRepo
-//            username = publishingUser
-//            password = publishingKey
-//        }
-//        defaults {
-//            publications 'VentPublication'
-//            publishArtifacts = true
-//            publishPom = true
-//        }
-//    }
-//    clientConfig.setIncludeEnvVars(false)
-//    clientConfig.info.setBuildName("vent")
-//    clientConfig.info.setVcsUrl("https://github.com/FilipMalczak/vent.git")
-//    if (System.getenv("TRAVIS") == "true") {
-//        clientConfig.info.setBuildNumber("TRAVIS_"+System.getenv("TRAVIS_BUILD_NUMBER"))
-//        clientConfig.info.setBuildUrl("https://travis-ci.org/FilipMalczak/vent/builds/"+System.getenv("TRAVIS_BUILD_NUMBER"))
-//        clientConfig.info.setPrincipal("https://travis-ci.org/"+System.getenv("TRAVIS_REPO_SLUG"))
-//        clientConfig.info.setVcsRevision(System.getenv("TRAVIS_COMMIT"))
-//    }
-//}
-//
-//bootJar.enabled = false
-//jar.enabled = true
-//
-//task assertPublishingIsPossible {
-//    doFirst {
-//        assert publishingUser != null
-//        assert publishingKey != null
-//    }
-//}
-//
-//task publishArtifacts(group: "publishing",
-//        description: "Published artifacts to Artifactory and, in case of master branch, to Bintray") {
-//    dependsOn assertPublishingIsPossible
-//    dependsOn artifactoryPublish
-//    if (currentState == "RELEASE")
-//        dependsOn bintrayUpload
-//}
-//
-////todo introduce nightly builds
-//task publishArtifactsFromCI(group: "publishing",
-//        description: "If this is executed by Travis because of git push (and not pull request, etc), " +
-//                "publish artifacts; else - no-op"){
-//    if (System.getenv("TRAVIS_EVENT_TYPE") == "push")
-//        dependsOn publishArtifacts
-//}
-//
-//artifactoryPublish.shouldRunAfter(assertPublishingIsPossible)
-//bintrayUpload.shouldRunAfter(assertPublishingIsPossible)
+
 
 wrapper {
     distributionType = Wrapper.DistributionType.ALL

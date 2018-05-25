@@ -1,6 +1,9 @@
 //todo this module is heavily underdeveloped, it needs some love
 //and then it needs a client
 
+//todo make sure that both boot jar and standard jar are published
+jar.enabled = true
+
 dependencies {
     implementation('org.springframework.boot:spring-boot-starter-actuator')
     implementation('org.springframework.boot:spring-boot-starter-webflux')

@@ -1,4 +1,5 @@
 language: java
+before_install: ./gradlew echoGroupAndVersion
 install: ./gradlew clean assemble
 script: ./gradlew test
 after_success:
