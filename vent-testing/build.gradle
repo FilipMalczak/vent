@@ -1,0 +1,7 @@
+dependencies {
+    implementation project(":vent-api")
+    implementation project(":vent-utils")
+    api('org.springframework.boot:spring-boot-starter-test')
+    api('io.projectreactor:reactor-test')
+
+}

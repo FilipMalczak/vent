@@ -1,0 +1,7 @@
+dependencies {
+    implementation project(':vent-api')
+    implementation project(':vent-adapters')
+    implementation project(':vent-utils')
+    compileOnly group: 'com.google.auto.service', name: 'auto-service', version: '1.0-rc4'
+
+}

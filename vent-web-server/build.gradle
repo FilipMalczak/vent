@@ -1,0 +1,9 @@
+//todo this module is heavily underdeveloped, it needs some love
+//and then it needs a client
+
+dependencies {
+    implementation('org.springframework.boot:spring-boot-starter-actuator')
+    implementation('org.springframework.boot:spring-boot-starter-webflux')
+    implementation group: 'ma.glasnost.orika', name: 'orika-core', version: '1.5.2'
+    implementation project(":vent-embedded")
+}

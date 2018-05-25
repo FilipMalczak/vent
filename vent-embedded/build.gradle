@@ -1,0 +1,14 @@
+dependencies {
+    implementation('de.flapdoodle.embed:de.flapdoodle.embed.mongo')
+    api project(":vent-api")
+    implementation project(":velvet")
+    implementation project(":vent-utils")
+    //todo use pure driver, without spring data
+//    implementation "org.mongodb:mongodb-driver-reactivestreams"
+//    implementation "org.springframework.data:spring-data-mongodb"
+    implementation('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
+//    implementation project(":vent-adapters") //todo
+    testImplementation project(":vent-testing")
+    testImplementation project(":vent-adapters")
+    testRuntime project(":vent-adapters-common")
+}

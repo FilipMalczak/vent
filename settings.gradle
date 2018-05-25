@@ -1,1 +1,11 @@
-rootProject.name = 'vent'
+rootProject.name = 'vent-parent'
+
+include 'vent-traits'
+include 'vent-adapters'
+include 'vent-adapters-common'
+include 'vent-api'
+include 'vent-utils'
+include 'vent-embedded'
+include 'velvet'
+include 'vent-web-server'
+include 'vent-testing'

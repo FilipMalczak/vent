@@ -4,218 +4,219 @@ buildscript {
 	}
 	repositories {
 		mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath "gradle.plugin.org.unbroken-dome.gradle-plugins:gradle-gitversion-plugin:0.10.0"
 	}
 }
 
-plugins {
-    id "com.jfrog.bintray" version "1.7.3"
-    id "com.jfrog.artifactory" version "4.7.2"
-    id "org.unbroken-dome.gitversion" version "0.10.0"
-}
+//plugins {
+//    id "com.jfrog.bintray" version "1.7.3"
+//    id "com.jfrog.artifactory" version "4.7.2"
+//}
 //todo align plugins to one convention (apply/plugins section)
 
-apply plugin: 'java'
-apply plugin: 'groovy'
-apply plugin: 'jacoco'
-apply plugin: 'maven-publish'
-apply plugin: 'org.springframework.boot'
-apply plugin: 'io.spring.dependency-management'
+subprojects {
+    apply plugin: 'java-library'
+    apply plugin: 'groovy'
+    apply plugin: 'jacoco'
+//    apply plugin: 'maven-publish'
+//    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'org.unbroken-dome.gitversion'
 
-group = 'com.github.filipmalczak'
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+    group = 'com.github.filipmalczak'
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
 
-ext {
-    currentVersion = "0.2.0"
-}
-
-gitVersion {
-    // we only override branch for pushes, because version is effectively important only when publishing artifacts;
-    // see publishArtifactsFromCI task
-    if (System.getenv("TRAVIS_EVENT_TYPE") == "push") {
-        overrideBranchName = System.getenv("TRAVIS_BRANCH")
+    ext {
+        currentVersion = "0.2.0"
     }
-    rules {
-        before {
-            version = "$currentVersion-$branchName-SNAPSHOT"
-            project.ext {
-                currentState = "FEATURE"
-            }
+
+    gitVersion {
+        // we only override branch for pushes, because version is effectively important only when publishing artifacts;
+        // see publishArtifactsFromCI task
+        if (System.getenv("TRAVIS_EVENT_TYPE") == "push") {
+            overrideBranchName = System.getenv("TRAVIS_BRANCH")
         }
-        onBranch("master"){
-            version = currentVersion
-            project.ext {
-                currentState = "RELEASE"
+        rules {
+            before {
+                version = "$currentVersion-$branchName-SNAPSHOT"
+                project.ext {
+                    currentState = "FEATURE"
+                }
             }
-        }
-        onBranch("dev"){
-            version = "$currentVersion-SNAPSHOT"
-            project.ext {
-                currentState = "SNAPSHOT"
+            onBranch("master") {
+                version = currentVersion
+                project.ext {
+                    currentState = "RELEASE"
+                }
             }
-        }
-    }
-}
-
-version = gitVersion.determineVersion()
-
-repositories {
-	mavenCentral()
-}
-
-dependencies {
-	compile('org.springframework.boot:spring-boot-starter-actuator')
-	compile('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
-	compile('org.springframework.boot:spring-boot-starter-webflux')
-	compile('de.flapdoodle.embed:de.flapdoodle.embed.mongo')
-
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.5'
-	compile group: 'ma.glasnost.orika', name: 'orika-core', version: '1.5.2'
-    compile 'uk.com.robust-it:cloning:1.9.10'
-//    compile 'org.apiguardian:apiguardian-api:1.0.0' //todo start using this
-
-    testCompile('org.springframework.boot:spring-boot-starter-test')
-    testCompile('io.projectreactor:reactor-test')
-
-    testCompile 'org.junit.jupiter:junit-jupiter-api:5.2.0'
-	testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '2.18.3'
-	testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.2.0'
-
-	testCompile group: 'org.spockframework', name: 'spock-core', version: '1.1-groovy-2.4'
-	testRuntime 'org.junit.vintage:junit-vintage-engine:5.2.0' //required for Spock
-
-    compileOnly('org.projectlombok:lombok')
-    testCompileOnly('org.projectlombok:lombok')
-}
-
-test {
-    useJUnitPlatform()
-    testLogging {
-        events "started", "passed", "skipped", "failed"
-        afterSuite { desc, result ->
-            if (!desc.parent) { // will match the outermost suite
-                println "Results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} successes, ${result.failedTestCount} failures, ${result.skippedTestCount} skipped)"
+            onBranch("dev") {
+                version = "$currentVersion-SNAPSHOT"
+                project.ext {
+                    currentState = "SNAPSHOT"
+                }
             }
         }
     }
-}
 
-jacocoTestReport {
-    reports {
-        xml.enabled true
-        xml.destination new File(buildDir, "/reports/jacoco/report.xml")
-        html.enabled true
-        html.destination new File(buildDir, "/reports/jacoco/html")
+    version = gitVersion.determineVersion()
+
+    repositories {
+        mavenCentral()
     }
-}
 
-test.doLast jacocoTestReport.&execute
-
-ext {
-    bintrayRepo = 'maven'
-    artifactoryRepo = currentState == "RELEASE" ? 'oss-release-local' : 'oss-snapshot-local'
-    publishingUser = project.hasProperty("publishingUsername") ?
-            project.getProperty("publishingUsername") :
-            System.getenv("PUBLISHING_USERNAME")
-    publishingKey = project.hasProperty("publishingApiKey") ?
-            project.getProperty("publishingApiKey") :
-            System.getenv("PUBLISHING_API_KEY")
-    artifactoryUrl = project.hasProperty("artifactoryContextUrl") ?
-            project.getProperty("artifactoryContextUrl") :
-            System.getenv("ARTIFACTORY_URL")
-}
-
-publishing {
-    publications {
-        VentPublication(MavenPublication) {
-            from components.java
+    dependencyManagement {
+        imports {
+//            mavenBom "io.projectreactor:reactor-bom:Bismuth-SR9"
+            mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
         }
     }
-}
 
-bintray {
-    user = project.publishingUser
-    key = project.publishingKey
-    publications = ['VentPublication']
-    pkg {
-        repo = bintrayRepo
-        name = 'vent'
-        licenses = ['MIT']
-        vcsUrl = 'https://github.com/FilipMalczak/vent.git'
-        githubRepo = "FilipMalczak/vent"
-        if (System.getenv("TRAVIS") == "true") {
-            attributes = [
-                buildNo: "TRAVIS_"+System.getenv("TRAVIS_BUILD_NUMBER"),
-                buildUrl: "https://travis-ci.org/FilipMalczak/vent/builds/"+System.getenv("TRAVIS_BUILD_NUMBER"),
-                ciUrl: "https://travis-ci.org/"+System.getenv("TRAVIS_REPO_SLUG"),
-                gitCommit: System.getenv("TRAVIS_COMMIT")
-            ]
+    dependencies {
+////    api 'org.apiguardian:apiguardian-api:1.0.0' //todo start using this
+
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.2.0'
+        testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '2.18.3'
+        testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.2.0'
+
+        testImplementation group: 'org.spockframework', name: 'spock-core', version: '1.1-groovy-2.4'
+        testRuntime 'org.junit.vintage:junit-vintage-engine:5.2.0' //required for Spock
+
+        compileOnly('org.projectlombok:lombok:1.16.20')
+        testCompileOnly('org.projectlombok:lombok:1.16.20')
+    }
+
+    test {
+        useJUnitPlatform()
+        testLogging {
+            events "started", "passed", "skipped", "failed"
+            afterSuite { desc, result ->
+                if (!desc.parent) { // will match the outermost suite
+                    println "Results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} successes, ${result.failedTestCount} failures, ${result.skippedTestCount} skipped)"
+                }
+            }
         }
     }
-}
 
-artifactory {
-    contextUrl = artifactoryUrl
-    publish {
-        repository {
-            repoKey = artifactoryRepo
-            username = publishingUser
-            password = publishingKey
-        }
-        defaults {
-            publications 'VentPublication'
-            publishArtifacts = true
-            publishPom = true
+    jacocoTestReport {
+        reports {
+            xml.enabled true
+            xml.destination new File(buildDir, "/reports/jacoco/report.xml")
+            html.enabled true
+            html.destination new File(buildDir, "/reports/jacoco/html")
         }
     }
-    clientConfig.setIncludeEnvVars(false)
-    clientConfig.info.setBuildName("vent")
-    clientConfig.info.setVcsUrl("https://github.com/FilipMalczak/vent.git")
-    if (System.getenv("TRAVIS") == "true") {
-        clientConfig.info.setBuildNumber("TRAVIS_"+System.getenv("TRAVIS_BUILD_NUMBER"))
-        clientConfig.info.setBuildUrl("https://travis-ci.org/FilipMalczak/vent/builds/"+System.getenv("TRAVIS_BUILD_NUMBER"))
-        clientConfig.info.setPrincipal("https://travis-ci.org/"+System.getenv("TRAVIS_REPO_SLUG"))
-        clientConfig.info.setVcsRevision(System.getenv("TRAVIS_COMMIT"))
+
+    test.doLast jacocoTestReport.&execute
+
+    ext {
+        bintrayRepo = 'maven'
+        artifactoryRepo = currentState == "RELEASE" ? 'oss-release-local' : 'oss-snapshot-local'
+        publishingUser = project.hasProperty("publishingUsername") ?
+                project.getProperty("publishingUsername") :
+                System.getenv("PUBLISHING_USERNAME")
+        publishingKey = project.hasProperty("publishingApiKey") ?
+                project.getProperty("publishingApiKey") :
+                System.getenv("PUBLISHING_API_KEY")
+        artifactoryUrl = project.hasProperty("artifactoryContextUrl") ?
+                project.getProperty("artifactoryContextUrl") :
+                System.getenv("ARTIFACTORY_URL")
     }
+
 }
-
-bootJar.enabled = false
-jar.enabled = true
-
-task assertPublishingIsPossible {
-    doFirst {
-        assert publishingUser != null
-        assert publishingKey != null
-    }
-}
-
-task publishArtifacts(group: "publishing",
-        description: "Published artifacts to Artifactory and, in case of master branch, to Bintray") {
-    dependsOn assertPublishingIsPossible
-    dependsOn artifactoryPublish
-    if (currentState == "RELEASE")
-        dependsOn bintrayUpload
-}
-
-//todo introduce nightly builds
-task publishArtifactsFromCI(group: "publishing",
-        description: "If this is executed by Travis because of git push (and not pull request, etc), " +
-                "publish artifacts; else - no-op"){
-    if (System.getenv("TRAVIS_EVENT_TYPE") == "push")
-        dependsOn publishArtifacts
-}
-
-artifactoryPublish.shouldRunAfter(assertPublishingIsPossible)
-bintrayUpload.shouldRunAfter(assertPublishingIsPossible)
+//publishing {
+//    publications {
+//        VentPublication(MavenPublication) {
+//            from components.java
+//        }
+//    }
+//}
+//
+//bintray {
+//    user = project.publishingUser
+//    key = project.publishingKey
+//    publications = ['VentPublication']
+//    pkg {
+//        repo = bintrayRepo
+//        name = 'vent'
+//        licenses = ['MIT']
+//        vcsUrl = 'https://github.com/FilipMalczak/vent.git'
+//        githubRepo = "FilipMalczak/vent"
+//        if (System.getenv("TRAVIS") == "true") {
+//            attributes = [
+//                buildNo: "TRAVIS_"+System.getenv("TRAVIS_BUILD_NUMBER"),
+//                buildUrl: "https://travis-ci.org/FilipMalczak/vent/builds/"+System.getenv("TRAVIS_BUILD_NUMBER"),
+//                ciUrl: "https://travis-ci.org/"+System.getenv("TRAVIS_REPO_SLUG"),
+//                gitCommit: System.getenv("TRAVIS_COMMIT")
+//            ]
+//        }
+//    }
+//}
+//
+//artifactory {
+//    contextUrl = artifactoryUrl
+//    publish {
+//        repository {
+//            repoKey = artifactoryRepo
+//            username = publishingUser
+//            password = publishingKey
+//        }
+//        defaults {
+//            publications 'VentPublication'
+//            publishArtifacts = true
+//            publishPom = true
+//        }
+//    }
+//    clientConfig.setIncludeEnvVars(false)
+//    clientConfig.info.setBuildName("vent")
+//    clientConfig.info.setVcsUrl("https://github.com/FilipMalczak/vent.git")
+//    if (System.getenv("TRAVIS") == "true") {
+//        clientConfig.info.setBuildNumber("TRAVIS_"+System.getenv("TRAVIS_BUILD_NUMBER"))
+//        clientConfig.info.setBuildUrl("https://travis-ci.org/FilipMalczak/vent/builds/"+System.getenv("TRAVIS_BUILD_NUMBER"))
+//        clientConfig.info.setPrincipal("https://travis-ci.org/"+System.getenv("TRAVIS_REPO_SLUG"))
+//        clientConfig.info.setVcsRevision(System.getenv("TRAVIS_COMMIT"))
+//    }
+//}
+//
+//bootJar.enabled = false
+//jar.enabled = true
+//
+//task assertPublishingIsPossible {
+//    doFirst {
+//        assert publishingUser != null
+//        assert publishingKey != null
+//    }
+//}
+//
+//task publishArtifacts(group: "publishing",
+//        description: "Published artifacts to Artifactory and, in case of master branch, to Bintray") {
+//    dependsOn assertPublishingIsPossible
+//    dependsOn artifactoryPublish
+//    if (currentState == "RELEASE")
+//        dependsOn bintrayUpload
+//}
+//
+////todo introduce nightly builds
+//task publishArtifactsFromCI(group: "publishing",
+//        description: "If this is executed by Travis because of git push (and not pull request, etc), " +
+//                "publish artifacts; else - no-op"){
+//    if (System.getenv("TRAVIS_EVENT_TYPE") == "push")
+//        dependsOn publishArtifacts
+//}
+//
+//artifactoryPublish.shouldRunAfter(assertPublishingIsPossible)
+//bintrayUpload.shouldRunAfter(assertPublishingIsPossible)
 
 wrapper {
     distributionType = Wrapper.DistributionType.ALL
     gradleVersion = '4.7'
 }
 
-//todo: split to embedded and web modules
 //todo migrate from travis.org to travis.com https://blog.travis-ci.com/2018-05-02-open-source-projects-on-travis-ci-com-with-github-apps?utm_source=Broadcast&utm_campaign=2may_release
 
