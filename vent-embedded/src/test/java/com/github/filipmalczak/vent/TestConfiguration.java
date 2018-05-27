@@ -11,7 +11,7 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 
 @Configuration
 public class TestConfiguration {
-    private static final boolean EXTENSIVE_LOGGING = true;
+    private static final boolean EXTENSIVE_LOGGING = false;
 
     public static class ExtensiveLoggingCondition implements Condition {
 

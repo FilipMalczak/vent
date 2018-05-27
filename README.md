@@ -66,7 +66,7 @@ Spring 5 configuration to be imported
 - [x] getting object state at any moment in time
 - [x] compacting (creating new page)
 - [x] querying
-- [ ] deleting an object
+- [x] deleting an object
 - [ ] full HTTP API (partially done, though untested)
 
 ## Further features
@@ -75,6 +75,7 @@ Spring 5 configuration to be imported
 - factory for Spring Data-like repositories based on Vent
 - better configurability (better pointing to underlying Mongo instance, working 
 properties for compacting)
+- API extensions (mainly in default interface methods)
 - more event types
 
 ## Other ideas:

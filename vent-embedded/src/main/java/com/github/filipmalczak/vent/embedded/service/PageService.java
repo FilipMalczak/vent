@@ -5,6 +5,7 @@ import com.github.filipmalczak.vent.api.model.Success;
 import com.github.filipmalczak.vent.api.model.VentId;
 import com.github.filipmalczak.vent.embedded.model.Page;
 import com.github.filipmalczak.vent.embedded.model.events.Event;
+import com.github.filipmalczak.vent.embedded.model.events.impl.Delete;
 import com.github.filipmalczak.vent.embedded.model.events.impl.EventFactory;
 import com.github.filipmalczak.vent.embedded.utils.MongoTranslator;
 import lombok.AllArgsConstructor;
@@ -96,9 +97,15 @@ public class PageService {
                 collectionName,
                 Criteria.where("objectId").is(toMongo(id)).
                     and("startingFrom").lte(at).
-                    orOperator(
-                        Criteria.where("nextPageFrom").gt(at),
-                        Criteria.where("nextPageFrom").is(null)
+                    andOperator(
+                        Criteria.where("").orOperator(
+                            Criteria.where("nextPageFrom").gt(at),
+                            Criteria.where("nextPageFrom").is(null)
+                        ),
+                        Criteria.where("").orOperator(
+                            Criteria.where("objectDeletedOn").gt(at),
+                            Criteria.where("objectDeletedOn").is(null)
+                        )
                     )
             ).
             sort(Comparator.comparing(Page::getStartingFrom)).
@@ -144,7 +151,13 @@ public class PageService {
     public Mono<EventConfirmation> addEvent(@NonNull String collectionName, @NonNull Page page, @NonNull Event event){
         EventConfirmation confirmation = page.addEvent(event);
         return mongoTemplate.save(page, collectionName).then(just(confirmation));
+    }
 
+    public Mono<EventConfirmation> delete(@NonNull String collectionName, @NonNull Page page){
+        Delete delete = eventFactory.delete();
+        EventConfirmation confirmation = page.addEvent(delete);
+        page.setObjectDeletedOn(delete.getOccuredOn());
+        return mongoTemplate.save(page, collectionName).then(just(confirmation));
     }
 
     //fixme doesnt fit the responsibility, see EmbeddedReactiveVentCollection.drop

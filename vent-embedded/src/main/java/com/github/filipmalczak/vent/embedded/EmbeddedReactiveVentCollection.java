@@ -79,8 +79,12 @@ public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
     public Mono<EventConfirmation> update(VentId id, Map newState) {
         //todo analyse impact to criteria for Equals, see com.github.filipmalczak.vent.api.query.operator.EqualsOperator
         //todo check whether query can be optimized with this approach
-        //todo once crowding is implemented, test this properly
         return addEventToNewPage(id, eventFactory.update(newState));
+    }
+
+    @Override
+    public Mono<EventConfirmation> delete(@NonNull VentId id) {
+        return pageService.currentPage(name, id).flatMap(p -> pageService.delete(name, p));
     }
 
     @Override

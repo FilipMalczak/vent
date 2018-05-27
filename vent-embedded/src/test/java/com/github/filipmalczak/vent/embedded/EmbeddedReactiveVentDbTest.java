@@ -22,6 +22,8 @@ import static com.github.filipmalczak.vent.helper.Struct.*;
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+//todo: test DeleteValue
+//todo: test Delete
 @VentSpringTest
 @Slf4j
 class EmbeddedReactiveVentDbTest {
@@ -461,6 +463,25 @@ class EmbeddedReactiveVentDbTest {
                     build(),
                 present
             );
+        });
+    }
+
+    //todo test get nonexisting
+    //todo test get from before delete
+    //todo delete and querying
+
+    @Test
+    public void createAndDelete(){
+        temporalService.withResults(times.byInterval(2), () -> {
+
+            StepVerifier.create(
+                ventDb.getCollection(TEST_COLLECTION).create().
+                    flatMap(ventId -> ventDb.getCollection(TEST_COLLECTION).delete(ventId)).
+                    flatMap(eventConfirmation ->
+                        ventDb.getCollection(TEST_COLLECTION).
+                            get(eventConfirmation.getVentId(), times.after(2))
+                    )
+            ).verifyComplete();
         });
     }
 }

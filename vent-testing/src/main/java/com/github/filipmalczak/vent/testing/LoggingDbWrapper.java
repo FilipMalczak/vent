@@ -143,6 +143,11 @@ public class LoggingDbWrapper implements ReactiveVentDb {
             }
 
             @Override
+            public Mono<EventConfirmation> delete(VentId id) {
+                return delegateCollection.delete(id);
+            }
+
+            @Override
             @SneakyThrows
             public ReactiveQueryBuilder<?, ? extends ReactiveVentQuery> queryBuilder() {
                 try {

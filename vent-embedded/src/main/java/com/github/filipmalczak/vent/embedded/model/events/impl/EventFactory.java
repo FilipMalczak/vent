@@ -15,16 +15,20 @@ public class EventFactory {
         return new Create(initialState, temporalService.now());
     }
 
+    public Delete delete(){
+        return new Delete(temporalService.now());
+    }
+
+    public Update update(Map newValue){
+        return new Update(newValue, temporalService.now());
+    }
+
     public PutValue putValue(String path, Object value){
         return new PutValue(path, value, temporalService.now());
     }
 
     public DeleteValue deleteValue(String path){
         return new DeleteValue(path, temporalService.now());
-    }
-
-    public Update update(Map newValue){
-        return new Update(newValue, temporalService.now());
     }
 
     //todo: merge: update, but does not remove non-overriding fields in argument; doable with batch PUT too; which is better?

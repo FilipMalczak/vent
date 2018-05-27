@@ -59,6 +59,11 @@ public class BlockingCollectionAdapter implements BlockingVentCollection {
     }
 
     @Override
+    public EventConfirmation delete(VentId id) {
+        return ventCollection.delete(id).block();
+    }
+
+    @Override
     public BlockingQueryBuilder<?, ? extends BlockingVentQuery> queryBuilder() {
         return new BlockingQueryBuilderAdapter(ventCollection.queryBuilder());
     }
