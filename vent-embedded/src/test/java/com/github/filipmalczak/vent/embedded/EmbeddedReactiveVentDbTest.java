@@ -376,8 +376,7 @@ class EmbeddedReactiveVentDbTest {
             Map createState = map(pair("a", 1), pair("b", 2));
             String putArg = "a";
             int putValue = 3;
-            Map putState = map(createState);
-            putState.put(putArg, putValue);
+            Map putState = map(createState, pair(putArg, putValue));
             Map updateState = map(pair("c", 4));
             BlockingVentDb db = adapt(ventDb, BlockingVentDb.class);
             VentId id = db.getCollection(TEST_COLLECTION).create(createState);
@@ -425,8 +424,7 @@ class EmbeddedReactiveVentDbTest {
             Map updateState = map(pair("c", 4));
             String putArg = "x";
             int putValue = 4;
-            Map putState = map(updateState);
-            putState.put(putArg, putValue);
+            Map putState = map(updateState, pair(putArg, putValue));
             BlockingVentDb db = adapt(ventDb, BlockingVentDb.class);
             VentId id = db.getCollection(TEST_COLLECTION).create(createState);
             db.getCollection(TEST_COLLECTION).update(id, updateState);

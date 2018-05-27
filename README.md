@@ -42,7 +42,7 @@ of Vent in other languages.
 - [x] creating an object
 - [x] changing object state by single events (put value, delete value, update the whole object)
 - [x] getting object state at any moment in time
-- [ ] compacting (creating new page)
+- [x] compacting (creating new page)
 - [x] querying
 - [ ] deleting an object
 - [ ] full HTTP API (partially done, though untested)

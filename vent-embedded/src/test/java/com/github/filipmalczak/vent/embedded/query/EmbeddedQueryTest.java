@@ -230,218 +230,275 @@ public class EmbeddedQueryTest {
         @DisplayName("Test querying of objects in state after some events")
         public class EventResults {
 
-            @Test
-            @DisplayName("Query by top level field")
-            public void byTopLevelField() {
-                temporalService.withResults(times.byInterval(5), () -> {
-                    Map aData = person(
-                        "A1", "A2",
-                        20,
-                        "S1", "C1",
-                        list(
-                            account("AA1", 100),
-                            account("AA2", 200),
-                            account("AA3", 300)
-                        )
-                    );
-                    VentId a = blockingVentDb.getCollection(COLLECTION_NAME).create(aData);
-                    Map bData = person(
-                        "B1", "B2",
-                        25,
-                        "S2", "C1",
-                        list(
-                            account("AB1", 200),
-                            account("AB2", 500),
-                            account("AB3", 30)
-                        )
-                    );
-                    VentId b = blockingVentDb.getCollection(COLLECTION_NAME).create(bData);
+            @Nested
+            @DisplayName("Events are PutValue")
+            public class WithPutValue {
+                @Test
+                @DisplayName("Query by top level field")
+                public void byTopLevelField() {
+                    temporalService.withResults(times.byInterval(5), () -> {
+                        Map aData = person(
+                            "A1", "A2",
+                            20,
+                            "S1", "C1",
+                            list(
+                                account("AA1", 100),
+                                account("AA2", 200),
+                                account("AA3", 300)
+                            )
+                        );
+                        VentId a = blockingVentDb.getCollection(COLLECTION_NAME).create(aData);
+                        Map bData = person(
+                            "B1", "B2",
+                            25,
+                            "S2", "C1",
+                            list(
+                                account("AB1", 200),
+                                account("AB2", 500),
+                                account("AB3", 30)
+                            )
+                        );
+                        VentId b = blockingVentDb.getCollection(COLLECTION_NAME).create(bData);
 
-                    blockingVentDb.getCollection(COLLECTION_NAME).putValue(a, "age", 30);
-                    blockingVentDb.getCollection(COLLECTION_NAME).putValue(b, "age", 35);
+                        blockingVentDb.getCollection(COLLECTION_NAME).putValue(a, "age", 30);
+                        blockingVentDb.getCollection(COLLECTION_NAME).putValue(b, "age", 35);
 
-                    EmbeddedReactiveQuery query = query(EqualsOperator.with("age", 35));
-                    List<ObjectSnapshot> results = query.find(temporalService.now()).toStream().collect(toList());
-                    assertEquals(
-                        list(
-                            ObjectSnapshot.builder().
-                                ventId(b).
-                                state(map(bData, pair("age", 35))).
-                                lastUpdate(times.after(3)).
-                                queryTime(times.after(4)).
-                                version(1).build()
-                        ),
-                        results
-                    );
-                });
+                        EmbeddedReactiveQuery query = query(EqualsOperator.with("age", 35));
+                        List<ObjectSnapshot> results = query.find(temporalService.now()).toStream().collect(toList());
+                        assertEquals(
+                            list(
+                                ObjectSnapshot.builder().
+                                    ventId(b).
+                                    state(map(bData, pair("age", 35))).
+                                    lastUpdate(times.after(3)).
+                                    queryTime(times.after(4)).
+                                    version(1).build()
+                            ),
+                            results
+                        );
+                    });
+                }
+
+
+                @Test
+                @DisplayName("Query by nested field set with explicit PutValue")
+                public void byNestedFieldWithExplicitPut() {
+                    temporalService.withResults(times.byInterval(5), () -> {
+                        Map aData = person(
+                            "A1", "A2",
+                            20,
+                            "S1", "C1",
+                            list(
+                                account("AA1", 100),
+                                account("AA2", 200),
+                                account("AA3", 300)
+                            )
+                        );
+                        VentId a = blockingVentDb.getCollection(COLLECTION_NAME).create(aData);
+                        Map bData = person(
+                            "B1", "B2",
+                            25,
+                            "S2", "C1",
+                            list(
+                                account("AB1", 200),
+                                account("AB2", 500),
+                                account("AB3", 30)
+                            )
+                        );
+                        VentId b = blockingVentDb.getCollection(COLLECTION_NAME).create(bData);
+
+                        blockingVentDb.getCollection(COLLECTION_NAME).putValue(a, "name.first", "X");
+                        blockingVentDb.getCollection(COLLECTION_NAME).putValue(b, "name.first", "Y");
+
+                        EmbeddedReactiveQuery query = query(EqualsOperator.with("name.first", "Y"));
+                        List<ObjectSnapshot> results = query.find(temporalService.now()).toStream().collect(toList());
+                        assertEquals(
+                            list(
+                                ObjectSnapshot.builder().
+                                    ventId(b).
+                                    state(map(
+                                        bData,
+                                        pair("name", map(
+                                            pair("first", "Y"),
+                                            pair("last", ((Map<String, ?>) bData.get("name")).get("last"))
+                                        ))
+                                    )).
+                                    lastUpdate(times.after(3)).
+                                    queryTime(times.after(4)).
+                                    version(1).build()
+                            ),
+                            results
+                        );
+                    });
+                }
+
+                @Test
+                @DisplayName("Query by nested field set with PutValue for superpath")
+                public void byNestedFieldWithSuperpathPut() {
+                    temporalService.withResults(times.byInterval(5), () -> {
+                        Map aData = person(
+                            "A1", "A2",
+                            20,
+                            "S1", "C1",
+                            list(
+                                account("AA1", 100),
+                                account("AA2", 200),
+                                account("AA3", 300)
+                            )
+                        );
+                        VentId a = blockingVentDb.getCollection(COLLECTION_NAME).create(aData);
+                        Map bData = person(
+                            "B1", "B2",
+                            25,
+                            "S2", "C1",
+                            list(
+                                account("AB1", 200),
+                                account("AB2", 500),
+                                account("AB3", 30)
+                            )
+                        );
+                        VentId b = blockingVentDb.getCollection(COLLECTION_NAME).create(bData);
+
+                        blockingVentDb.getCollection(COLLECTION_NAME).
+                            putValue(a, "name", map(
+                                pair("first", "X1"),
+                                pair("last", "X2")
+                            ));
+                        blockingVentDb.getCollection(COLLECTION_NAME).
+                            putValue(b, "name", map(
+                                pair("first", "Y1"),
+                                pair("last", "Y2")
+                            ));
+
+                        EmbeddedReactiveQuery query = query(EqualsOperator.with("name.last", "X2"));
+                        List<ObjectSnapshot> results = query.find(temporalService.now()).toStream().collect(toList());
+                        assertEquals(
+                            list(
+                                ObjectSnapshot.builder().
+                                    ventId(a).
+                                    state(map(
+                                        aData,
+                                        pair("name", map(
+                                            pair("first", "X1"),
+                                            pair("last", "X2")
+                                        ))
+                                    )).
+                                    lastUpdate(times.after(2)).
+                                    queryTime(times.after(4)).
+                                    version(1).build()
+                            ),
+                            results
+                        );
+                    });
+                }
+
+                @Test
+                @DisplayName("Query by nested list index")
+                public void byNestedListIndex() {
+                    temporalService.withResults(times.byInterval(4), () -> {
+                        Map aData = person(
+                            "A1", "A2",
+                            20,
+                            "S1", "C1",
+                            list(
+                                account("AA1", 100),
+                                account("AA2", 200),
+                                account("AA3", 300)
+                            )
+                        );
+                        VentId a = blockingVentDb.getCollection(COLLECTION_NAME).create(aData);
+                        Map bData = person(
+                            "B1", "B2",
+                            25,
+                            "S2", "C1",
+                            list(
+                                account("AB1", 200),
+                                account("AB2", 500),
+                                account("AB3", 30)
+                            )
+                        );
+                        VentId b = blockingVentDb.getCollection(COLLECTION_NAME).create(bData);
+
+                        blockingVentDb.getCollection(COLLECTION_NAME).putValue(a, "accounts[0].balance", 1234);
+
+                        EmbeddedReactiveQuery query = query(EqualsOperator.with("accounts[0].balance", 1234));
+                        List<ObjectSnapshot> results = query.find(temporalService.now()).toStream().collect(toList());
+                        assertEquals(
+                            list(
+                                ObjectSnapshot.builder().
+                                    ventId(a).
+                                    state(map(
+                                        aData,
+                                        pair("accounts", list(
+                                            account("AA1", 1234),
+                                            account("AA2", 200),
+                                            account("AA3", 300)
+                                        ))
+                                    )).
+                                    lastUpdate(times.after(2)).
+                                    queryTime(times.after(3)).
+                                    version(1).build()
+                            ),
+                            results
+                        );
+                    });
+                }
             }
 
 
-            @Test
-            @DisplayName("Query by nested field set with explicit PutValue")
-            public void byNestedFieldWithExplicitPut() {
-                temporalService.withResults(times.byInterval(5), () -> {
-                    Map aData = person(
-                        "A1", "A2",
-                        20,
-                        "S1", "C1",
-                        list(
-                            account("AA1", 100),
-                            account("AA2", 200),
-                            account("AA3", 300)
-                        )
-                    );
-                    VentId a = blockingVentDb.getCollection(COLLECTION_NAME).create(aData);
-                    Map bData = person(
-                        "B1", "B2",
-                        25,
-                        "S2", "C1",
-                        list(
-                            account("AB1", 200),
-                            account("AB2", 500),
-                            account("AB3", 30)
-                        )
-                    );
-                    VentId b = blockingVentDb.getCollection(COLLECTION_NAME).create(bData);
+            @Nested
+            @DisplayName("Events are Update")
+            public class UpdateRelated {
+                //todo more extensive tests of update; see c.g.f.v.embedded.EmbeddedReactiveVentDbTest
 
-                    blockingVentDb.getCollection(COLLECTION_NAME).putValue(a, "name.first", "X");
-                    blockingVentDb.getCollection(COLLECTION_NAME).putValue(b, "name.first", "Y");
+                @Test
+                public void createUpdate(){
+                    temporalService.withResults(times.byInterval(5), () -> {
+                        Map aData = person(
+                            "A1", "A2",
+                            20,
+                            "S1", "C1",
+                            list(
+                                account("AA1", 100),
+                                account("AA2", 200),
+                                account("AA3", 300)
+                            )
+                        );
+                        VentId a = blockingVentDb.getCollection(COLLECTION_NAME).create(aData);
+                        Map aUpdatedData = map(aData, pair("age", 30));
+                        Map bData = person(
+                            "B1", "B2",
+                            25,
+                            "S2", "C1",
+                            list(
+                                account("AB1", 200),
+                                account("AB2", 500),
+                                account("AB3", 30)
+                            )
+                        );
+                        Map bUpdatedData = map(bData, pair("age", 35));
+                        VentId b = blockingVentDb.getCollection(COLLECTION_NAME).create(bData);
 
-                    EmbeddedReactiveQuery query = query(EqualsOperator.with("name.first", "Y"));
-                    List<ObjectSnapshot> results = query.find(temporalService.now()).toStream().collect(toList());
-                    assertEquals(
-                        list(
-                            ObjectSnapshot.builder().
-                                ventId(b).
-                                state(map(
-                                    bData,
-                                    pair("name", map(
-                                        pair("first", "Y"),
-                                        pair("last", ((Map<String, ?>)bData.get("name")).get("last"))
-                                    ))
-                                )).
-                                lastUpdate(times.after(3)).
-                                queryTime(times.after(4)).
-                                version(1).build()
-                        ),
-                        results
-                    );
-                });
-            }
+                        blockingVentDb.getCollection(COLLECTION_NAME).putValue(a, "age", 30);
+                        blockingVentDb.getCollection(COLLECTION_NAME).putValue(b, "age", 35);
 
-            @Test
-            @DisplayName("Query by nested field set with PutValue for superpath")
-            public void byNestedFieldWithSuperpathPut() {
-                temporalService.withResults(times.byInterval(5), () -> {
-                    Map aData = person(
-                        "A1", "A2",
-                        20,
-                        "S1", "C1",
-                        list(
-                            account("AA1", 100),
-                            account("AA2", 200),
-                            account("AA3", 300)
-                        )
-                    );
-                    VentId a = blockingVentDb.getCollection(COLLECTION_NAME).create(aData);
-                    Map bData = person(
-                        "B1", "B2",
-                        25,
-                        "S2", "C1",
-                        list(
-                            account("AB1", 200),
-                            account("AB2", 500),
-                            account("AB3", 30)
-                        )
-                    );
-                    VentId b = blockingVentDb.getCollection(COLLECTION_NAME).create(bData);
-
-                    blockingVentDb.getCollection(COLLECTION_NAME).
-                        putValue(a, "name", map(
-                            pair("first", "X1"),
-                            pair("last", "X2")
-                        ));
-                    blockingVentDb.getCollection(COLLECTION_NAME).
-                        putValue(b, "name", map(
-                            pair("first", "Y1"),
-                            pair("last", "Y2")
-                        ));
-
-                    EmbeddedReactiveQuery query = query(EqualsOperator.with("name.last", "X2"));
-                    List<ObjectSnapshot> results = query.find(temporalService.now()).toStream().collect(toList());
-                    assertEquals(
-                        list(
-                            ObjectSnapshot.builder().
-                                ventId(a).
-                                state(map(
-                                    aData,
-                                    pair("name", map(
-                                        pair("first", "X1"),
-                                        pair("last", "X2")
-                                    ))
-                                )).
-                                lastUpdate(times.after(2)).
-                                queryTime(times.after(4)).
-                                version(1).build()
-                        ),
-                        results
-                    );
-                });
-            }
-
-            @Test
-            @DisplayName("Query by nested list index")
-            public void byNestedListIndex() {
-                temporalService.withResults(times.byInterval(4), () -> {
-                    Map aData = person(
-                        "A1", "A2",
-                        20,
-                        "S1", "C1",
-                        list(
-                            account("AA1", 100),
-                            account("AA2", 200),
-                            account("AA3", 300)
-                        )
-                    );
-                    VentId a = blockingVentDb.getCollection(COLLECTION_NAME).create(aData);
-                    Map bData = person(
-                        "B1", "B2",
-                        25,
-                        "S2", "C1",
-                        list(
-                            account("AB1", 200),
-                            account("AB2", 500),
-                            account("AB3", 30)
-                        )
-                    );
-                    VentId b = blockingVentDb.getCollection(COLLECTION_NAME).create(bData);
-
-                    blockingVentDb.getCollection(COLLECTION_NAME).putValue(a, "accounts[0].balance", 1234);
-
-                    EmbeddedReactiveQuery query = query(EqualsOperator.with("accounts[0].balance", 1234));
-                    List<ObjectSnapshot> results = query.find(temporalService.now()).toStream().collect(toList());
-                    assertEquals(
-                        list(
-                            ObjectSnapshot.builder().
-                                ventId(a).
-                                state(map(
-                                    aData,
-                                    pair("accounts", list(
-                                        account("AA1", 1234),
-                                        account("AA2", 200),
-                                        account("AA3", 300)
-                                    ))
-                                )).
-                                lastUpdate(times.after(2)).
-                                queryTime(times.after(3)).
-                                version(1).build()
-                        ),
-                        results
-                    );
-                });
+                        EmbeddedReactiveQuery query = query(EqualsOperator.with("age", 35));
+                        List<ObjectSnapshot> results = query.find(temporalService.now()).toStream().collect(toList());
+                        assertEquals(
+                            list(
+                                ObjectSnapshot.builder().
+                                    ventId(b).
+                                    state(map(bData, pair("age", 35))).
+                                    lastUpdate(times.after(3)).
+                                    queryTime(times.after(4)).
+                                    version(1).build()
+                            ),
+                            results
+                        );
+                    });
+                }
             }
         }
-
 
         @Test
         public void replaceListItemToMatchQuery() {
@@ -748,8 +805,6 @@ public class EmbeddedQueryTest {
             });
         }
     }
-
-    //todo test update-related stuff
 
     private EmbeddedReactiveQuery query(Operator rootOperator){
         return new EmbeddedReactiveQuery(COLLECTION_NAME, rootOperator, mongoQueryPreparator, mongoTemplate, snapshotService);
