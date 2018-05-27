@@ -23,6 +23,6 @@ public class Adapters {
             throw new RuntimeException(); //todo
         if (supporting.size() > 1 && supporting.get(0).supports(adaptation) == supporting.get(1).supports(adaptation))
             throw new RuntimeException(); //todo
-        return supporting.get(0).addapt(source, targetClass);
+        return supporting.get(0).adapt(source, targetClass);
     }
 }

@@ -25,7 +25,7 @@ public class TestingTemporalService implements TemporalService {
             runnable.run();
         } finally {
             try {
-                assertEquals(initialQueueSize, queueToReturn.size(), "All times have to be used!");
+                assertEquals(initialQueueSize, queueToReturn.size(), "All times have to be used! (left: "+queueToReturn+")");
             } catch (Throwable t) {
                 throw t;
             } finally {
@@ -39,10 +39,25 @@ public class TestingTemporalService implements TemporalService {
     }
 
     public void addResults(Collection<LocalDateTime> times){
+        if (stackTracer != null) {
+            log.info("addResults("+times+"): Call hierarchy: " + stackTracer.getCurrentHierarchy());
+        }
         queueToReturn.addAll(times);
+        if (stackTracer != null) {
+            log.info("current queue: "+queueToReturn);
+        }
+
     }
+
     public void addResults(LocalDateTime... times){
         addResults(asList(times));
+    }
+
+    public LocalDateTime peekNow(){
+        if (stackTracer != null){
+            log.info("peekNow(): Call hierarchy: "+stackTracer.getCurrentHierarchy());
+        }
+        return queueToReturn.get(0);
     }
 
     @Override

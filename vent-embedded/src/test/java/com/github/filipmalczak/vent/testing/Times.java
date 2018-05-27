@@ -24,9 +24,16 @@ public class Times {
     }
 
     public List<LocalDateTime> byInterval(int size){
-        return IntStream.range(0, size).
+        return after(IntStream.range(0, size));
+    }
+
+    public List<LocalDateTime> after(IntStream intervals){
+        return intervals.
             mapToObj(this::after).
             collect(toList());
+    }
+    public List<LocalDateTime> after(int... intervals){
+        return after(IntStream.of(intervals));
     }
 
     public LocalDateTime after(int intervals){

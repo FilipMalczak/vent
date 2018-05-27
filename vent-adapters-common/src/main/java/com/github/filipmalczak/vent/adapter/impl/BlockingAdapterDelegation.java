@@ -62,7 +62,7 @@ public class BlockingAdapterDelegation implements Adapter {
 
     @Override
     @SneakyThrows
-    public <T, S> T addapt(S source, Class<T> targetClass) {
+    public <T, S> T adapt(S source, Class<T> targetClass) {
         Class sourceClass = source.getClass();
         // by contract adapt() will be called only when AdaptationSupport from supports() has
         // no NONE for source nor target, so this is safe

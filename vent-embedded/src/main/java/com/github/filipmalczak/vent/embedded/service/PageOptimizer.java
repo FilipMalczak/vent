@@ -127,7 +127,7 @@ public class PageOptimizer {
 
     private void optimize(String collectionName, Page page, LocalDateTime at){
         pageService.
-            createEmptyNextPage(collectionName, page).
+            createEmptyNextPage(collectionName, page, at).
             map(p -> {
                 p.setInitialState(snapshotService.render(page, at).getState());
                 return p;

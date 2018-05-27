@@ -22,6 +22,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.Map;
 
 import static com.github.filipmalczak.vent.embedded.utils.MongoTranslator.toMongo;
@@ -104,21 +105,21 @@ public class PageService {
             next();
     }
 
-    public Mono<Page> createEmptyNextPage(@NonNull String collectionName, @NonNull VentId id){
-        return currentPage(collectionName, id).flatMap(p -> createEmptyNextPage(collectionName, p));
+    public Mono<Page> createEmptyNextPage(@NonNull String collectionName, @NonNull VentId id, @NonNull LocalDateTime startingFrom){
+        return currentPage(collectionName, id).flatMap(p -> createEmptyNextPage(collectionName, p, startingFrom));
     }
 
-    public Mono<Page> createEmptyNextPage(@NonNull String collectionName, @NonNull Page previousPage){
+    public Mono<Page> createEmptyNextPage(@NonNull String collectionName, @NonNull Page previousPage, @NonNull LocalDateTime startingFrom){
         Page newPage = new Page(
             null,
             previousPage.getObjectId(),
             previousPage.getPageId(),
             null,
             previousPage.getFromVersion() + previousPage.getEvents().size(),
-            temporalService.now(),
+            startingFrom,
             null,
             null,
-            asList(),
+            new LinkedList<>(),
             null
         );
         return mongoTemplate.

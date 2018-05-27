@@ -90,7 +90,7 @@ public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
 
     private Mono<EventConfirmation> addEventToNewPage(VentId id, Event event){
         return pageService.
-            createEmptyNextPage(name, id).
+            createEmptyNextPage(name, id, event.getOccuredOn()).
             flatMap(p -> pageService.addEvent(name, p, event));
     }
 

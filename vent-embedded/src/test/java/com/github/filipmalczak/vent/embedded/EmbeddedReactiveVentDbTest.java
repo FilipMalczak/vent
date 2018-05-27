@@ -1,9 +1,11 @@
 package com.github.filipmalczak.vent.embedded;
 
 import com.github.filipmalczak.vent.VentSpringTest;
+import com.github.filipmalczak.vent.api.blocking.BlockingVentDb;
 import com.github.filipmalczak.vent.api.model.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.model.VentId;
 import com.github.filipmalczak.vent.testing.TestingTemporalService;
+import com.github.filipmalczak.vent.testing.Times;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +17,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+import static com.github.filipmalczak.vent.adapter.Adapters.adapt;
 import static com.github.filipmalczak.vent.helper.Struct.*;
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,6 +31,8 @@ class EmbeddedReactiveVentDbTest {
     @Autowired
     private TestingTemporalService temporalService;
 
+    private Times times;
+
     private static final String TEST_COLLECTION = "test_collection";
 
     private Holder<VentId> holder;
@@ -35,6 +40,7 @@ class EmbeddedReactiveVentDbTest {
     @BeforeEach
     public void setUp(){
         holder = new Holder<>();
+        times = Times.defaultFromMilleniumBreak();
         ventDb.initialize();
     }
 
@@ -330,5 +336,133 @@ class EmbeddedReactiveVentDbTest {
                 o
             )
         ).verifyComplete();
+    }
+
+    @Test
+    public void createAndUpdateThenGetNowAndInThePast(){
+        temporalService.withResults(times.after(0, 10), () -> {
+            Map createState = map(pair("a", 1), pair("b", 2));
+            Map updateState = map(pair("c", 3));
+            BlockingVentDb db = adapt(ventDb, BlockingVentDb.class);
+            VentId id = db.getCollection(TEST_COLLECTION).create(createState);
+            db.getCollection(TEST_COLLECTION).update(id, updateState);
+            ObjectSnapshot past = db.getCollection(TEST_COLLECTION).get(id, times.after(1));
+            assertEquals(ObjectSnapshot.builder().
+                    ventId(id).
+                    state(createState).
+                    version(0).
+                    lastUpdate(times.after(0)).
+                    queryTime(times.after(1)).
+                    build(),
+                past
+            );
+
+            ObjectSnapshot present = db.getCollection(TEST_COLLECTION).get(id, times.after(11));
+            assertEquals(ObjectSnapshot.builder().
+                    ventId(id).
+                    state(updateState).
+                    version(1).
+                    lastUpdate(times.after(10)).
+                    queryTime(times.after(11)).
+                    build(),
+                present
+            );
+        });
+    }
+
+    @Test
+    public void createPutAndUpdateThenGetNowAndInThePast(){
+        temporalService.withResults(times.after(0, 5, 10), () -> {
+            Map createState = map(pair("a", 1), pair("b", 2));
+            String putArg = "a";
+            int putValue = 3;
+            Map putState = map(createState);
+            putState.put(putArg, putValue);
+            Map updateState = map(pair("c", 4));
+            BlockingVentDb db = adapt(ventDb, BlockingVentDb.class);
+            VentId id = db.getCollection(TEST_COLLECTION).create(createState);
+            db.getCollection(TEST_COLLECTION).putValue(id, putArg, putValue);
+            db.getCollection(TEST_COLLECTION).update(id, updateState);
+            ObjectSnapshot prePut = db.getCollection(TEST_COLLECTION).get(id, times.after(1));
+            assertEquals(ObjectSnapshot.builder().
+                    ventId(id).
+                    state(createState).
+                    version(0).
+                    lastUpdate(times.after(0)).
+                    queryTime(times.after(1)).
+                    build(),
+                prePut
+            );
+
+            ObjectSnapshot preUpdate = db.getCollection(TEST_COLLECTION).get(id, times.after(6));
+            assertEquals(ObjectSnapshot.builder().
+                    ventId(id).
+                    state(putState).
+                    version(1).
+                    lastUpdate(times.after(5)).
+                    queryTime(times.after(6)).
+                    build(),
+                preUpdate
+            );
+
+            ObjectSnapshot present = db.getCollection(TEST_COLLECTION).get(id, times.after(11));
+            assertEquals(ObjectSnapshot.builder().
+                    ventId(id).
+                    state(updateState).
+                    version(2).
+                    lastUpdate(times.after(10)).
+                    queryTime(times.after(11)).
+                    build(),
+                present
+            );
+        });
+    }
+
+    @Test
+    public void createUpdateAndPutThenGetNowAndInThePast(){
+        temporalService.withResults(times.after(0, 5, 10), () -> {
+            Map createState = map(pair("a", 1), pair("b", 2));
+            Map updateState = map(pair("c", 4));
+            String putArg = "x";
+            int putValue = 4;
+            Map putState = map(updateState);
+            putState.put(putArg, putValue);
+            BlockingVentDb db = adapt(ventDb, BlockingVentDb.class);
+            VentId id = db.getCollection(TEST_COLLECTION).create(createState);
+            db.getCollection(TEST_COLLECTION).update(id, updateState);
+            db.getCollection(TEST_COLLECTION).putValue(id, putArg, putValue);
+            ObjectSnapshot preUpdate = db.getCollection(TEST_COLLECTION).get(id, times.after(1));
+            assertEquals(ObjectSnapshot.builder().
+                    ventId(id).
+                    state(createState).
+                    version(0).
+                    lastUpdate(times.after(0)).
+                    queryTime(times.after(1)).
+                    build(),
+                preUpdate
+            );
+
+            ObjectSnapshot prePut = db.getCollection(TEST_COLLECTION).get(id, times.after(6));
+            assertEquals(ObjectSnapshot.builder().
+                    ventId(id).
+                    state(updateState).
+                    version(1).
+                    lastUpdate(times.after(5)).
+                    queryTime(times.after(6)).
+                    build(),
+                prePut
+            );
+
+            ObjectSnapshot present = db.getCollection(TEST_COLLECTION).get(id, times.after(11));
+            assertEquals(ObjectSnapshot.builder().
+                    ventId(id).
+                    state(putState).
+                    version(2).
+                    lastUpdate(times.after(10)).
+                    queryTime(times.after(11)).
+                    build(),
+                present
+            );
+        });
     }
 }

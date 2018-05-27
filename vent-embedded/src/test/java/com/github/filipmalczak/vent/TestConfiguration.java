@@ -11,7 +11,7 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 
 @Configuration
 public class TestConfiguration {
-    private static final boolean EXTENSIVE_LOGGING = false;
+    private static final boolean EXTENSIVE_LOGGING = true;
 
     public static class ExtensiveLoggingCondition implements Condition {
 
@@ -34,6 +34,7 @@ public class TestConfiguration {
 
     @Conditional(ExtensiveLoggingCondition.class)
     @Bean
+    @Primary
     public ReactiveVentDb reactiveVentDb(EmbeddedReactiveVentDb embeddedReactiveVentDb, StackTracer stackTracer){
         return LoggingDbWrapper.defaultWrapper(stackTracer, embeddedReactiveVentDb);
     }
