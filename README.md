@@ -35,6 +35,28 @@ General idea for deployment is that the user should provide MongoDB instance and
 with embedded instance (used in-memory) or exposed via some protocol (e.g. HTTP) - which enables usage
 of Vent in other languages.
 
+## Current module list
+
+- `velvet` - simplified XPath-like expressions for Java map/list hierarchies, supporting read and write access
+- `vent-adapters` - `ServiceLoader`- enabled adapters between types (e.g. can turn reactive implementation into 
+blocking); this module contains only the infrastructure and API
+- `vent-adapters-common` - this contains implementations for common adapters; currently a few dedicated wrappers and 
+a generic one for reactive->blocking
+- `vent-api` - Both generic and concrete interfaces for Vent database, collection, etc; also contains value
+object definitions
+- `vent-embedded` - Embedded Vent implementation, working aroung provided ReactiveMongoTemplate; exposed as
+Spring 5 configuration to be imported
+- `vent-testing` - Testing utilities
+- `vent-traits` - Reflection API for handling common type traits (like "reactive" or "asynchronous")
+- `vent-utils` - General utilities
+- `vent-web-server` - Webflux-enabled web server configuration that exposes VentDb over HTTP
+
+### Planned modules:
+
+- `vent-web-client` - Client for aforementioned server, implementing VentDb API
+
+ 
+
 ## MVP
 
 > MVP is under development. I'm gonna try to keep done things ticked, but don't trust it 100%, better read the code.
@@ -53,11 +75,7 @@ of Vent in other languages.
 - factory for Spring Data-like repositories based on Vent
 - better configurability (better pointing to underlying Mongo instance, working 
 properties for compacting)
-
-## Organizational work
-
-> will be done once the MVP is ready
-- modularization (API, embedded, web.server, web.client, velvet; maybe split core/blocking/reactive API)
+- more event types
 
 ## Other ideas:
 
