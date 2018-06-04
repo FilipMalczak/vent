@@ -1,6 +1,7 @@
 package com.github.filipmalczak.vent.embedded.service;
 
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentDb;
+import com.github.filipmalczak.vent.api.temporal.TemporalService;
 import com.github.filipmalczak.vent.embedded.exception.IllegalVentStateException;
 import com.github.filipmalczak.vent.embedded.model.Page;
 import lombok.Synchronized;

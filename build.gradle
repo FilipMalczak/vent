@@ -80,24 +80,39 @@ subprojects {
         mavenCentral()
     }
 
+    //todo normalize dependency notation "group:project[:version" against group: group, name: project[, version: version]
+    //I think that single-string is better
+
     dependencyManagement {
         imports {
             mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
+        }
+        dependencies {
+            dependency 'org.junit.jupiter:junit-jupiter-api:5.2.0'
+            dependency group: 'org.mockito', name: 'mockito-junit-jupiter', version: '2.18.3'
+            dependency 'org.junit.jupiter:junit-jupiter-engine:5.2.0'
+
+            dependency group: 'org.spockframework', name: 'spock-core', version: '1.1-groovy-2.4'
+            dependency 'org.junit.vintage:junit-vintage-engine:5.2.0' //required for Spock
+            dependency group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.2.0'
+
+            dependency 'org.projectlombok:lombok:1.16.20'
         }
     }
 
     dependencies {
 ////    api 'org.apiguardian:apiguardian-api:1.0.0' //todo start using this
 
-        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.2.0'
-        testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '2.18.3'
-        testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.2.0'
+        testImplementation 'org.junit.jupiter:junit-jupiter-api'
+        testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter'
+        testRuntime 'org.junit.jupiter:junit-jupiter-engine'
 
-        testImplementation group: 'org.spockframework', name: 'spock-core', version: '1.1-groovy-2.4'
-        testRuntime 'org.junit.vintage:junit-vintage-engine:5.2.0' //required for Spock
+        testImplementation group: 'org.spockframework', name: 'spock-core'
+        testRuntime 'org.junit.vintage:junit-vintage-engine'
+        testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params'
 
-        compileOnly('org.projectlombok:lombok:1.16.20')
-        testCompileOnly('org.projectlombok:lombok:1.16.20')
+        compileOnly('org.projectlombok:lombok')
+        testCompileOnly('org.projectlombok:lombok')
     }
 
     test {

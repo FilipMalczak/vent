@@ -3,6 +3,8 @@ package com.github.filipmalczak.vent.embedded.service;
 import com.github.filipmalczak.vent.api.model.EventConfirmation;
 import com.github.filipmalczak.vent.api.model.Success;
 import com.github.filipmalczak.vent.api.model.VentId;
+import com.github.filipmalczak.vent.api.temporal.TemporallyEnabled;
+import com.github.filipmalczak.vent.api.temporal.TemporalService;
 import com.github.filipmalczak.vent.embedded.model.Page;
 import com.github.filipmalczak.vent.embedded.model.events.Event;
 import com.github.filipmalczak.vent.embedded.model.events.impl.Delete;
@@ -11,7 +13,6 @@ import com.github.filipmalczak.vent.embedded.utils.MongoTranslator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -31,10 +32,10 @@ import static java.util.Arrays.asList;
 import static reactor.core.publisher.Mono.just;
 
 @Service
-@Getter @Setter @AllArgsConstructor
-public class PageService {
+@AllArgsConstructor
+public class PageService implements TemporallyEnabled {
     @Autowired
-    private @NonNull TemporalService temporalService;
+    @Getter private @NonNull TemporalService temporalService;
 
     @Autowired
     private @NonNull ReactiveMongoTemplate mongoTemplate;

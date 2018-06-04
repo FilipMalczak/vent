@@ -8,6 +8,7 @@ import com.github.filipmalczak.vent.api.reactive.ReactiveVentCollection;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentDb;
 import com.github.filipmalczak.vent.api.reactive.query.ReactiveQueryBuilder;
 import com.github.filipmalczak.vent.api.reactive.query.ReactiveVentQuery;
+import com.github.filipmalczak.vent.api.temporal.TemporalService;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -36,13 +37,14 @@ public class LoggingDbWrapper implements ReactiveVentDb {
     private ReactiveVentDb delegate;
 
     @Override
-    public void initialize() {
-        delegate.initialize();
-    }
-
-    @Override
     public ReactiveVentCollection getCollection(String collectionName) {
         return new ReactiveVentCollection() {
+
+
+            @Override
+            public TemporalService getTemporalService() {
+                return null;
+            }
 
             private ReactiveVentCollection delegateCollection = delegate.getCollection(collectionName);
 
@@ -253,5 +255,10 @@ public class LoggingDbWrapper implements ReactiveVentDb {
         if (logExceptions)
             log.error(t.toString());
         return t;
+    }
+
+    @Override
+    public TemporalService getTemporalService() {
+        return null;
     }
 }

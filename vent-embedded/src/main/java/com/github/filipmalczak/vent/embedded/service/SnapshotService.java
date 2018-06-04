@@ -4,6 +4,7 @@ import com.github.filipmalczak.vent.api.model.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.model.VentId;
 import com.github.filipmalczak.vent.embedded.model.Page;
 import com.github.filipmalczak.vent.embedded.model.events.Event;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,11 +18,9 @@ import static com.github.filipmalczak.vent.embedded.utils.MongoTranslator.fromMo
 
 
 @Service
+@AllArgsConstructor(onConstructor = @__(@Autowired))
 public class SnapshotService {
-    @Autowired
     private SnapshotRenderer snapshotRenderer;
-
-    @Autowired
     private PageService pageService;
 
     public Mono<ObjectSnapshot> getSnapshot(@NonNull String collectionName, @NonNull VentId ventId, @NonNull LocalDateTime queryAt){

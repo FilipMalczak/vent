@@ -807,7 +807,7 @@ public class EmbeddedQueryTest {
     }
 
     private EmbeddedReactiveQuery query(Operator rootOperator){
-        return new EmbeddedReactiveQuery(COLLECTION_NAME, rootOperator, mongoQueryPreparator, mongoTemplate, snapshotService);
+        return new EmbeddedReactiveQuery(COLLECTION_NAME, rootOperator, mongoQueryPreparator, mongoTemplate, snapshotService, temporalService);
     }
 
     private static Map person(String firstName, String lastName, int age, String street, String city, List<Map> accounts){

@@ -8,6 +8,7 @@ import com.github.filipmalczak.vent.api.model.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.model.Success;
 import com.github.filipmalczak.vent.api.model.VentId;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentCollection;
+import com.github.filipmalczak.vent.api.temporal.TemporalService;
 import lombok.Value;
 
 import java.time.LocalDateTime;
@@ -66,5 +67,10 @@ public class BlockingCollectionAdapter implements BlockingVentCollection {
     @Override
     public BlockingQueryBuilder<?, ? extends BlockingVentQuery> queryBuilder() {
         return new BlockingQueryBuilderAdapter(ventCollection.queryBuilder());
+    }
+
+    @Override
+    public TemporalService getTemporalService() {
+        return ventCollection.getTemporalService();
     }
 }

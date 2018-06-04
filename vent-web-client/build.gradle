@@ -1,0 +1,5 @@
+dependencies {
+    api project(":vent-api")
+    implementation('org.springframework:spring-webflux')
+    implementation project(":vent-web-common")
+}

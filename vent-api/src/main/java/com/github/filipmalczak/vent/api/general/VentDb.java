@@ -1,16 +1,13 @@
 package com.github.filipmalczak.vent.api.general;
 
+import com.github.filipmalczak.vent.api.temporal.TemporallyEnabled;
 import lombok.NonNull;
 
-public interface VentDb<CollectionImpl extends VentCollection<SingleSuccess, ?, ?, ?, ?, ?, ?>, ManyStrings, SingleSuccess, SingleBoolean> {
-    //todo this may somehow become optional
-    //todo maybe these should return SingleSuccess and SingleBoolean?
-    /**
-     * Should be no-op is isInitialized returns true.
-     */
-    default void initialize(){}
-    default boolean isInitialized(){return true;}
-
+//split trait-dependent VentOperations and always-blocking VentManagement (like getManagedCollections())
+public interface VentDb<
+    CollectionImpl extends VentCollection<SingleSuccess, ?, ?, ?, ?, ?, ?>,
+    ManyStrings, SingleSuccess, SingleBoolean
+    > extends TemporallyEnabled {
     CollectionImpl getCollection(String collectionName);
 
     default SingleSuccess drop(String collectionName){

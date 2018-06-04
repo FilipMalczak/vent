@@ -1,6 +1,6 @@
 package com.github.filipmalczak.vent.embedded;
 
-import com.github.filipmalczak.vent.embedded.service.TemporalService;
+import com.github.filipmalczak.vent.api.temporal.TemporalService;
 import com.mongodb.MongoClient;
 import org.bson.BsonReader;
 import org.bson.BsonWriter;

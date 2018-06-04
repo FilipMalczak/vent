@@ -9,4 +9,5 @@ import java.time.LocalDateTime;
 public class EventConfirmation {
     private VentId ventId;
     private LocalDateTime happenedOn;
+    //todo: add event type; optional candidates: event id, object version, page id/hash
 }

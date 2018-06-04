@@ -7,6 +7,7 @@ import com.github.filipmalczak.vent.api.model.VentId;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentCollection;
 import com.github.filipmalczak.vent.api.reactive.query.ReactiveQueryBuilder;
 import com.github.filipmalczak.vent.api.reactive.query.ReactiveVentQuery;
+import com.github.filipmalczak.vent.api.temporal.TemporalService;
 import com.github.filipmalczak.vent.embedded.model.Page;
 import com.github.filipmalczak.vent.embedded.model.events.Event;
 import com.github.filipmalczak.vent.embedded.model.events.impl.EventFactory;
@@ -89,7 +90,7 @@ public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
 
     @Override
     public ReactiveQueryBuilder<?, ? extends ReactiveVentQuery> queryBuilder() {
-        return new EmbeddedReactiveQueryBuilder(name, new AndCriteriaBuilder(), mongoQueryPreparator, mongoTemplate, snapshotService);
+        return new EmbeddedReactiveQueryBuilder(name, new AndCriteriaBuilder(), mongoQueryPreparator, mongoTemplate, snapshotService, getTemporalService());
     }
 
     private Mono<EventConfirmation> addEventToNewPage(VentId id, Event event){
@@ -102,5 +103,10 @@ public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
         return pageService.
             currentPage(name, id).
             flatMap(p -> pageService.addEvent(name, p, event));
+    }
+
+    @Override
+    public TemporalService getTemporalService() {
+        return pageService.getTemporalService();
     }
 }

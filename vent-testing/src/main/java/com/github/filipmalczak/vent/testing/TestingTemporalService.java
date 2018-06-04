@@ -1,6 +1,6 @@
 package com.github.filipmalczak.vent.testing;
 
-import com.github.filipmalczak.vent.embedded.service.TemporalService;
+import com.github.filipmalczak.vent.api.temporal.TemporalService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 

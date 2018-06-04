@@ -3,5 +3,5 @@ dependencies {
     implementation project(":vent-utils")
     api('org.springframework.boot:spring-boot-starter-test')
     api('io.projectreactor:reactor-test')
-
+    implementation'org.junit.jupiter:junit-jupiter-api'
 }

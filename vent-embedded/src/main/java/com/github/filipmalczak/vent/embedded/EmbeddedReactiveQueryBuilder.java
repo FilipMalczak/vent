@@ -2,6 +2,7 @@ package com.github.filipmalczak.vent.embedded;
 
 import com.github.filipmalczak.vent.api.general.query.CriteriaBuilder;
 import com.github.filipmalczak.vent.api.reactive.query.ReactiveQueryBuilder;
+import com.github.filipmalczak.vent.api.temporal.TemporalService;
 import com.github.filipmalczak.vent.embedded.query.AndCriteriaBuilder;
 import com.github.filipmalczak.vent.embedded.query.EmbeddedReactiveQuery;
 import com.github.filipmalczak.vent.embedded.service.MongoQueryPreparator;
@@ -15,16 +16,12 @@ import java.util.function.Consumer;
 
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 public class EmbeddedReactiveQueryBuilder implements ReactiveQueryBuilder<EmbeddedReactiveQueryBuilder, EmbeddedReactiveQuery> {
-    private @NonNull
-    String collectionName;
-    private @NonNull
-    AndCriteriaBuilder rootCriteriaBuilder;
-    private @NonNull
-    MongoQueryPreparator mongoQueryPreparator;
-    private @NonNull
-    ReactiveMongoTemplate mongoTemplate;
-    private @NonNull
-    SnapshotService snapshotService;
+    private @NonNull String collectionName;
+    private @NonNull AndCriteriaBuilder rootCriteriaBuilder;
+    private @NonNull MongoQueryPreparator mongoQueryPreparator;
+    private @NonNull ReactiveMongoTemplate mongoTemplate;
+    private @NonNull SnapshotService snapshotService;
+    private @NonNull TemporalService temporalService;
 
 
     @Override
@@ -53,6 +50,6 @@ public class EmbeddedReactiveQueryBuilder implements ReactiveQueryBuilder<Embedd
 
     @Override
     public EmbeddedReactiveQuery build() {
-        return new EmbeddedReactiveQuery(collectionName, rootCriteriaBuilder.toOperator(), mongoQueryPreparator, mongoTemplate, snapshotService);
+        return new EmbeddedReactiveQuery(collectionName, rootCriteriaBuilder.toOperator(), mongoQueryPreparator, mongoTemplate, snapshotService, temporalService);
     }
 }

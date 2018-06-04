@@ -1,5 +1,6 @@
 package com.github.filipmalczak.vent.embedded;
 
+import com.github.filipmalczak.vent.VentSpringTest;
 import com.github.filipmalczak.vent.embedded.model.VentDbDescriptor;
 import com.github.filipmalczak.vent.embedded.model.events.impl.EventFactory;
 import com.github.filipmalczak.vent.embedded.query.EmbeddedReactiveQuery;
@@ -7,11 +8,13 @@ import com.github.filipmalczak.vent.embedded.query.operator.*;
 import com.github.filipmalczak.vent.embedded.service.MongoQueryPreparator;
 import com.github.filipmalczak.vent.embedded.service.PageService;
 import com.github.filipmalczak.vent.embedded.service.SnapshotService;
+import com.github.filipmalczak.vent.testing.TestingTemporalService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import reactor.core.publisher.Flux;
 
@@ -20,6 +23,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static reactor.core.publisher.Mono.just;
 
+@VentSpringTest
 class EmbeddedReactiveQueryBuilderTest {
     @Mock
     private PageService pageService;
@@ -31,6 +35,9 @@ class EmbeddedReactiveQueryBuilderTest {
     private ReactiveMongoTemplate mongoTemplate;
     @Mock
     private SnapshotService snapshotService;
+
+    @Autowired
+    private TestingTemporalService temporalService;
 
     private static final String COLLECTION_NAME = "collection";
 
@@ -44,7 +51,8 @@ class EmbeddedReactiveQueryBuilderTest {
         when(mongoTemplate.collectionExists(anyString())).thenReturn(just(true));
         when(mongoTemplate.insert(any(VentDbDescriptor.class), anyString())).thenReturn(just(new VentDbDescriptor()));
         when(mongoTemplate.findAll(eq(VentDbDescriptor.class), anyString())).thenReturn(Flux.just(new VentDbDescriptor()));
-        ventDb.initialize();
+
+        when(pageService.getTemporalService()).thenReturn(temporalService);
     }
 
     @Test
@@ -206,6 +214,6 @@ class EmbeddedReactiveQueryBuilderTest {
     }
 
     private EmbeddedReactiveQuery query(Operator rootOperator){
-        return new EmbeddedReactiveQuery(COLLECTION_NAME, rootOperator, mongoQueryPreparator, mongoTemplate, snapshotService);
+        return new EmbeddedReactiveQuery(COLLECTION_NAME, rootOperator, mongoQueryPreparator, mongoTemplate, snapshotService, ventDb.getTemporalService());
     }
 }

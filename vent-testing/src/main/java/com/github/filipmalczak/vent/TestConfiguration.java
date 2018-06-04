@@ -1,8 +1,10 @@
 package com.github.filipmalczak.vent;
 
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentDb;
+import com.github.filipmalczak.vent.api.temporal.TemporalService;
 import com.github.filipmalczak.vent.testing.LoggingDbWrapper;
 import com.github.filipmalczak.vent.testing.StackTracer;
+import com.github.filipmalczak.vent.testing.TestingTemporalService;
 import org.springframework.context.annotation.*;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
@@ -24,9 +26,15 @@ public class TestConfiguration {
         return StackTracer.builder().basePackageClass(this.getClass()).build();
     }
 
-    @Conditional(ExtensiveLoggingCondition.class)
     @Bean
-    public ReactiveVentDb reactiveVentDb(ReactiveVentDb embeddedReactiveVentDb, StackTracer stackTracer){
-        return LoggingDbWrapper.defaultWrapper(stackTracer, embeddedReactiveVentDb);
+    public TemporalService temporalService(){
+        return new TestingTemporalService();
     }
+
+    //todo: rethink logging
+//    @Conditional(ExtensiveLoggingCondition.class)
+//    @Bean
+//    public ReactiveVentDb reactiveVentDb(ReactiveVentDb embeddedReactiveVentDb, StackTracer stackTracer){
+//        return LoggingDbWrapper.defaultWrapper(stackTracer, embeddedReactiveVentDb);
+//    }
 }

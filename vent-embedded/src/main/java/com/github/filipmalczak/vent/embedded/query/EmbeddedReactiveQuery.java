@@ -2,6 +2,7 @@ package com.github.filipmalczak.vent.embedded.query;
 
 import com.github.filipmalczak.vent.api.model.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.reactive.query.ReactiveVentQuery;
+import com.github.filipmalczak.vent.api.temporal.TemporalService;
 import com.github.filipmalczak.vent.embedded.model.Page;
 import com.github.filipmalczak.vent.embedded.model.events.impl.Create;
 import com.github.filipmalczak.vent.embedded.query.operator.Operator;
@@ -42,6 +43,8 @@ public class EmbeddedReactiveQuery implements ReactiveVentQuery{
     private @NonNull MongoQueryPreparator mongoQueryPreparator;
     private @NonNull ReactiveMongoTemplate mongoTemplate;
     private @NonNull SnapshotService snapshotService;
+    //this should be nullable
+    @Getter private @NonNull TemporalService temporalService;
 
     //fixme count(...) and exists(...) can be implemented with mongo count and exists
 

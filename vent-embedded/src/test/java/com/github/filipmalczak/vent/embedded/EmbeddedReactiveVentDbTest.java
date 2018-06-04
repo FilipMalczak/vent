@@ -43,7 +43,6 @@ class EmbeddedReactiveVentDbTest {
     public void setUp(){
         holder = new Holder<>();
         times = Times.defaultFromMilleniumBreak();
-        ventDb.initialize();
     }
 
     /**

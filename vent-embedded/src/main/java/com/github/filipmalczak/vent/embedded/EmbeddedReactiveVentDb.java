@@ -3,6 +3,7 @@ package com.github.filipmalczak.vent.embedded;
 import com.github.filipmalczak.vent.api.model.Success;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentCollection;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentDb;
+import com.github.filipmalczak.vent.api.temporal.TemporalService;
 import com.github.filipmalczak.vent.embedded.model.VentDbDescriptor;
 import com.github.filipmalczak.vent.embedded.model.events.impl.EventFactory;
 import com.github.filipmalczak.vent.embedded.service.MongoQueryPreparator;
@@ -25,7 +26,6 @@ import static reactor.core.publisher.Mono.just;
 
 //todo define API status for embedded stuff; probably provide single factory-like entry point
 @Component
-@AllArgsConstructor(onConstructor = @__(@Autowired))
 @Slf4j
 public class EmbeddedReactiveVentDb implements ReactiveVentDb {
     private @NonNull PageService pageService;
@@ -39,10 +39,18 @@ public class EmbeddedReactiveVentDb implements ReactiveVentDb {
     private @NonNull ReactiveMongoTemplate mongoTemplate;
 
     private static final String VENT_DESCRIPTOR_COLLECTION = "vent.descriptor";
+    private boolean initialized = false;
 
-    @PostConstruct
-    @Override
-    public void initialize() {
+    @Autowired
+    public EmbeddedReactiveVentDb(PageService pageService, EventFactory eventFactory, SnapshotService snapshotService, MongoQueryPreparator mongoQueryPreparator, ReactiveMongoTemplate mongoTemplate) {
+        this.pageService = pageService;
+        this.eventFactory = eventFactory;
+        this.snapshotService = snapshotService;
+        this.mongoQueryPreparator = mongoQueryPreparator;
+        this.mongoTemplate = mongoTemplate;
+    }
+
+    private void initialize() {
         mongoTemplate.
             collectionExists(VENT_DESCRIPTOR_COLLECTION).
             filter(x -> !x).
@@ -62,6 +70,7 @@ public class EmbeddedReactiveVentDb implements ReactiveVentDb {
 
     @Override
     public Mono<Success> optimizePages(SuggestionStrength strength, OptimizationType type) {
+        //todo muthafucking TODO
         return null;
     }
 
@@ -80,6 +89,10 @@ public class EmbeddedReactiveVentDb implements ReactiveVentDb {
     }
 
     private Mono<VentDbDescriptor> getDescriptor(){
+        if (!initialized) {
+            initialize();
+            initialized = true;
+        }
         return mongoTemplate.
             findAll(VentDbDescriptor.class, VENT_DESCRIPTOR_COLLECTION).
             singleOrEmpty().
@@ -89,5 +102,10 @@ public class EmbeddedReactiveVentDb implements ReactiveVentDb {
 
     private Mono<VentDbDescriptor> saveDescriptor(VentDbDescriptor descriptor){
         return mongoTemplate.save(descriptor, VENT_DESCRIPTOR_COLLECTION);
+    }
+
+    @Override
+    public TemporalService getTemporalService() {
+        return pageService.getTemporalService();
     }
 }
