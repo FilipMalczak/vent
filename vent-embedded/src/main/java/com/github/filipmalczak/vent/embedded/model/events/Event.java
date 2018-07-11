@@ -11,6 +11,7 @@ import java.util.function.Function;
  * The argument can be modified in place and returned - there is no need for deep copy, as it will exist only in
  * scope of applying chain of events by some SnapshotRenderer.
  */
-public interface Event extends Function<Map, Map> {
+public interface Event<E extends Event<E>> extends Function<Map, Map> {
     LocalDateTime getOccuredOn();
+    E withOccuredOn(LocalDateTime occuredOn);
 }

@@ -1,12 +1,34 @@
-//todo this module is heavily underdeveloped, it needs some love
-//and then it needs a client
+//todo manage buildscript - plugins can be put on classpath in root; see embedded too
+//todo update boot to at least 2.0.3
+buildscript {
+    repositories {
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath "gradle.plugin.com.sourcemuse.gradle.plugin:GradleMongoPlugin:1.0.6"
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+    }
+}
 
 //todo make sure that both boot jar and standard jar are published
 jar.enabled = true
 
+apply plugin: "com.sourcemuse.mongo"
+apply plugin: "org.springframework.boot"
+
+test.dependsOn startManagedMongoDb
+bootRun.dependsOn startManagedMongoDb
+
 dependencies {
-    implementation('org.springframework.boot:spring-boot-starter-actuator')
-    implementation('org.springframework.boot:spring-boot-starter-webflux')
-    implementation project(":vent-web-common")
-    implementation project(":vent-embedded")
+    api('org.springframework.boot:spring-boot-starter-actuator')
+    api('org.springframework.boot:spring-boot-starter-webflux')
+    api project(":vent-web-common")
+    api project(":vent-embedded")
+    implementation('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
+    testImplementation('de.flapdoodle.embed:de.flapdoodle.embed.mongo')
+    testImplementation("org.springframework.boot:spring-boot-test-autoconfigure")
+    testImplementation "org.springframework:spring-test"
+    testImplementation project(":vent-api")
+    testImplementation project(":vent-web-client")
+    testImplementation project(":vent-api-tck")
 }

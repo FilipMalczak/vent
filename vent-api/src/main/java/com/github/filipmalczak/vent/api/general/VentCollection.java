@@ -12,7 +12,7 @@ public interface VentCollection<
     SingleSuccess, SingleId, SingleConfirmation, SingleSnapshot,
     ManyIds, ManySnapshots,
     QueryBuilderImpl extends QueryBuilder> extends TemporallyEnabled {
-    String getName();
+    String getVentCollectionName();
 
     SingleSuccess drop();
 

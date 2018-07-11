@@ -19,7 +19,7 @@ import java.util.Map;
 import static com.github.filipmalczak.vent.web.paths.CommonPaths.*;
 
 @AllArgsConstructor(onConstructor = @__(@Autowired))
-@Controller
+@RestController
 public class CollectionController {
     private ReactiveVentDb reactiveVentDb;
     private MapperFacade mapperFacade;

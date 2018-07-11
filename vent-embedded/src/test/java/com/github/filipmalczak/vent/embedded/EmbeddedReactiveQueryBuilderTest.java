@@ -1,10 +1,11 @@
 package com.github.filipmalczak.vent.embedded;
 
 import com.github.filipmalczak.vent.VentSpringTest;
-import com.github.filipmalczak.vent.embedded.model.VentDbDescriptor;
+import com.github.filipmalczak.vent.api.model.Success;
 import com.github.filipmalczak.vent.embedded.model.events.impl.EventFactory;
 import com.github.filipmalczak.vent.embedded.query.EmbeddedReactiveQuery;
 import com.github.filipmalczak.vent.embedded.query.operator.*;
+import com.github.filipmalczak.vent.embedded.service.CollectionService;
 import com.github.filipmalczak.vent.embedded.service.MongoQueryPreparator;
 import com.github.filipmalczak.vent.embedded.service.PageService;
 import com.github.filipmalczak.vent.embedded.service.SnapshotService;
@@ -35,6 +36,8 @@ class EmbeddedReactiveQueryBuilderTest {
     private ReactiveMongoTemplate mongoTemplate;
     @Mock
     private SnapshotService snapshotService;
+    @Mock
+    private CollectionService collectionService;
 
     @Autowired
     private TestingTemporalService temporalService;
@@ -48,10 +51,7 @@ class EmbeddedReactiveQueryBuilderTest {
     public void setUp(){
         MockitoAnnotations.initMocks(this);
         //todo this can be extracted; "passes initialization" fixture can be useful
-        when(mongoTemplate.collectionExists(anyString())).thenReturn(just(true));
-        when(mongoTemplate.insert(any(VentDbDescriptor.class), anyString())).thenReturn(just(new VentDbDescriptor()));
-        when(mongoTemplate.findAll(eq(VentDbDescriptor.class), anyString())).thenReturn(Flux.just(new VentDbDescriptor()));
-
+        when(collectionService.manage(COLLECTION_NAME)).thenReturn(just(Success.NO_OP_SUCCESS));
         when(pageService.getTemporalService()).thenReturn(temporalService);
     }
 
@@ -214,6 +214,6 @@ class EmbeddedReactiveQueryBuilderTest {
     }
 
     private EmbeddedReactiveQuery query(Operator rootOperator){
-        return new EmbeddedReactiveQuery(COLLECTION_NAME, rootOperator, mongoQueryPreparator, mongoTemplate, snapshotService, ventDb.getTemporalService());
+        return new EmbeddedReactiveQuery(COLLECTION_NAME, rootOperator, mongoQueryPreparator, mongoTemplate, snapshotService, collectionService, ventDb.getTemporalService());
     }
 }

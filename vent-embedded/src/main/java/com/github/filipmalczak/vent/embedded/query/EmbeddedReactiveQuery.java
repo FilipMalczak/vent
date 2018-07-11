@@ -6,12 +6,13 @@ import com.github.filipmalczak.vent.api.temporal.TemporalService;
 import com.github.filipmalczak.vent.embedded.model.Page;
 import com.github.filipmalczak.vent.embedded.model.events.impl.Create;
 import com.github.filipmalczak.vent.embedded.query.operator.Operator;
+import com.github.filipmalczak.vent.embedded.service.CollectionService;
 import com.github.filipmalczak.vent.embedded.service.MongoQueryPreparator;
 import com.github.filipmalczak.vent.embedded.service.SnapshotService;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
-import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import reactor.core.publisher.Flux;
 
@@ -41,8 +42,9 @@ public class EmbeddedReactiveQuery implements ReactiveVentQuery{
     private @NonNull String collectionName;
     private @NonNull Operator rootOperator;
     private @NonNull MongoQueryPreparator mongoQueryPreparator;
-    private @NonNull ReactiveMongoTemplate mongoTemplate;
+    private @NonNull ReactiveMongoOperations mongoOperations;
     private @NonNull SnapshotService snapshotService;
+    private @NonNull CollectionService collectionService;
     //this should be nullable
     @Getter private @NonNull TemporalService temporalService;
 
@@ -69,11 +71,16 @@ public class EmbeddedReactiveQuery implements ReactiveVentQuery{
                 pair("initialState", rootOperator.toMongoInitialStateCriteria())
             ))
         );
-        candidatePagesMongoQuery = mongoQueryPreparator.prepare(candidatePagesMongoQuery);
-        return mongoTemplate.find(new BasicQuery(new Document(candidatePagesMongoQuery)), Page.class, collectionName).
-            //fixme I think that this is redundant
-            filter(p -> p.describesStateAt(queryAt)).
-            map(p -> snapshotService.render(p, queryAt)).
-            filter(x -> rootOperator.toRuntimeCriteria().test(x.getState()));
+        Map<String, Object> prepared = mongoQueryPreparator.prepare(candidatePagesMongoQuery);
+        return collectionService.mongoCollectionName(collectionName, queryAt).log("QUERY COLLECTION").flux().flatMap(r ->
+            mongoOperations.find(new BasicQuery(new Document(prepared)), Page.class, r.getName()).
+                log("QUERY RAW FIND").
+                //todo it would be nice to use r.getNow() here, but queryAt saves us an additional stack frame; tough choice
+                //fixme I think that this is redundant
+                filter(p -> p.describesStateAt(queryAt)).
+                map(p -> snapshotService.render(p, queryAt)).
+                filter(x -> rootOperator.toRuntimeCriteria().test(x.getState())).
+                log("QUERY FINAL RESULT")
+        );
     }
 }

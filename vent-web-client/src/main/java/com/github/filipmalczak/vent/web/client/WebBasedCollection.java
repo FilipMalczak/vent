@@ -24,19 +24,19 @@ import static reactor.core.publisher.Mono.just;
 
 @AllArgsConstructor
 public class WebBasedCollection implements ReactiveVentCollection {
-    @Getter private String name;
+    @Getter private String ventCollectionName;
     private WebClient webClient;
     private MapperFacade mapperFacade;
 
     @Override
     public Mono<Success> drop() {
-        return webClient.delete().uri(COLLECTION, name).retrieve().bodyToMono(Success.class);
+        return webClient.delete().uri(COLLECTION, ventCollectionName).retrieve().bodyToMono(Success.class);
     }
 
     @Override
     public Mono<VentId> create(Map initialState) {
         return webClient.post().
-            uri(OBJECTS, name).
+            uri(OBJECTS, ventCollectionName).
             body(just(new CreateRequest(initialState)), CreateRequest.class).
             retrieve().
             bodyToMono(IdView.class).
@@ -46,7 +46,7 @@ public class WebBasedCollection implements ReactiveVentCollection {
     @Override
     public Mono<EventConfirmation> putValue(VentId id, String path, Object value) {
         return webClient.put().
-            uri(STATE_WITH_PATH, name, id.getValue(), path).
+            uri(STATE_WITH_PATH, ventCollectionName, id.getValue(), path).
             body(just(new NewStateRequest(value)), NewStateRequest.class).
             retrieve().
             bodyToMono(EventConfirmationView.class).
@@ -56,7 +56,7 @@ public class WebBasedCollection implements ReactiveVentCollection {
     @Override
     public Mono<EventConfirmation> deleteValue(VentId id, String path) {
         return webClient.delete().
-            uri(STATE_WITH_PATH, name, id.getValue(), path).
+            uri(STATE_WITH_PATH, ventCollectionName, id.getValue(), path).
             retrieve().
             bodyToMono(EventConfirmationView.class).
             map(view -> mapperFacade.map(view, EventConfirmation.class));
@@ -65,7 +65,7 @@ public class WebBasedCollection implements ReactiveVentCollection {
     @Override
     public Mono<EventConfirmation> update(VentId id, Map newState) {
         return webClient.put().
-            uri(OBJECT, name, id.getValue()).
+            uri(OBJECT, ventCollectionName, id.getValue()).
             body(just(new NewStateRequest(newState)), NewStateRequest.class).
             retrieve().
             bodyToMono(EventConfirmationView.class).
@@ -75,7 +75,7 @@ public class WebBasedCollection implements ReactiveVentCollection {
     @Override
     public Mono<EventConfirmation> delete(VentId id) {
         return webClient.delete().
-            uri(OBJECT, name, id.getValue()).
+            uri(OBJECT, ventCollectionName, id.getValue()).
             retrieve().
             bodyToMono(EventConfirmationView.class).
             map(view -> mapperFacade.map(view, EventConfirmation.class));
@@ -84,7 +84,7 @@ public class WebBasedCollection implements ReactiveVentCollection {
     @Override
     public Flux<VentId> identifyAll(LocalDateTime queryAt) {
         return webClient.head().
-            uri(OBJECTS_WITH_QUERY_TIME, name, queryAt).
+            uri(OBJECTS_WITH_QUERY_TIME, ventCollectionName, queryAt).
             retrieve().
             bodyToFlux(IdView.class).
             map(view -> mapperFacade.map(view, VentId.class));
@@ -93,7 +93,7 @@ public class WebBasedCollection implements ReactiveVentCollection {
     @Override
     public Mono<ObjectSnapshot> get(VentId id, LocalDateTime queryAt) {
         return webClient.get().
-            uri(OBJECT_WITH_QUERY_TIME, name, id.getValue(), queryAt).
+            uri(OBJECT_WITH_QUERY_TIME, ventCollectionName, id.getValue(), queryAt).
             retrieve().
             bodyToMono(ObjectView.class).
             map(view -> mapperFacade.map(view, ObjectSnapshot.class));
@@ -108,7 +108,7 @@ public class WebBasedCollection implements ReactiveVentCollection {
     @Override
     public Flux<ObjectSnapshot> getAll(LocalDateTime queryAt) {
         return webClient.get().
-            uri(OBJECTS_WITH_QUERY_TIME, name, queryAt).
+            uri(OBJECTS_WITH_QUERY_TIME, ventCollectionName, queryAt).
             retrieve().
             bodyToFlux(ObjectView.class).
             map(view -> mapperFacade.map(view, ObjectSnapshot.class));

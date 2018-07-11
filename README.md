@@ -1,5 +1,11 @@
 # vent
 
+> This branch is very WIP. I've extracted TCK and used it on embedded implementation. That enforced some 
+> module juggling. Additionally, I've switched from single Vent-managed DB descriptor to descriptor per 
+> collection (collection as in Vent, which maps to one or more MongoDB collections). Apparently, web 
+> server won't start up yet, so I've disabled its tests (which were tests for web client at the same time).
+> That is what I'm working on right now.
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 [![Insight.io](https://www.insight.io/repoBadge/github.com/FilipMalczak/vent)](https://insight.io/github.com/FilipMalczak/vent)
@@ -82,13 +88,16 @@ Artifactory Maven repositories are:
 - [x] compacting (creating new page)
 - [x] querying
 - [x] deleting an object
-- [x] full HTTP API with client (untested, this is majority of the scope of 0.2.0)
-- [ ] TCK (Total Constraints Kit; basically, test suite for API; will be developed while testing web client)
+- [ ] full HTTP API with client (doesn't pass TCK yet, but majority is written)
+- [x] TCK (Total Constraints Kit; basically, test suite for API)
 
 ## Further features
 
 > In random order
 
+- rename "embedded" to "mongo", provide additional impl over GIT
+- split read/write APIs
+- transactionality
 - query-based updates (PUT VALUE address.city = "Another one" WHERE or(facts.hasMoved, facts.wasRelocated))
 - fetching some time period (instead of object state at timestamp)
 - factory for Spring Data-like repositories based on Vent

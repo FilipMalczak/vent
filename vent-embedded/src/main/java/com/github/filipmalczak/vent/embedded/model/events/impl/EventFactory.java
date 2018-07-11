@@ -1,34 +1,33 @@
 package com.github.filipmalczak.vent.embedded.model.events.impl;
 
 import com.github.filipmalczak.vent.api.temporal.TemporalService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
 
 import java.util.Map;
 
-@Component
+//occuredOn should always be null - caller will take care of assigning timestamp
+@AllArgsConstructor
 public class EventFactory {
-    @Autowired
-    private TemporalService temporalService;
 
     public Create create(Map initialState){
-        return new Create(initialState, temporalService.now());
+        return new Create(initialState, null);
     }
 
     public Delete delete(){
-        return new Delete(temporalService.now());
+        return new Delete(null);
     }
 
     public Update update(Map newValue){
-        return new Update(newValue, temporalService.now());
+        return new Update(newValue, null);
     }
 
     public PutValue putValue(String path, Object value){
-        return new PutValue(path, value, temporalService.now());
+        return new PutValue(path, value, null);
     }
 
     public DeleteValue deleteValue(String path){
-        return new DeleteValue(path, temporalService.now());
+        return new DeleteValue(path, null);
     }
 
     //todo: merge: update, but does not remove non-overriding fields in argument; doable with batch PUT too; which is better?

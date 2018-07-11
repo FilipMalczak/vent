@@ -1,6 +1,6 @@
 package com.github.filipmalczak.vent.api.model;
 
-import lombok.Value;
+import lombok.*;
 
 
 @Value

@@ -6,5 +6,5 @@ jar.enabled = true
 
 dependencies {
     api project(":vent-api")
-    api group: 'ma.glasnost.orika', name: 'orika-core', version: '1.5.2'
+    api group: 'ma.glasnost.orika', name: 'orika-core'
 }

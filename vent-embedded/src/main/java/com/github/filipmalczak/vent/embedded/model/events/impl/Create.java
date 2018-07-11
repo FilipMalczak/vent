@@ -1,11 +1,12 @@
 package com.github.filipmalczak.vent.embedded.model.events.impl;
 
+import com.github.filipmalczak.vent.embedded.model.events.Event;
 import com.github.filipmalczak.vent.embedded.model.events.helper.TimestampedEvent;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 
-public class Create extends TimestampedEvent{
+public class Create extends TimestampedEvent<Create>{
     private Map initialState;
 
     Create(Map initialState, LocalDateTime occuredOn) {
@@ -18,5 +19,10 @@ public class Create extends TimestampedEvent{
         if (map != null)
             throw new RuntimeException("Create must happen first!"); //todo
         return initialState;
+    }
+
+    @Override
+    public Create withOccuredOn(LocalDateTime occuredOn) {
+        return new Create(initialState, occuredOn);
     }
 }

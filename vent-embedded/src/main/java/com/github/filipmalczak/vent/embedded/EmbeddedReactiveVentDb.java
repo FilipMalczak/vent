@@ -4,29 +4,24 @@ import com.github.filipmalczak.vent.api.model.Success;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentCollection;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentDb;
 import com.github.filipmalczak.vent.api.temporal.TemporalService;
-import com.github.filipmalczak.vent.embedded.model.VentDbDescriptor;
 import com.github.filipmalczak.vent.embedded.model.events.impl.EventFactory;
+import com.github.filipmalczak.vent.embedded.service.CollectionService;
 import com.github.filipmalczak.vent.embedded.service.MongoQueryPreparator;
 import com.github.filipmalczak.vent.embedded.service.PageService;
 import com.github.filipmalczak.vent.embedded.service.SnapshotService;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import javax.annotation.PostConstruct;
-
-import static com.github.filipmalczak.vent.api.model.Success.NO_OP_SUCCESS;
-import static com.github.filipmalczak.vent.api.model.Success.SUCCESS;
-import static reactor.core.publisher.Mono.just;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 //todo define API status for embedded stuff; probably provide single factory-like entry point
-@Component
 @Slf4j
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class EmbeddedReactiveVentDb implements ReactiveVentDb {
     private @NonNull PageService pageService;
 
@@ -36,36 +31,18 @@ public class EmbeddedReactiveVentDb implements ReactiveVentDb {
 
     private @NonNull MongoQueryPreparator mongoQueryPreparator;
 
-    private @NonNull ReactiveMongoTemplate mongoTemplate;
+    private @NonNull CollectionService collectionService;
+
+    private @NonNull ReactiveMongoOperations mongoOperations;
 
     private static final String VENT_DESCRIPTOR_COLLECTION = "vent.descriptor";
-    private boolean initialized = false;
-
-    @Autowired
-    public EmbeddedReactiveVentDb(PageService pageService, EventFactory eventFactory, SnapshotService snapshotService, MongoQueryPreparator mongoQueryPreparator, ReactiveMongoTemplate mongoTemplate) {
-        this.pageService = pageService;
-        this.eventFactory = eventFactory;
-        this.snapshotService = snapshotService;
-        this.mongoQueryPreparator = mongoQueryPreparator;
-        this.mongoTemplate = mongoTemplate;
-    }
-
-    private void initialize() {
-        mongoTemplate.
-            collectionExists(VENT_DESCRIPTOR_COLLECTION).
-            filter(x -> !x).
-            flatMap(b -> initializeDescriptor()).
-            subscribe();
-    }
-
-    private Mono<VentDbDescriptor> initializeDescriptor(){
-        return mongoTemplate.insert(new VentDbDescriptor(), VENT_DESCRIPTOR_COLLECTION);
-    }
+    private AtomicBoolean initialized = new AtomicBoolean(false);
 
     @Override
     public ReactiveVentCollection getCollection(String collectionName) {
-        manage(collectionName);
-        return new EmbeddedReactiveVentCollection(collectionName, pageService, eventFactory, snapshotService, mongoQueryPreparator, mongoTemplate);
+        //fixme: ugly
+        collectionService.manage(collectionName).block();
+        return new EmbeddedReactiveVentCollection(collectionName, pageService, eventFactory, snapshotService, mongoQueryPreparator, collectionService, mongoOperations);
     }
 
     @Override
@@ -76,32 +53,12 @@ public class EmbeddedReactiveVentDb implements ReactiveVentDb {
 
     @Override
     public Flux<String> getManagedCollections() {
-        return getDescriptor().flatMapIterable(VentDbDescriptor::getManagedCollections);
+        return collectionService.getAllCollectionNames();
     }
 
     @Override
     public Mono<Success> manage(String collectionName) {
-        return getDescriptor().
-            filter(d -> d.manage(collectionName)).
-            map(this::saveDescriptor).
-            map(x -> SUCCESS).
-            switchIfEmpty(just(NO_OP_SUCCESS));
-    }
-
-    private Mono<VentDbDescriptor> getDescriptor(){
-        if (!initialized) {
-            initialize();
-            initialized = true;
-        }
-        return mongoTemplate.
-            findAll(VentDbDescriptor.class, VENT_DESCRIPTOR_COLLECTION).
-            singleOrEmpty().
-//            onErrorMap((IndexOutOfBoundsException e) -> new RuntimeException(e)). //todo more than one descriptor should be treated as error
-            switchIfEmpty(initializeDescriptor());
-    }
-
-    private Mono<VentDbDescriptor> saveDescriptor(VentDbDescriptor descriptor){
-        return mongoTemplate.save(descriptor, VENT_DESCRIPTOR_COLLECTION);
+        return collectionService.manage(collectionName);
     }
 
     @Override

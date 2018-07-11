@@ -5,11 +5,7 @@ import com.github.filipmalczak.vent.api.temporal.TemporalService;
 import com.github.filipmalczak.vent.embedded.exception.IllegalVentStateException;
 import com.github.filipmalczak.vent.embedded.model.Page;
 import lombok.Synchronized;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import reactor.core.publisher.Flux;
 
 import javax.annotation.PostConstruct;
@@ -28,33 +24,32 @@ import java.util.function.Predicate;
 //todo consider crowding optimization on "put value"
 //todo move scheduling out of here
 //todo figure out some more flexible criteria for partial optimization; it would be nice to provide extension point for that
-@Component
 public class PageOptimizer {
-    @Autowired
+//    @Autowired
     private ReactiveVentDb ventDb;
 
-    @Autowired
+//    @Autowired
     private TemporalService temporalService;
 
-    @Autowired
+//    @Autowired
     private PageService pageService;
 
-    @Autowired
+//    @Autowired
     private SnapshotService snapshotService;
 
-    @Autowired
-    private ReactiveMongoTemplate mongoTemplate;
+//    @Autowired
+    private ReactiveMongoOperations mongoOperations;
 
-    @Value("${vent.pageOptimization.partial.olderThan.value}")
+//    @Value("${vent.pageOptimization.partial.olderThan.value}")
     private int olderThanValue;
 
-    @Value("${vent.pageOptimization.partial.olderThan.unit}")
+//    @Value("${vent.pageOptimization.partial.olderThan.unit}")
     private ChronoUnit olderThanUnit;
 
-    @Value("${vent.pageOptimization.partial.crowding}")
+//    @Value("${vent.pageOptimization.partial.crowding}")
     private int partialCrowdingThreshold;
 
-    @Value("${vent.pageOptimization.full.crowding}")
+//    @Value("${vent.pageOptimization.full.crowding}")
     private int fullCrowdingThreshold;
 
     private ExecutorService executorService = Executors.newFixedThreadPool(4); //todo take the value from config
@@ -81,7 +76,7 @@ public class PageOptimizer {
      * Full optimization is performed for all non-deleted objects. This shouldn't run too often, but should not be
      * skipped neither, to keep sane query and get times.
      */
-    @Scheduled(cron = "${vent.pageOptimization.full.schedule}")
+//    @Scheduled(cron = "${vent.pageOptimization.full.schedule}")
     @Synchronized public void performFullOptimization(){
         LocalDateTime now = temporalService.now();
         performOptimization(fullOptimizationPredicateFactory, now);
@@ -92,7 +87,7 @@ public class PageOptimizer {
      * configured age. This is supposed to boost performance when querying and getting objects, by keeping event lists
      * short enough and almost empty for stale objects.
      */
-    @Scheduled(cron = "${vent.pageOptimization.partial.schedule}")
+//    @Scheduled(cron = "${vent.pageOptimization.partial.schedule}")
     @Synchronized public void performPartialOptimization(){
         LocalDateTime now = temporalService.now();
         performOptimization(partialOptimizationPredicateFactory, now);
@@ -133,7 +128,7 @@ public class PageOptimizer {
                 p.setInitialState(snapshotService.render(page, at).getState());
                 return p;
             }).
-            flatMap(p -> mongoTemplate.save(p, collectionName)).
+            flatMap(p -> mongoOperations.save(p, collectionName)).
             block();
     }
 }

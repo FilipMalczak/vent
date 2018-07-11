@@ -6,7 +6,7 @@ import com.github.filipmalczak.vent.velvet.Velvet;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-public class PutValue extends InPlaceEvent {
+public class PutValue extends InPlaceEvent<PutValue> {
     private final String path;
     private final Object value;
 
@@ -19,5 +19,10 @@ public class PutValue extends InPlaceEvent {
     @Override
     protected void modify(Map map) {
         Velvet.parse(path).bind(map).set(value);
+    }
+
+    @Override
+    public PutValue withOccuredOn(LocalDateTime occuredOn) {
+        return new PutValue(path, value, occuredOn);
     }
 }

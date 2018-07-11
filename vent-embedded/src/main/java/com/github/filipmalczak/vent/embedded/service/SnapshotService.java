@@ -6,8 +6,6 @@ import com.github.filipmalczak.vent.embedded.model.Page;
 import com.github.filipmalczak.vent.embedded.model.events.Event;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
@@ -17,8 +15,7 @@ import java.util.Map;
 import static com.github.filipmalczak.vent.embedded.utils.MongoTranslator.fromMongo;
 
 
-@Service
-@AllArgsConstructor(onConstructor = @__(@Autowired))
+@AllArgsConstructor
 public class SnapshotService {
     private SnapshotRenderer snapshotRenderer;
     private PageService pageService;

@@ -5,12 +5,13 @@ import com.github.filipmalczak.vent.api.reactive.query.ReactiveQueryBuilder;
 import com.github.filipmalczak.vent.api.temporal.TemporalService;
 import com.github.filipmalczak.vent.embedded.query.AndCriteriaBuilder;
 import com.github.filipmalczak.vent.embedded.query.EmbeddedReactiveQuery;
+import com.github.filipmalczak.vent.embedded.service.CollectionService;
 import com.github.filipmalczak.vent.embedded.service.MongoQueryPreparator;
 import com.github.filipmalczak.vent.embedded.service.SnapshotService;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 
 import java.util.function.Consumer;
 
@@ -19,8 +20,9 @@ public class EmbeddedReactiveQueryBuilder implements ReactiveQueryBuilder<Embedd
     private @NonNull String collectionName;
     private @NonNull AndCriteriaBuilder rootCriteriaBuilder;
     private @NonNull MongoQueryPreparator mongoQueryPreparator;
-    private @NonNull ReactiveMongoTemplate mongoTemplate;
+    private @NonNull ReactiveMongoOperations mongoOperations;
     private @NonNull SnapshotService snapshotService;
+    private @NonNull CollectionService collectionService; //todo
     private @NonNull TemporalService temporalService;
 
 
@@ -50,6 +52,6 @@ public class EmbeddedReactiveQueryBuilder implements ReactiveQueryBuilder<Embedd
 
     @Override
     public EmbeddedReactiveQuery build() {
-        return new EmbeddedReactiveQuery(collectionName, rootCriteriaBuilder.toOperator(), mongoQueryPreparator, mongoTemplate, snapshotService, temporalService);
+        return new EmbeddedReactiveQuery(collectionName, rootCriteriaBuilder.toOperator(), mongoQueryPreparator, mongoOperations, snapshotService, collectionService, temporalService);
     }
 }

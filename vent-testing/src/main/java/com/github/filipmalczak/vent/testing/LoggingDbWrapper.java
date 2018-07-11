@@ -49,8 +49,8 @@ public class LoggingDbWrapper implements ReactiveVentDb {
             private ReactiveVentCollection delegateCollection = delegate.getCollection(collectionName);
 
             @Override
-            public String getName() {
-                return delegateCollection.getName();
+            public String getVentCollectionName() {
+                return delegateCollection.getVentCollectionName();
             }
 
             @Override

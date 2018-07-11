@@ -1,14 +1,45 @@
+buildscript {
+    repositories {
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath "gradle.plugin.com.sourcemuse.gradle.plugin:GradleMongoPlugin:1.0.6"
+    }
+}
+
+apply plugin: "com.sourcemuse.mongo"
+
+test.dependsOn startManagedMongoDb
+
+mongo {
+//    port 'RANDOM'
+}
+
+test {
+    systemProperty "project.mongo.port", "${project.mongo.port}"
+    doFirst {
+        println "XXXXXXXXX ${project.mongo.port}"
+    }
+}
+
+
 dependencies {
-    implementation('de.flapdoodle.embed:de.flapdoodle.embed.mongo')
     api project(":vent-api")
     implementation project(":velvet")
     implementation project(":vent-utils")
     //todo use pure driver, without spring data
-//    implementation "org.mongodb:mongodb-driver-reactivestreams"
-//    implementation "org.springframework.data:spring-data-mongodb"
-    implementation('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
+    //this is API only to be exposable through Spring (see vent-web-server; VentConfiguration)
+    api "org.mongodb:mongodb-driver-reactivestreams"
+    implementation("org.springframework.data:spring-data-mongodb"){
+        exclude group: "org.springframework"
+    }
+    implementation "io.projectreactor:reactor-core"
+    testImplementation('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
 //    implementation project(":vent-adapters") //todo
+//    testImplementation('de.flapdoodle.embed:de.flapdoodle.embed.mongo')
     testImplementation project(":vent-testing")
+    testImplementation project(":vent-api-tck")
     testImplementation project(":vent-adapters")
     testRuntime project(":vent-adapters-common")
 }
+

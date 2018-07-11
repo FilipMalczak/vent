@@ -20,8 +20,8 @@ public class BlockingCollectionAdapter implements BlockingVentCollection {
     private ReactiveVentCollection ventCollection;
 
     @Override
-    public String getName() {
-        return ventCollection.getName();
+    public String getVentCollectionName() {
+        return ventCollection.getVentCollectionName();
     }
 
     @Override

@@ -32,7 +32,7 @@ allprojects {
         }
         rules {
             before {
-                version = "$currentVersion-$branchName-SNAPSHOT"
+                version = "$currentVersion-${branchName.hashCode()}-SNAPSHOT"
                 project.ext {
                     currentState = "FEATURE"
                 }
@@ -45,6 +45,12 @@ allprojects {
             }
             onBranch("dev") {
                 version = "$currentVersion-SNAPSHOT"
+                project.ext {
+                    currentState = "SNAPSHOT"
+                }
+            }
+            onBranch(~/snapshot\/v(.+)/) {
+                version.setFrom matches[1]
                 project.ext {
                     currentState = "SNAPSHOT"
                 }
@@ -88,6 +94,8 @@ subprojects {
             mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
         }
         dependencies {
+            dependency group: 'ma.glasnost.orika', name: 'orika-core', version: '1.5.2'
+
             dependency 'org.junit.jupiter:junit-jupiter-api:5.2.0'
             dependency group: 'org.mockito', name: 'mockito-junit-jupiter', version: '2.18.3'
             dependency 'org.junit.jupiter:junit-jupiter-engine:5.2.0'
@@ -95,6 +103,8 @@ subprojects {
             dependency group: 'org.spockframework', name: 'spock-core', version: '1.1-groovy-2.4'
             dependency 'org.junit.vintage:junit-vintage-engine:5.2.0' //required for Spock
             dependency group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.2.0'
+
+            dependency "com.github.sbrannen:spring-test-junit5:1.2.0"
 
             dependency 'org.projectlombok:lombok:1.16.20'
         }

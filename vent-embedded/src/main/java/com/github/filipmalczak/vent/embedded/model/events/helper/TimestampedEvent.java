@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @ToString
 @EqualsAndHashCode
-public abstract class TimestampedEvent implements Event{
+public abstract class TimestampedEvent<E extends TimestampedEvent<E>> implements Event<E>{
     @Getter private final LocalDateTime occuredOn;
 
     protected TimestampedEvent(LocalDateTime occuredOn) {

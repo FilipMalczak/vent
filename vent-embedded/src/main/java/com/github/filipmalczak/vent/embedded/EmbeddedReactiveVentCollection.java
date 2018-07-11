@@ -12,6 +12,7 @@ import com.github.filipmalczak.vent.embedded.model.Page;
 import com.github.filipmalczak.vent.embedded.model.events.Event;
 import com.github.filipmalczak.vent.embedded.model.events.impl.EventFactory;
 import com.github.filipmalczak.vent.embedded.query.AndCriteriaBuilder;
+import com.github.filipmalczak.vent.embedded.service.CollectionService;
 import com.github.filipmalczak.vent.embedded.service.MongoQueryPreparator;
 import com.github.filipmalczak.vent.embedded.service.PageService;
 import com.github.filipmalczak.vent.embedded.service.SnapshotService;
@@ -19,7 +20,7 @@ import com.github.filipmalczak.vent.embedded.utils.MongoTranslator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
-import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -29,7 +30,7 @@ import java.util.Map;
 @AllArgsConstructor
 //todo builder?
 public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
-    @Getter private @NonNull String name;
+    @Getter private @NonNull String ventCollectionName;
 
     private @NonNull PageService pageService;
 
@@ -39,20 +40,24 @@ public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
 
     private @NonNull MongoQueryPreparator mongoQueryPreparator;
 
-    private @NonNull ReactiveMongoTemplate mongoTemplate;
+    private @NonNull CollectionService collectionService;
+
+    private @NonNull ReactiveMongoOperations mongoOperations;
 
     @Override
     public Mono<Success> drop() {
         //fixme this is ugly, it shouldnt be pageServices responsibility, but I don't want dependency on template
-        return pageService.drop(name);
+        return collectionService.mongoCollectionName(ventCollectionName).log("DROP").flatMap(r -> pageService.drop(r.getName()));
     }
 
     @Override
     public Mono<VentId> create(Map initialState) {
-        return pageService.
-            createFirstPage(name, initialState).
-            map(Page::getObjectId).
-            map(MongoTranslator::fromMongo);
+        return collectionService.mongoCollectionName(ventCollectionName).log("CREATE").flatMap(r ->
+            pageService.
+                createFirstPage(r.getName(), r.getNow(), initialState).
+                map(Page::getObjectId).
+                map(MongoTranslator::fromMongo)
+        );
     }
 
     @Override
@@ -68,12 +73,22 @@ public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
 
     @Override
     public Mono<ObjectSnapshot> get(VentId id, LocalDateTime queryAt) {
-        return snapshotService.getSnapshot(name, id, queryAt);
+        return collectionService.mongoCollectionName(ventCollectionName, queryAt).flatMap(r ->
+            snapshotService.
+                getSnapshot(r.getName(), id, queryAt)
+        );
     }
 
     @Override
     public Flux<VentId> identifyAll(LocalDateTime queryAt) {
-        return pageService.allPages(name, queryAt).map(Page::getObjectId).map(MongoTranslator::fromMongo);
+        return collectionService.mongoCollectionName(ventCollectionName, queryAt).flux().flatMap(r ->
+            pageService.allPages(
+                    r.getName(),
+                    queryAt
+                ).
+                map(Page::getObjectId).
+                map(MongoTranslator::fromMongo)
+        );
     }
 
     @Override
@@ -85,24 +100,34 @@ public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
 
     @Override
     public Mono<EventConfirmation> delete(@NonNull VentId id) {
-        return pageService.currentPage(name, id).flatMap(p -> pageService.delete(name, p));
+        return collectionService.mongoCollectionName(ventCollectionName).log("DELETE").flatMap(r ->
+            pageService.
+                currentPage(r.getName(), id).
+                flatMap(p ->
+                    pageService.delete(r.getName(), r.getNow(), p)
+                )
+        );
     }
 
     @Override
     public ReactiveQueryBuilder<?, ? extends ReactiveVentQuery> queryBuilder() {
-        return new EmbeddedReactiveQueryBuilder(name, new AndCriteriaBuilder(), mongoQueryPreparator, mongoTemplate, snapshotService, getTemporalService());
+        return new EmbeddedReactiveQueryBuilder(ventCollectionName, new AndCriteriaBuilder(), mongoQueryPreparator, mongoOperations, snapshotService, collectionService, getTemporalService());
     }
 
     private Mono<EventConfirmation> addEventToNewPage(VentId id, Event event){
-        return pageService.
-            createEmptyNextPage(name, id, event.getOccuredOn()).
-            flatMap(p -> pageService.addEvent(name, p, event));
+        return collectionService.mongoCollectionName(ventCollectionName).log("NEW PAGE").flatMap(r ->
+            pageService.
+                createEmptyNextPage(r.getName(), id, r.getNow()).
+                flatMap(p -> pageService.addEvent(r.getName(), p, r.align(event)))
+        );
     }
 
     private Mono<EventConfirmation> addEventToCurrentPage(VentId id, Event event){
-        return pageService.
-            currentPage(name, id).
-            flatMap(p -> pageService.addEvent(name, p, event));
+        return collectionService.mongoCollectionName(ventCollectionName).log("CURRENT PAGE").flatMap(r ->
+            pageService.
+                currentPage(r.getName(), id).
+                flatMap(p -> pageService.addEvent(r.getName(), p, r.align(event)))
+        );
     }
 
     @Override

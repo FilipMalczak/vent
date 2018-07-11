@@ -12,6 +12,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.function.Predicate;
 
 import static com.github.filipmalczak.vent.web.paths.CommonPaths.COLLECTION;
@@ -21,7 +22,7 @@ import static com.github.filipmalczak.vent.web.paths.CommonPaths.OPTIMIZE;
 //todo this can be done functional style, without annotations
 // https://docs.spring.io/spring/docs/5.0.0.BUILD-SNAPSHOT/spring-framework-reference/html/web-reactive.html#_routerfunctions
 @AllArgsConstructor(onConstructor = @__(@Autowired))
-@Controller
+@RestController
 public class DbController {
     private ReactiveVentDb reactiveVentDb;
 
@@ -32,8 +33,11 @@ public class DbController {
     }
 
     @RequestMapping(path = COLLECTIONS, method = RequestMethod.HEAD)
+//    public Mono<List<String>> getManagedCollections(){
+//        return reactiveVentDb.getManagedCollections().collectList();
+//    }
     public Flux<String> getManagedCollections(){
-        return reactiveVentDb.getManagedCollections();
+        return reactiveVentDb.getManagedCollections().log("collections");
     }
 
     @RequestMapping(path = COLLECTION, method = RequestMethod.HEAD)
@@ -46,6 +50,6 @@ public class DbController {
 
     @PutMapping(COLLECTION)
     public Mono<Success> manage(@PathVariable String name){
-        return reactiveVentDb.manage(name);
+        return reactiveVentDb.manage(name).log("manage");
     }
 }

@@ -5,7 +5,7 @@ import com.github.filipmalczak.vent.embedded.model.events.helper.TimestampedEven
 import java.time.LocalDateTime;
 import java.util.Map;
 
-public class Update extends TimestampedEvent {
+public class Update extends TimestampedEvent<Update> {
     private Map newValue;
 
     Update(Map newValue, LocalDateTime occuredOn) {
@@ -16,5 +16,10 @@ public class Update extends TimestampedEvent {
     @Override
     public Map apply(Map map) {
         return newValue;
+    }
+
+    @Override
+    public Update withOccuredOn(LocalDateTime occuredOn) {
+        return new Update(newValue, occuredOn);
     }
 }

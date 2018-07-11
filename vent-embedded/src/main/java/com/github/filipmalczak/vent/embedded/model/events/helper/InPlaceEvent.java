@@ -3,7 +3,7 @@ package com.github.filipmalczak.vent.embedded.model.events.helper;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-public abstract class InPlaceEvent extends TimestampedEvent {
+public abstract class InPlaceEvent<E extends InPlaceEvent<E>> extends TimestampedEvent<E> {
     protected InPlaceEvent(LocalDateTime occuredOn) {
         super(occuredOn);
     }

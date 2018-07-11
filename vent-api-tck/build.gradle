@@ -1,0 +1,8 @@
+dependencies {
+    api project(":vent-api")
+    api project(":vent-testing")
+    api project(":vent-adapters")
+    implementation project(":vent-utils")
+    implementation project(":vent-adapters-common")
+    api 'org.junit.jupiter:junit-jupiter-api'
+}

@@ -4,7 +4,7 @@ public interface CommonPaths {
     String QUERY_TIME_PARAM = "queryAt={queryAt}";
     String PATH_PARAM = "path={path}";
 
-    String API = "/api";
+    String API = "api";
     String V1 = API+"/v1";
 
     String DB = V1+"/db";

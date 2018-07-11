@@ -9,27 +9,37 @@ import org.bson.codecs.DecoderContext;
 import org.bson.codecs.EncoderContext;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-@Configuration
-@ComponentScan
-@EnableAutoConfiguration
-public class EmbeddedVentConfiguration {
+//@Configuration
+//@ComponentScan
+//@EnableAutoConfiguration
+//@EnableReactiveMongoRepositories
+//@ImportAutoConfiguration(MongoReactiveDataAutoConfiguration.class)//({MongoReactiveAutoConfiguration.class, MongoReactiveDataAutoConfiguration.class, MongoDataAutoConfiguration.class})
+public class EmbeddedVentCodecs {
+//    @Bean
+//    public ReactiveVentDb reactiveVentDb(EmbeddedReactiveVentDb embeddedReactiveVentDb){
+//        return embeddedReactiveVentDb;
+//    }
 
-    @Bean
-    public CodecRegistry codecRegistry(Codec<LocalDateTime> localDateTimeCodec, MongoClient mongoClient){
+//    @Bean
+    public CodecRegistry codecRegistry(Codec<LocalDateTime> localDateTimeCodec, CodecRegistry... registries){
         return CodecRegistries.fromRegistries(
-            CodecRegistries.fromCodecs(localDateTimeCodec),
-            mongoClient.getMongoClientOptions().getCodecRegistry()
+            Stream.concat(
+                Stream.of(CodecRegistries.fromCodecs(localDateTimeCodec)),
+                Stream.of(registries)
+            ).collect(Collectors.toList())
+
+//            mongoClient.getMongoClientOptions().getCodecRegistry()
+//            ,
+//            registries
         );
     }
 
-    @Bean
+//    @Bean
     public Codec<LocalDateTime> localDateTimeCodec(TemporalService temporalService){
         return new Codec<LocalDateTime>() {
             @Override

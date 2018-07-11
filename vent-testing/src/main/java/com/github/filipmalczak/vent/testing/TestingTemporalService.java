@@ -53,6 +53,10 @@ public class TestingTemporalService implements TemporalService {
         addResults(asList(times));
     }
 
+    public void clear(){
+        queueToReturn.clear();
+    }
+
     public LocalDateTime peekNow(){
         if (stackTracer != null){
             log.info("peekNow(): Call hierarchy: "+stackTracer.getCurrentHierarchy());

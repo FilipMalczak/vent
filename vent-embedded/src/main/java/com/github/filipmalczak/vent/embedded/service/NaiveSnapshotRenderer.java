@@ -1,7 +1,6 @@
 package com.github.filipmalczak.vent.embedded.service;
 
 import com.github.filipmalczak.vent.embedded.model.events.Event;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
@@ -14,9 +13,6 @@ import static java.util.function.Function.identity;
  * for given path". In other words, this renderer just applies all the events, without trying to use some
  * semantic knowledge about them.
  */
-
-@Service
-//@ConditionalOnMissingBean(SnapshotRenderer.class) //fixme work on conditional bean
 public class NaiveSnapshotRenderer implements SnapshotRenderer {
 
     @Override

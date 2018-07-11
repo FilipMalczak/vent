@@ -5,9 +5,11 @@ import lombok.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.github.filipmalczak.vent.helper.Struct.list;
 import static com.github.filipmalczak.vent.helper.Struct.set;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.joining;
@@ -17,7 +19,9 @@ import static java.util.stream.Collectors.joining;
 public class StackTracer {
     private Class<?> basePackageClass;
     @Builder.Default
-    private Set<String> packagesToFilterOut = set("java.util", "java.lang", "sun.reflect", "org.junit", "com.intellij", "reactor");
+    private Set<String> defaultPackagesToFilterOut = set("java.util", "java.lang", "sun.reflect", "org.junit", "com.intellij", "reactor");
+    @Builder.Default
+    private Set<String> customPackagesToFilterOut = set();
     @Builder.Default
     private int defaultShorteningLevel = 3;
     @Builder.Default
@@ -26,6 +30,14 @@ public class StackTracer {
     private boolean withLineNumber = true;
     @Builder.Default
     private boolean alwaysIncludeFirstFrame = true;
+
+    @Getter(lazy = true) private final Set<String> packagesToFilterOut = ((Supplier<Set<String>>)(() -> {
+        Set<String> out = set();
+        out.addAll(defaultPackagesToFilterOut);
+        out.addAll(customPackagesToFilterOut);
+        return out;
+    })).get();
+
 
     public List<Frame> getCurrentFrames(){
         try {
@@ -44,11 +56,11 @@ public class StackTracer {
             alwaysIncludeFirstFrame ?
                 Stream.concat(
                     safeSublist(currentFrames, 0, -1).stream().
-                        filter(f -> packagesToFilterOut.stream().noneMatch(p -> f.getPackageName().startsWith(p))),
+                        filter(f -> getPackagesToFilterOut().stream().noneMatch(p -> f.getPackageName().startsWith(p))),
                     Stream.of(currentFrames.get(currentFrames.size()-1))
                 ) :
                 currentFrames.stream().
-                    filter(f -> packagesToFilterOut.stream().noneMatch(p -> f.getPackageName().startsWith(p)))
+                    filter(f -> getPackagesToFilterOut().stream().noneMatch(p -> f.getPackageName().startsWith(p)))
         ).collect(Collectors.toList());
     }
 
