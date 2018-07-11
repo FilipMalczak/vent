@@ -50,7 +50,7 @@ allprojects {
                 }
             }
             onBranch(~/snapshot\/v(.+)/) {
-                version.setFrom matches[1]
+                version = "${matches[1]}-SNAPSHOT"
                 project.ext {
                     currentState = "SNAPSHOT"
                 }
@@ -61,10 +61,19 @@ allprojects {
     version = gitVersion.determineVersion()
 }
 
+String padCenter(int minSize, String left, String right){
+    int padSize = minSize - left.size() - right.size();
+    if (padSize < 0)
+        padSize = 0;
+    return left+(" "*padSize)+right
+}
+
 task echoGroupAndVersion(group: "help", description: "Figures out project group and current version and prints them") {
     doLast {
-        println "Project group:   ${group}"
-        println "Project version: ${version}"
+        println padCenter(80,   "Project group:   ${project.group}", " - artifact group")
+        println                 "Current version: ${currentVersion}"
+        println                 "Project status: ${currentState}"
+        println padCenter(80,   "Project version: ${version}", " - artifact version")
     }
 }
 
