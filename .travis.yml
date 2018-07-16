@@ -1,6 +1,6 @@
 language: java
 before_install:
-  - ./gradlew --version # this is just so gradle fetches all the dependencies and download log is here and not in next command log
+  - ./gradlew clean # this is just so gradle fetches all the dependencies and download log is here and not in next command log
   - ./gradlew echoGroupAndVersion
 install: ./gradlew clean assemble
 script: ./gradlew test
