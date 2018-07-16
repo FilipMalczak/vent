@@ -88,8 +88,8 @@ Artifactory Maven repositories are:
 - [x] compacting (creating new page)
 - [x] querying
 - [x] deleting an object
-- [ ] full HTTP API with client (doesn't pass TCK yet, but majority is written)
-- [x] TCK (Total Constraints Kit; basically, test suite for API)
+- [ ] full HTTP API with client (passes VentDbTck, no support for VentQueryTck yet)
+- [x] TCK (Total Constraints Kit; basically, test suite for API, appliable to any client)
 
 ## Further features
 

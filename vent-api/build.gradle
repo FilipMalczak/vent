@@ -1,5 +1,3 @@
 dependencies {
     api project(":vent-traits")
-//    api rootProject.getSubprojects().find {it.name == "vent-traits"}.collect {println it; return it}.configurations.api
-//    implementation ":vent-adapters"
 }

@@ -70,10 +70,10 @@ String padCenter(int minSize, String left, String right){
 
 task echoGroupAndVersion(group: "help", description: "Figures out project group and current version and prints them") {
     doLast {
-        println padCenter(80,   "Project group:   ${project.group}", " - artifact group")
+        println padCenter(80,   "Project group:   ${project.group}", " <- artifact group  ")
         println                 "Current version: ${currentVersion}"
-        println                 "Project status: ${currentState}"
-        println padCenter(80,   "Project version: ${version}", " - artifact version")
+        println                 "Project status:  ${currentState}"
+        println padCenter(80,   "Project version: ${version}",       " <- artifact version")
     }
 }
 
@@ -103,6 +103,9 @@ subprojects {
             mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
         }
         dependencies {
+            dependency group: 'com.google.auto.service', name: 'auto-service', version: '1.0-rc4'
+            dependency 'uk.com.robust-it:cloning:1.9.10'
+
             dependency group: 'ma.glasnost.orika', name: 'orika-core', version: '1.5.2'
 
             dependency 'org.junit.jupiter:junit-jupiter-api:5.2.0'

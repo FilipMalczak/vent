@@ -10,7 +10,7 @@ buildscript {
     }
 }
 
-//todo make sure that both boot jar and standard jar are published
+//todo make sure that both boot jar and standard jar are published; todo#2 - should plain JAR be published?
 jar.enabled = true
 
 apply plugin: "com.sourcemuse.mongo"
@@ -25,7 +25,6 @@ dependencies {
     api project(":vent-web-common")
     api project(":vent-embedded")
     implementation('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
-//    testImplementation('de.flapdoodle.embed:de.flapdoodle.embed.mongo')
     testImplementation("org.springframework.boot:spring-boot-test-autoconfigure")
     testImplementation "org.springframework:spring-test"
     testImplementation project(":vent-api")
