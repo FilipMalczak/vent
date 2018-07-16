@@ -2,7 +2,4 @@ dependencies {
     api project(":vent-api")
     implementation('org.springframework:spring-webflux')
     implementation project(":vent-web-common")
-    testImplementation('de.flapdoodle.embed:de.flapdoodle.embed.mongo')
-    testImplementation project(":vent-api-tck")
-    testImplementation project(":vent-web-server")
 }

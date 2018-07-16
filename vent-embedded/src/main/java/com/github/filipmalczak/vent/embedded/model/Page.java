@@ -20,6 +20,7 @@ import static java.util.stream.Collectors.toList;
 @Document
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class Page {
     @Id
     private ObjectId pageId;

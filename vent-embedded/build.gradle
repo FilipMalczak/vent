@@ -11,15 +11,8 @@ apply plugin: "com.sourcemuse.mongo"
 
 test.dependsOn startManagedMongoDb
 
-mongo {
-//    port 'RANDOM'
-}
-
 test {
     systemProperty "project.mongo.port", "${project.mongo.port}"
-    doFirst {
-        println "XXXXXXXXX ${project.mongo.port}"
-    }
 }
 
 
@@ -35,8 +28,6 @@ dependencies {
     }
     implementation "io.projectreactor:reactor-core"
     testImplementation('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
-//    implementation project(":vent-adapters") //todo
-//    testImplementation('de.flapdoodle.embed:de.flapdoodle.embed.mongo')
     testImplementation project(":vent-testing")
     testImplementation project(":vent-api-tck")
     testImplementation project(":vent-adapters")

@@ -3,7 +3,10 @@ package com.github.filipmalczak.vent.api.model;
 import lombok.*;
 
 
-@Value
+//@Value
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class VentId {
     private String value;
 }

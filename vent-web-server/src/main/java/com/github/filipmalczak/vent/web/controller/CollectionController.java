@@ -1,14 +1,12 @@
 package com.github.filipmalczak.vent.web.controller;
 
-import com.github.filipmalczak.vent.api.general.VentDb;
 import com.github.filipmalczak.vent.api.model.Success;
 import com.github.filipmalczak.vent.api.model.VentId;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentDb;
+import com.github.filipmalczak.vent.web.integration.Converters;
 import com.github.filipmalczak.vent.web.model.*;
 import lombok.AllArgsConstructor;
-import ma.glasnost.orika.MapperFacade;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -22,7 +20,7 @@ import static com.github.filipmalczak.vent.web.paths.CommonPaths.*;
 @RestController
 public class CollectionController {
     private ReactiveVentDb reactiveVentDb;
-    private MapperFacade mapperFacade;
+    private Converters converters;
 
     @DeleteMapping(COLLECTION)
     public Mono<Success> drop(@PathVariable String name){
@@ -33,7 +31,7 @@ public class CollectionController {
     public Mono<IdView> create(@PathVariable String name, @RequestBody CreateRequest request){
         return reactiveVentDb.getCollection(name).
             create(request.getInitialState()).
-            map(id -> mapperFacade.map(id, IdView.class));
+            map(converters::convert);
     }
 
     @PutMapping(STATE)
@@ -41,7 +39,7 @@ public class CollectionController {
                                                 @RequestParam String path, @RequestBody NewStateRequest request){
         return reactiveVentDb.getCollection(name).
             putValue(new VentId(id), path, request.getNewState()).
-            map(confirmation -> mapperFacade.map(confirmation, EventConfirmationView.class));
+            map(converters::convert);
     }
 
     @DeleteMapping(STATE)
@@ -49,7 +47,7 @@ public class CollectionController {
                                                     @RequestParam String path){
         return reactiveVentDb.getCollection(name).
             deleteValue(new VentId(id), path).
-            map(confirmation -> mapperFacade.map(confirmation, EventConfirmationView.class));
+            map(converters::convert);
     }
 
     @PutMapping(OBJECT)
@@ -58,28 +56,28 @@ public class CollectionController {
         //fixme ugly downcast to Map
         return reactiveVentDb.getCollection(name).
             update(new VentId(id), (Map) request.getNewState()).
-            map(confirmation -> mapperFacade.map(confirmation, EventConfirmationView.class));
+            map(converters::convert);
     }
 
     @DeleteMapping(OBJECT)
     public Mono<EventConfirmationView> update(@PathVariable String name, @PathVariable String id){
         return reactiveVentDb.getCollection(name).
             delete(new VentId(id)).
-            map(confirmation -> mapperFacade.map(confirmation, EventConfirmationView.class));
+            map(converters::convert);
     }
 
-    @RequestMapping(path = OBJECTS, method = RequestMethod.HEAD)
+    @GetMapping(IDS)
     public Flux<IdView> identifyAll(@PathVariable String name, @RequestParam LocalDateTime queryAt){
         return reactiveVentDb.getCollection(name).
             identifyAll(queryAt).
-            map(id -> mapperFacade.map(id, IdView.class));
+            map(converters::convert);
     }
 
     @GetMapping(OBJECT)
     public Mono<ObjectView> get(@PathVariable String name, @PathVariable String id, @RequestParam LocalDateTime queryAt){
         return reactiveVentDb.getCollection(name).
             get(new VentId(id), queryAt).
-            map(snapshot -> mapperFacade.map(snapshot, ObjectView.class));
+            map(converters::convert);
     }
 
     //todo execute query
@@ -88,6 +86,6 @@ public class CollectionController {
     public Flux<ObjectView> getAll(@PathVariable String name, @RequestParam LocalDateTime queryAt){
         return reactiveVentDb.getCollection(name).
             getAll(queryAt).
-            map(snapshot -> mapperFacade.map(snapshot, ObjectView.class));
+            map(converters::convert);
     }
 }

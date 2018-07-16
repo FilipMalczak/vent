@@ -25,7 +25,7 @@ dependencies {
     api project(":vent-web-common")
     api project(":vent-embedded")
     implementation('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
-    testImplementation('de.flapdoodle.embed:de.flapdoodle.embed.mongo')
+//    testImplementation('de.flapdoodle.embed:de.flapdoodle.embed.mongo')
     testImplementation("org.springframework.boot:spring-boot-test-autoconfigure")
     testImplementation "org.springframework:spring-test"
     testImplementation project(":vent-api")

@@ -4,25 +4,23 @@ import com.github.filipmalczak.vent.api.model.Success;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentCollection;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentDb;
 import com.github.filipmalczak.vent.api.temporal.TemporalService;
+import com.github.filipmalczak.vent.web.integration.Converters;
 import lombok.AllArgsConstructor;
-import ma.glasnost.orika.MapperFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import static com.github.filipmalczak.vent.web.paths.CommonPaths.COLLECTION;
-import static com.github.filipmalczak.vent.web.paths.CommonPaths.COLLECTIONS;
-import static com.github.filipmalczak.vent.web.paths.CommonPaths.OPTIMIZE;
+import static com.github.filipmalczak.vent.web.paths.CommonPaths.*;
 
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public class ReactiveWebVentDbClient implements ReactiveVentDb {
     private WebClient webClient;
-    private MapperFacade mapperFacade;
+    private Converters converters;
 
     @Override
     public ReactiveVentCollection getCollection(String collectionName) {
-        return new WebBasedCollection(collectionName, webClient, mapperFacade);
+        return new WebBasedCollection(collectionName, webClient, converters);
     }
 
     @Override
@@ -32,12 +30,12 @@ public class ReactiveWebVentDbClient implements ReactiveVentDb {
 
     @Override
     public Flux<String> getManagedCollections() {
-        return webClient.head().uri(COLLECTIONS).retrieve().bodyToFlux(String.class);
+        return webClient.get().uri(COLLECTIONS).retrieve().bodyToFlux(String.class);
     }
 
     @Override
     public Mono<Boolean> isManaged(String collectionName) {
-        return webClient.head().uri(COLLECTION, collectionName).exchange().
+        return webClient.get().uri(COLLECTION, collectionName).exchange().
             map(r -> r.statusCode()).
             map(c -> c.is2xxSuccessful()); //todo tighter contract - 204 or 404
     }

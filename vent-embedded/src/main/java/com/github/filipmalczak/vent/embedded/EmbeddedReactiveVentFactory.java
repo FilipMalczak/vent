@@ -5,6 +5,7 @@ import com.github.filipmalczak.vent.embedded.model.events.impl.EventFactory;
 import com.github.filipmalczak.vent.embedded.service.*;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 
 import java.util.function.BiFunction;
@@ -12,6 +13,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @NoArgsConstructor
+@Slf4j
 public class EmbeddedReactiveVentFactory {
     @FunctionalInterface
     public interface PageServiceCreator {
@@ -91,13 +93,21 @@ public class EmbeddedReactiveVentFactory {
 
     public EmbeddedReactiveVentDb newInstance(){
         ReactiveMongoOperations operations = nonNull(reactiveMongoOperations.get());
+        log.info("ReactiveMongoOperations: "+operations);
         TemporalService temporal = nonNull(temporalService.get());
+        log.info("TemporalService: "+temporal);
         EventFactory evFactory = nonNull(eventFactory.get());
+        log.info("EventFactory: "+evFactory);
         PageService page = nonNull(pageService.create(temporal, operations, evFactory));
+        log.info("PageService: "+page);
         SnapshotRenderer renderer = nonNull(snapshotRenderer.get());
+        log.info("SnapshotRenderer: "+renderer);
         SnapshotService snapshot = nonNull(snapshotService.apply(renderer, page));
+        log.info("SnapshotService: "+snapshot);
         CollectionService collection = nonNull(collectionService.apply(operations, temporal));
+        log.info("CollectionService: "+collection);
         MongoQueryPreparator preparator = nonNull(mongoQueryPreparator.get());
+        log.info("MongoQueryPreparator: "+preparator);
         return new EmbeddedReactiveVentDb(
             page,
             evFactory,

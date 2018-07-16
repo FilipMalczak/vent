@@ -1,6 +1,7 @@
 package com.github.filipmalczak.vent.testing;
 
 import com.github.filipmalczak.vent.api.temporal.TemporalService;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -18,15 +19,21 @@ public class TestingTemporalService implements TemporalService {
     @Autowired(required = false)
     private StackTracer stackTracer;
 
+    @SneakyThrows
     public <C extends Collection<LocalDateTime>> void withResults(C times, Runnable runnable){
         int initialQueueSize = queueToReturn.size();
         addResults(times);
+        Throwable originalThrowable = null;
         try {
             runnable.run();
+        } catch (Throwable t) {
+            originalThrowable = t;
         } finally {
             try {
                 assertEquals(initialQueueSize, queueToReturn.size(), "All times have to be used! (left: "+queueToReturn+")");
             } catch (Throwable t) {
+                if (originalThrowable != null)
+                    t.addSuppressed(originalThrowable);
                 throw t;
             } finally {
                 if (initialQueueSize > 0) {
@@ -35,6 +42,9 @@ public class TestingTemporalService implements TemporalService {
                 } else
                     queueToReturn.clear();
             }
+            //"assert empty queue" passed, lets check whether anything was thrown from runnable
+            if (originalThrowable != null)
+                throw originalThrowable;
         }
     }
 

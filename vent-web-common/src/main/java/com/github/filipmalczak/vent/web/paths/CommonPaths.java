@@ -16,7 +16,9 @@ public interface CommonPaths {
     String COLLECTION_WITH_QUERY_TIME = COLLECTION+"?"+QUERY_TIME_PARAM;
 
     String OBJECTS = COLLECTION+"/object";
+    String IDS = OBJECTS+"/id";
     String OBJECTS_WITH_QUERY_TIME = OBJECTS+"?"+QUERY_TIME_PARAM;
+    String IDS_WITH_QUERY_TIME = IDS+"?"+QUERY_TIME_PARAM;
 
     String OBJECT = OBJECTS+"/{id}";
     String OBJECT_WITH_QUERY_TIME = OBJECT+"?"+QUERY_TIME_PARAM;

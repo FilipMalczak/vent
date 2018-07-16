@@ -1,6 +1,8 @@
 package com.github.filipmalczak.vent.helper;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static java.util.Arrays.asList;
 
@@ -27,6 +29,10 @@ public class Struct {
 
     public static Set set(Object... vals){
         return new HashSet(list(vals));
+    }
+
+    public static List list(Iterable vals){
+        return (List) StreamSupport.stream(vals.spliterator(), false).collect(Collectors.toList());
     }
 
     public static List list(Object... vals){

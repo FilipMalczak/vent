@@ -6,18 +6,12 @@ import com.github.filipmalczak.vent.api.reactive.ReactiveVentDb;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-import java.util.function.Predicate;
-
-import static com.github.filipmalczak.vent.web.paths.CommonPaths.COLLECTION;
-import static com.github.filipmalczak.vent.web.paths.CommonPaths.COLLECTIONS;
-import static com.github.filipmalczak.vent.web.paths.CommonPaths.OPTIMIZE;
+import static com.github.filipmalczak.vent.web.paths.CommonPaths.*;
 
 //todo this can be done functional style, without annotations
 // https://docs.spring.io/spring/docs/5.0.0.BUILD-SNAPSHOT/spring-framework-reference/html/web-reactive.html#_routerfunctions
@@ -32,7 +26,7 @@ public class DbController {
         return reactiveVentDb.optimizePages(strength, type);
     }
 
-    @RequestMapping(path = COLLECTIONS, method = RequestMethod.HEAD)
+    @GetMapping(COLLECTIONS)
 //    public Mono<List<String>> getManagedCollections(){
 //        return reactiveVentDb.getManagedCollections().collectList();
 //    }
@@ -40,7 +34,7 @@ public class DbController {
         return reactiveVentDb.getManagedCollections().log("collections");
     }
 
-    @RequestMapping(path = COLLECTION, method = RequestMethod.HEAD)
+    @GetMapping(COLLECTION)
     public Mono<ServerResponse> isManaged(@PathVariable String name){
         return reactiveVentDb.isManaged(name).
             filter(b->b).

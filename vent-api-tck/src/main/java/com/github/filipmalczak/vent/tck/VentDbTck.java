@@ -230,7 +230,9 @@ public abstract class VentDbTck {
         StepVerifier.create(
             ventDb.getCollection(TEST_COLLECTION).create().
                 flatMap(ventId -> ventDb.getCollection(TEST_COLLECTION).get(ventId, past))
-        ).verifyComplete();
+        ).
+        //expect no value
+        verifyComplete();
     }
 
 

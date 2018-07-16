@@ -2,8 +2,9 @@ package com.github.filipmalczak.vent.embedded.service;
 
 import com.github.filipmalczak.vent.api.model.Success;
 import com.github.filipmalczak.vent.api.temporal.TemporalService;
-import com.github.filipmalczak.vent.embedded.model.collections.CollectionDescriptor;
-import com.github.filipmalczak.vent.embedded.model.collections.CollectionPeriodDescriptor;
+import com.github.filipmalczak.vent.embedded.model.CollectionDescriptor;
+import com.github.filipmalczak.vent.embedded.model.CollectionPeriodDescriptor;
+import com.github.filipmalczak.vent.embedded.model.Page;
 import com.github.filipmalczak.vent.embedded.model.events.Event;
 import lombok.AllArgsConstructor;
 import lombok.Value;
@@ -14,6 +15,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Optional;
 
 import static com.github.filipmalczak.vent.embedded.utils.CollectionsUtils.COLLECTIONS_MONGO_COLLECTION;
@@ -54,14 +56,18 @@ public class CollectionService {
 //    public Mono<String> getMongoCollectionNameForPeriodMatching(String ventCollectionName, LocalDateTime at){}
 
     public Flux<CollectionDescriptor> getAllCollections(){
-        return Flux.from(
-            operations.
-                getCollection(COLLECTIONS_MONGO_COLLECTION).
-                find(CollectionDescriptor.class)
-        );
+        return operations.findAll(CollectionDescriptor.class, COLLECTIONS_MONGO_COLLECTION);
+//        return Flux.from(
+//            operations.
+//                getCollection(COLLECTIONS_MONGO_COLLECTION).
+//                find(CollectionDescriptor.class)
+//        );
     }
 
     public Flux<String> getAllCollectionNames(){
+//        return operations.find(Query.query(Criteria.byExample(new HashMap<>())), Page.class).log("pages EXAMPLE").thenMany(
+//            getAllCollections().map(CollectionDescriptor::getVentCollectionName)
+//        );
         return getAllCollections().map(CollectionDescriptor::getVentCollectionName);
     }
 
@@ -126,9 +132,9 @@ public class CollectionService {
         return isManaged(ventCollectionName).flatMap(isMngd ->
             isMngd ?
                 just(Success.NO_OP_SUCCESS):
-                createManaged(ventCollectionName)
-        ).map( newCollection ->
-            Success.SUCCESS
+                createManaged(ventCollectionName).map( newCollection ->
+                    Success.SUCCESS
+                )
         );
     }
 }

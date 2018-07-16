@@ -10,11 +10,9 @@ import org.bson.codecs.configuration.CodecRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Configuration
 public class VentConfiguration extends EmbeddedVentCodecs {
@@ -23,6 +21,7 @@ public class VentConfiguration extends EmbeddedVentCodecs {
 
     @Bean
     public CodecRegistry codecRegistry(Codec<LocalDateTime> localDateTimeCodec) {
+//        return super.codecRegistry(localDateTimeCodec, MongoClient.getDefaultCodecRegistry());
         return super.codecRegistry(localDateTimeCodec, template.getMongoDatabase().getCodecRegistry());
     }
 
@@ -33,16 +32,18 @@ public class VentConfiguration extends EmbeddedVentCodecs {
     }
 
     @Bean
-    public ReactiveVentDb reactiveVentDb(){
+    public ReactiveVentDb reactiveVentDb(TemporalService temporalService){
         return new EmbeddedReactiveVentFactory().
             reactiveMongoOperations(() -> template).
+            temporalService(() -> temporalService).
             newInstance();
     }
 
     //todo figure out where to put this
     //fixme maybe inject this to reactiveVentDb as optional?
     @Bean
-    public TemporalService temporalService(ReactiveVentDb reactiveVentDb){
-        return reactiveVentDb.getTemporalService();
+    public TemporalService temporalService(){
+//        return reactiveVentDb.getTemporalService();
+        return new SimpleTemporalService();
     }
 }

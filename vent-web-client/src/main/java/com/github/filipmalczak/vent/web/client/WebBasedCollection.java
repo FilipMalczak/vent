@@ -8,10 +8,11 @@ import com.github.filipmalczak.vent.api.reactive.ReactiveVentCollection;
 import com.github.filipmalczak.vent.api.reactive.query.ReactiveQueryBuilder;
 import com.github.filipmalczak.vent.api.reactive.query.ReactiveVentQuery;
 import com.github.filipmalczak.vent.api.temporal.TemporalService;
+import com.github.filipmalczak.vent.web.integration.Converters;
+import com.github.filipmalczak.vent.web.integration.DateFormat;
 import com.github.filipmalczak.vent.web.model.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import ma.glasnost.orika.MapperFacade;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -26,7 +27,7 @@ import static reactor.core.publisher.Mono.just;
 public class WebBasedCollection implements ReactiveVentCollection {
     @Getter private String ventCollectionName;
     private WebClient webClient;
-    private MapperFacade mapperFacade;
+    private Converters converters;
 
     @Override
     public Mono<Success> drop() {
@@ -40,7 +41,7 @@ public class WebBasedCollection implements ReactiveVentCollection {
             body(just(new CreateRequest(initialState)), CreateRequest.class).
             retrieve().
             bodyToMono(IdView.class).
-            map(view -> mapperFacade.map(view, VentId.class));
+            map(converters::convert);
     }
 
     @Override
@@ -50,7 +51,7 @@ public class WebBasedCollection implements ReactiveVentCollection {
             body(just(new NewStateRequest(value)), NewStateRequest.class).
             retrieve().
             bodyToMono(EventConfirmationView.class).
-            map(view -> mapperFacade.map(view, EventConfirmation.class));
+            map(converters::convert);
     }
 
     @Override
@@ -59,7 +60,7 @@ public class WebBasedCollection implements ReactiveVentCollection {
             uri(STATE_WITH_PATH, ventCollectionName, id.getValue(), path).
             retrieve().
             bodyToMono(EventConfirmationView.class).
-            map(view -> mapperFacade.map(view, EventConfirmation.class));
+            map(converters::convert);
     }
 
     @Override
@@ -69,7 +70,7 @@ public class WebBasedCollection implements ReactiveVentCollection {
             body(just(new NewStateRequest(newState)), NewStateRequest.class).
             retrieve().
             bodyToMono(EventConfirmationView.class).
-            map(view -> mapperFacade.map(view, EventConfirmation.class));
+            map(converters::convert);
     }
 
     @Override
@@ -78,25 +79,25 @@ public class WebBasedCollection implements ReactiveVentCollection {
             uri(OBJECT, ventCollectionName, id.getValue()).
             retrieve().
             bodyToMono(EventConfirmationView.class).
-            map(view -> mapperFacade.map(view, EventConfirmation.class));
+            map(converters::convert);
     }
 
     @Override
     public Flux<VentId> identifyAll(LocalDateTime queryAt) {
-        return webClient.head().
-            uri(OBJECTS_WITH_QUERY_TIME, ventCollectionName, queryAt).
+        return webClient.get().
+            uri(IDS_WITH_QUERY_TIME, ventCollectionName, queryAt).
             retrieve().
             bodyToFlux(IdView.class).
-            map(view -> mapperFacade.map(view, VentId.class));
+            map(converters::convert);
     }
 
     @Override
     public Mono<ObjectSnapshot> get(VentId id, LocalDateTime queryAt) {
         return webClient.get().
-            uri(OBJECT_WITH_QUERY_TIME, ventCollectionName, id.getValue(), queryAt).
+            uri(OBJECT_WITH_QUERY_TIME, ventCollectionName, id.getValue(), DateFormat.QUERY_AT.format(queryAt)).
             retrieve().
             bodyToMono(ObjectView.class).
-            map(view -> mapperFacade.map(view, ObjectSnapshot.class));
+            map(converters::convert);
     }
 
     //todo
@@ -108,10 +109,10 @@ public class WebBasedCollection implements ReactiveVentCollection {
     @Override
     public Flux<ObjectSnapshot> getAll(LocalDateTime queryAt) {
         return webClient.get().
-            uri(OBJECTS_WITH_QUERY_TIME, ventCollectionName, queryAt).
+            uri(OBJECTS_WITH_QUERY_TIME, ventCollectionName, DateFormat.QUERY_AT.format(queryAt)).
             retrieve().
             bodyToFlux(ObjectView.class).
-            map(view -> mapperFacade.map(view, ObjectSnapshot.class));
+            map(converters::convert);
     }
 
     @Override

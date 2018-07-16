@@ -1,4 +1,4 @@
-package com.github.filipmalczak.vent.embedded.model.collections;
+package com.github.filipmalczak.vent.embedded.model;
 
 import lombok.*;
 import org.bson.types.ObjectId;
@@ -6,7 +6,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -14,8 +13,11 @@ import java.util.Optional;
 import static com.github.filipmalczak.vent.embedded.utils.CollectionsUtils.COLLECTIONS_MONGO_COLLECTION;
 import static com.github.filipmalczak.vent.embedded.utils.CollectionsUtils.MONGO_COLLECTION_NAME_MAPPER;
 
-@Document(collection = COLLECTIONS_MONGO_COLLECTION)
+@Document
 @Data
+@AllArgsConstructor
+@RequiredArgsConstructor
+@NoArgsConstructor
 public class CollectionDescriptor {
     @Id
     private ObjectId ventCollectionId;

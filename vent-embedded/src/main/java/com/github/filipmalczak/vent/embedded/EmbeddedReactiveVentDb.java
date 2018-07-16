@@ -41,7 +41,7 @@ public class EmbeddedReactiveVentDb implements ReactiveVentDb {
     @Override
     public ReactiveVentCollection getCollection(String collectionName) {
         //fixme: ugly
-        collectionService.manage(collectionName).block();
+        collectionService.manage(collectionName).subscribe();
         return new EmbeddedReactiveVentCollection(collectionName, pageService, eventFactory, snapshotService, mongoQueryPreparator, collectionService, mongoOperations);
     }
 
