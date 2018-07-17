@@ -5,8 +5,6 @@ import com.github.filipmalczak.vent.api.model.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.model.Success;
 import com.github.filipmalczak.vent.api.model.VentId;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentCollection;
-import com.github.filipmalczak.vent.api.reactive.query.ReactiveQueryBuilder;
-import com.github.filipmalczak.vent.api.reactive.query.ReactiveVentQuery;
 import com.github.filipmalczak.vent.api.temporal.TemporalService;
 import com.github.filipmalczak.vent.web.integration.Converters;
 import com.github.filipmalczak.vent.web.integration.DateFormat;

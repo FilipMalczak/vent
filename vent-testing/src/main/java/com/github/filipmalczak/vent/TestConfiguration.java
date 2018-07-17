@@ -1,8 +1,6 @@
 package com.github.filipmalczak.vent;
 
-import com.github.filipmalczak.vent.api.reactive.ReactiveVentDb;
 import com.github.filipmalczak.vent.api.temporal.TemporalService;
-import com.github.filipmalczak.vent.testing.LoggingDbWrapper;
 import com.github.filipmalczak.vent.testing.StackTracer;
 import com.github.filipmalczak.vent.testing.TestingTemporalService;
 import org.springframework.context.annotation.*;

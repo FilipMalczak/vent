@@ -1,8 +1,6 @@
 package com.github.filipmalczak.vent.embedded.model.events.impl;
 
-import com.github.filipmalczak.vent.api.temporal.TemporalService;
 import lombok.AllArgsConstructor;
-import lombok.NonNull;
 
 import java.util.Map;
 

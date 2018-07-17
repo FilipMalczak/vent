@@ -1,6 +1,5 @@
 package com.github.filipmalczak.vent.embedded.model.events.impl;
 
-import com.github.filipmalczak.vent.embedded.model.events.Event;
 import com.github.filipmalczak.vent.embedded.model.events.helper.TimestampedEvent;
 
 import java.time.LocalDateTime;

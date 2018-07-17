@@ -5,8 +5,6 @@ import com.github.filipmalczak.vent.api.model.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentDb;
 import com.github.filipmalczak.vent.api.reactive.query.ReactiveQueryBuilder;
 import com.github.filipmalczak.vent.api.reactive.query.ReactiveVentQuery;
-import com.github.filipmalczak.vent.web.model.query.Operation;
-import com.github.filipmalczak.vent.web.model.query.OperationNotSupportedException;
 import com.github.filipmalczak.vent.web.model.query.QueryNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

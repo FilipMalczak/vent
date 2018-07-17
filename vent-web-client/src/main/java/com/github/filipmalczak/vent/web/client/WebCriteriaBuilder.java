@@ -1,7 +1,6 @@
 package com.github.filipmalczak.vent.web.client;
 
 import com.github.filipmalczak.vent.api.general.query.CriteriaBuilder;
-import com.github.filipmalczak.vent.helper.Struct;
 import com.github.filipmalczak.vent.web.model.query.NodeType;
 import com.github.filipmalczak.vent.web.model.query.QueryNode;
 

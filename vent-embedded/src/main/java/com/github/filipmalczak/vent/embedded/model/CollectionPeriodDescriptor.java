@@ -1,7 +1,6 @@
 package com.github.filipmalczak.vent.embedded.model;
 
 import lombok.*;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 import java.util.Optional;

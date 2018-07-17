@@ -9,7 +9,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.github.filipmalczak.vent.helper.Struct.list;
 import static com.github.filipmalczak.vent.helper.Struct.set;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.joining;

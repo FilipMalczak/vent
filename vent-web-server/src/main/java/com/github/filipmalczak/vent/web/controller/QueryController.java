@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static com.github.filipmalczak.vent.web.paths.CommonPaths.QUERY;
-import static com.github.filipmalczak.vent.web.paths.CommonPaths.QUERY_WITH_TIME;
 
 @RestController
 public class QueryController {

@@ -1,8 +1,6 @@
 package com.github.filipmalczak.vent.web.client;
 
-import com.github.filipmalczak.vent.TestServerConfig;
 import com.github.filipmalczak.vent.TestServerManager;
-import com.github.filipmalczak.vent.VentWebServer;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentDb;
 import com.github.filipmalczak.vent.tck.query.VentQueryTck;
 import com.github.filipmalczak.vent.testing.TestingTemporalService;
@@ -10,13 +8,8 @@ import com.github.filipmalczak.vent.web.integration.Converters;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.SpringApplication;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.web.reactive.function.client.WebClient;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(properties = "local.server.port=8080")

@@ -7,7 +7,6 @@ import com.github.filipmalczak.vent.web.model.query.ExecuteQueryRequest;
 import com.github.filipmalczak.vent.web.model.query.Operation;
 import com.github.filipmalczak.vent.web.model.query.QueryNode;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;

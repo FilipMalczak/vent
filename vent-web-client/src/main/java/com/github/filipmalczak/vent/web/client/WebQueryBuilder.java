@@ -1,17 +1,12 @@
 package com.github.filipmalczak.vent.web.client;
 
 import com.github.filipmalczak.vent.api.general.query.CriteriaBuilder;
-import com.github.filipmalczak.vent.api.model.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.reactive.query.ReactiveQueryBuilder;
 import com.github.filipmalczak.vent.web.model.query.NodeType;
 import com.github.filipmalczak.vent.web.model.query.QueryNode;
 import lombok.AllArgsConstructor;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.function.Consumer;
 
 import static com.github.filipmalczak.vent.helper.Struct.list;
