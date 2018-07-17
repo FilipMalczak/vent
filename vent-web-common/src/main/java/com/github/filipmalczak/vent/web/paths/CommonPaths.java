@@ -9,6 +9,7 @@ public interface CommonPaths {
 
     String DB = V1+"/db";
 
+    //fixme this s*it has to go from the API
     String OPTIMIZE = DB+"/optimize/{strength}/{type}";
 
     String COLLECTIONS = DB+"/collection";
@@ -26,5 +27,8 @@ public interface CommonPaths {
     String STATE = OBJECT+"/state";
     String STATE_WITH_PATH = STATE+"?"+PATH_PARAM;
 
+    //I know, I know, its RPC, while the other are trying to be RESTish; whoever has a better idea - speak up on gitter
+    String QUERY = COLLECTION+"/query";
+    String QUERY_WITH_TIME = QUERY+"?"+QUERY_TIME_PARAM;
     //todo query
 }

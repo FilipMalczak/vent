@@ -35,6 +35,10 @@ public class Struct {
         return (List) StreamSupport.stream(vals.spliterator(), false).collect(Collectors.toList());
     }
 
+    public static <T> List<T> list(){
+        return new ArrayList<T>();
+    }
+
     public static List list(Object... vals){
         return asList(vals);
     }

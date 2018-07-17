@@ -102,8 +102,8 @@ public class WebBasedCollection implements ReactiveVentCollection {
 
     //todo
     @Override
-    public ReactiveQueryBuilder<?, ? extends ReactiveVentQuery> queryBuilder() {
-        return null;
+    public WebQueryBuilder queryBuilder() {
+        return new WebQueryBuilder(webClient, ventCollectionName, new WebCriteriaBuilder());
     }
 
     @Override

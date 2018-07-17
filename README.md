@@ -1,5 +1,7 @@
 # vent
 
+[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/vent-event-sourced-db/Lobby)
+
 > This branch is very WIP. I've extracted TCK and used it on embedded implementation. That enforced some 
 > module juggling. Additionally, I've switched from single Vent-managed DB descriptor to descriptor per 
 > collection (collection as in Vent, which maps to one or more MongoDB collections). Apparently, web 
@@ -78,6 +80,15 @@ Artifactory Maven repositories are:
 
 > Follow one of links above, then click "Set me up" in top right-hand corner to see instructions for maven and gradle.
 
+## Looking for contributors
+
+Totally. Check out Vent gitter and I'll write down stuff to do as issues. 
+
+## "Customer Support"
+
+You're most welcome to contact me on gitter, I'll be happy to help you start using Vent in your app or debug something
+Vent-related. 
+
 ## MVP
 
 > MVP is under development. I'm gonna try to keep done things ticked, but don't trust it 100%, better read the code.
@@ -91,14 +102,17 @@ Artifactory Maven repositories are:
 - [ ] full HTTP API with client (passes VentDbTck, no support for VentQueryTck yet)
 - [x] TCK (Total Constraints Kit; basically, test suite for API, appliable to any client)
 
+> TODO: I think that TemporalService + implementations deserve their own modules; I need to think that through later.
+
 ## Further features
 
-> In random order
+> In random order, basically ideas what to do next. Unless someone wants to help this is easier than github.
 
 - rename "embedded" to "mongo", provide additional impl over GIT
 - split read/write APIs
 - transactionality
 - query-based updates (PUT VALUE address.city = "Another one" WHERE or(facts.hasMoved, facts.wasRelocated))
+- RPC/RMI
 - fetching some time period (instead of object state at timestamp)
 - factory for Spring Data-like repositories based on Vent
 - better configurability (better pointing to underlying Mongo instance, working 
