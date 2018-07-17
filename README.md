@@ -2,12 +2,6 @@
 
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/vent-event-sourced-db/Lobby)
 
-> This branch is very WIP. I've extracted TCK and used it on embedded implementation. That enforced some 
-> module juggling. Additionally, I've switched from single Vent-managed DB descriptor to descriptor per 
-> collection (collection as in Vent, which maps to one or more MongoDB collections). Apparently, web 
-> server won't start up yet, so I've disabled its tests (which were tests for web client at the same time).
-> That is what I'm working on right now.
-
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 [![Insight.io](https://www.insight.io/repoBadge/github.com/FilipMalczak/vent)](https://insight.io/github.com/FilipMalczak/vent)
@@ -82,12 +76,16 @@ Artifactory Maven repositories are:
 
 ## Looking for contributors
 
-Totally. Check out Vent gitter and I'll write down stuff to do as issues. 
+Totally. Check out Vent gitter and I'll write down stuff to do as issues.
+
+[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/vent-event-sourced-db/Lobby) 
 
 ## "Customer Support"
 
 You're most welcome to contact me on gitter, I'll be happy to help you start using Vent in your app or debug something
 Vent-related. 
+
+[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/vent-event-sourced-db/Lobby)
 
 ## MVP
 
@@ -99,8 +97,9 @@ Vent-related.
 - [x] compacting (creating new page)
 - [x] querying
 - [x] deleting an object
-- [ ] full HTTP API with client (passes VentDbTck, no support for VentQueryTck yet)
+- [x] full HTTP API with client
 - [x] TCK (Total Constraints Kit; basically, test suite for API, appliable to any client)
+- [ ] proper cleanup of TODOs, code smells, maybe some additional tests (WIP)
 
 > TODO: I think that TemporalService + implementations deserve their own modules; I need to think that through later.
 
@@ -109,7 +108,7 @@ Vent-related.
 > In random order, basically ideas what to do next. Unless someone wants to help this is easier than github.
 
 - rename "embedded" to "mongo", provide additional impl over GIT
-- split read/write APIs
+- split read/write APIs (but provide utilities to merge them)
 - transactionality
 - query-based updates (PUT VALUE address.city = "Another one" WHERE or(facts.hasMoved, facts.wasRelocated))
 - RPC/RMI
