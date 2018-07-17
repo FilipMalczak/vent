@@ -1,8 +1,8 @@
 language: java
 before_install:
-  - ./gradlew clean # this is just so gradle fetches all the dependencies and download log is here and not in next command log
+  - ./gradlew clean
   - ./gradlew echoGroupAndVersion
-install: ./gradlew clean assemble
+install: ./gradlew assemble # clean was called in before_install
 script: ./gradlew test
 after_success:
   - bash <(curl -s https://codecov.io/bash)
