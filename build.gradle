@@ -1,17 +1,22 @@
 buildscript {
 	ext {
-		springBootVersion = '2.0.2.RELEASE'
+		springBootVersion  = '2.0.3.RELEASE'
+        gitversionVersion  = '0.10.0'
+        buildInfoVersion   = '4.7.5'
+        gradleMongoVersion = '1.0.6'
 	}
 	repositories {
 		mavenCentral()
         maven {
             url "https://plugins.gradle.org/m2/"
         }
+        gradlePluginPortal()
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-        classpath "gradle.plugin.org.unbroken-dome.gradle-plugins:gradle-gitversion-plugin:0.10.0"
-        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.7.3"
+        classpath "gradle.plugin.org.unbroken-dome.gradle-plugins:gradle-gitversion-plugin:${gitversionVersion}"
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:${buildInfoVersion}"
+        classpath "gradle.plugin.com.sourcemuse.gradle.plugin:GradleMongoPlugin:${gradleMongoVersion}"
 	}
 }
 

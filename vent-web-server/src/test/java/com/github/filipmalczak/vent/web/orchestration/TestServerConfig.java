@@ -1,4 +1,4 @@
-package com.github.filipmalczak.vent;
+package com.github.filipmalczak.vent.web.orchestration;
 
 import com.github.filipmalczak.vent.api.temporal.TemporalService;
 import com.github.filipmalczak.vent.testing.TestingTemporalService;
