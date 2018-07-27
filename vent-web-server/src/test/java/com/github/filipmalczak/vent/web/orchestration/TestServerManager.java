@@ -56,7 +56,6 @@ public class TestServerManager {
                 log.info("Grace period passed, checking demand");
                 int demand = inUse.get();
                 log.info("Current server demand: "+demand);
-                //fixme safeguard agaist <0
                 if (demand <= 0 && context.isRunning()) {
                     log.info("No demand, stopping server");
                     context.stop();

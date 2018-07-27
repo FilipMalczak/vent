@@ -106,7 +106,6 @@ public class WebBasedCollection implements ReactiveVentCollection {
             map(converters::convert);
     }
 
-    //todo
     @Override
     public WebQueryBuilder queryBuilder() {
         return new WebQueryBuilder(webClient, ventCollectionName, new WebCriteriaBuilder());

@@ -12,8 +12,11 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Map;
 
+import static com.github.filipmalczak.vent.helper.Struct.map;
+import static com.github.filipmalczak.vent.helper.Struct.pair;
 import static com.github.filipmalczak.vent.web.paths.CommonPaths.*;
 
 @AllArgsConstructor(onConstructor = @__(@Autowired))
@@ -53,9 +56,11 @@ public class CollectionController {
     @PutMapping(OBJECT)
     public Mono<EventConfirmationView> update(@PathVariable String name, @PathVariable String id,
                                                 @RequestBody NewStateRequest request){
-        //fixme ugly downcast to Map
+        Map updatePayload = request.getNewState() instanceof Map ?
+            (Map) request.getNewState() :
+            pair("value", request.getNewState());
         return reactiveVentDb.getCollection(name).
-            update(new VentId(id), (Map) request.getNewState()).
+            update(new VentId(id), updatePayload).
             map(converters::convert);
     }
 
@@ -79,8 +84,6 @@ public class CollectionController {
             get(new VentId(id), queryAt).
             map(converters::convert);
     }
-
-    //todo execute query
 
     @GetMapping(OBJECTS)
     public Flux<ObjectView> getAll(@PathVariable String name, @RequestParam LocalDateTime queryAt){

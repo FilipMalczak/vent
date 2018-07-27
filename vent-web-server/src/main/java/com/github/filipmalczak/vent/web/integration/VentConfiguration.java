@@ -43,7 +43,6 @@ public class VentConfiguration extends EmbeddedVentCodecs {
     //fixme maybe inject this to reactiveVentDb as optional?
     @Bean
     public TemporalService temporalService(){
-//        return reactiveVentDb.getTemporalService();
         return new SimpleTemporalService();
     }
 }
