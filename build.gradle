@@ -26,7 +26,7 @@ allprojects {
     group = 'com.github.filipmalczak'
 
     ext {
-        currentVersion = "0.2.0"
+        currentVersion = "0.3.0"
     }
 
     gitVersion {
