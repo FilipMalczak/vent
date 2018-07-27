@@ -47,7 +47,7 @@ where `master` is always a release version, while `dev` a snapshot version.
 Current versions (common for all modules) are:
 
 - [![master](https://img.shields.io/badge/master-0.2.0-blue.svg)](https://oss.jfrog.org/artifactory/webapp/#/artifacts/browse/tree/General/oss-release-local/com/github/filipmalczak)
-- [![dev](https://img.shields.io/badge/dev-0.2.0--SNAPSHOT-brightgreen.svg)](https://oss.jfrog.org/artifactory/webapp/#/artifacts/browse/tree/General/oss-snapshot-local/com/github/filipmalczak)
+- [![dev](https://img.shields.io/badge/dev-0.3.0--SNAPSHOT-brightgreen.svg)](https://oss.jfrog.org/artifactory/webapp/#/artifacts/browse/tree/General/oss-snapshot-local/com/github/filipmalczak)
 
 Following modules are available:
 
