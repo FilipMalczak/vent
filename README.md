@@ -46,8 +46,8 @@ where `master` is always a release version, while `dev` a snapshot version.
 
 Current versions (common for all modules) are:
 
-- `master` - `0.2.0`
-- `dev` - `0.3.0-SNAPSHOT`
+- [![master](https://img.shields.io/badge/master-0.2.0-blue.svg)](https://oss.jfrog.org/artifactory/webapp/#/artifacts/browse/tree/General/oss-release-local/com/github/filipmalczak)
+- [![dev](https://img.shields.io/badge/dev-0.2.0--SNAPSHOT-brightgreen.svg)](https://oss.jfrog.org/artifactory/webapp/#/artifacts/browse/tree/General/oss-snapshot-local/com/github/filipmalczak)
 
 Following modules are available:
 
@@ -89,34 +89,39 @@ Vent-related.
 
 ## Oncoming features
 
-### Next version
+### Version under construction
 
-- extract temporal service to dedicated module
-- write a proper tutorial, its high time for that
-- rename "embedded" to "mongo"
-- strategy-based approach to optimization, scheduled with a plugin
-- better configurability (better pointing to underlying Mongo instance, working page optimization)
-- btw, Vent plugins (like optimization scheduler, but I guess transactions can be enabled this way too)
-- proper abstraction for transactionality (optimistic, version-based locking can be done by "freezing time" and is 
+- [ ] extract temporal service to dedicated module
+- [ ] write a proper tutorial, its high time for that
+- [ ] rename "embedded" to "mongo"
+- [ ] strategy-based approach to optimization, scheduled with a plugin
+- [ ] better configurability (better pointing to underlying Mongo instance, working page optimization)
+- [ ] Vent plugins like optimization scheduler, but I guess transactions can be enabled this way too
+- [ ] proper abstraction for transactionality (optimistic, version-based locking can be done by "freezing time" and is 
 basically ready to implement against an interface, but real locking may be tricky)
-- NTP-based temporal service
-- some better logging for mongo/embedded impl
-    - customizable for impl internals
-    - wrapper for DB for public API
-- asynchronous trait
-- "trait chains"; e.g. if we have adapters for blocking -> async and async -> reactive, then we should be able to turn 
+- [ ] NTP-based temporal service
+- [ ] some better logging for mongo/embedded impl
+    - [ ] customizable for impl internals
+    - [ ] wrapper for DB for public API
+- [ ] asynchronous trait and accompanying adapters
+- [ ] "trait chains"; e.g. if we have adapters for blocking -> async and async -> reactive, then we should be able to turn 
 blocking -> reactive
-- fix Bintray
+- [ ] fix Bintray
+- [ ] set up logging properly (use Slf4J everywhere, choose a modern backend for server and tests)
+
+### Next version candidates
+
+- provide additional impl over GIT
+- split read/write APIs (but provide utilities to merge them)
+- RPC/RMI
+- factory for Spring Data-like repositories based on Vent
 
 ### Backlog
 
 > In random order, basically ideas what to do next. May be taken into next version on the spot, depends on what I fancy.
 > Unless someone wants to help this is easier than github.
 
-- provide additional impl over GIT
-- split read/write APIs (but provide utilities to merge them)
 - query-based updates (PUT VALUE address.city = "Another one" WHERE or(facts.hasMoved, facts.wasRelocated))
-- RPC/RMI
 - fetching some time period (instead of object state at timestamp)
 - factory for Spring Data-like repositories based on Vent
 - API extensions (mainly in default interface methods)
