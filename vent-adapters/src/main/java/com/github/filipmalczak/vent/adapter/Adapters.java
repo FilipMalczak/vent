@@ -1,5 +1,8 @@
 package com.github.filipmalczak.vent.adapter;
 
+import com.github.filipmalczak.vent.adapter.exception.AmbiguousAdaptationException;
+import com.github.filipmalczak.vent.adapter.exception.UnsupportedAdaptationException;
+
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.stream.StreamSupport;
@@ -19,10 +22,14 @@ public class Adapters {
             sorted().
             limit(2).
             collect(toList());
-        if (supporting.isEmpty())
-            throw new RuntimeException(); //todo
-        if (supporting.size() > 1 && supporting.get(0).supports(adaptation) == supporting.get(1).supports(adaptation))
-            throw new RuntimeException(); //todo
+        if (supporting.isEmpty()) {
+            RuntimeException up = new UnsupportedAdaptationException(adaptation);
+            throw up;
+        }
+        if (supporting.size() > 1 && supporting.get(0).supports(adaptation) == supporting.get(1).supports(adaptation)) {
+            RuntimeException up = new AmbiguousAdaptationException(adaptation, supporting.get(0).supports(adaptation));
+            throw up;
+        }
         return supporting.get(0).adapt(source, targetClass);
     }
 }

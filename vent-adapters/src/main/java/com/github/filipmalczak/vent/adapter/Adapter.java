@@ -8,8 +8,4 @@ public interface Adapter {
 
     public <T, S> T adapt(S source, Class<T> targetClass);
 
-    //fixme screwed up visibility here
-    static boolean firstExtendsSecond(Class first, Class second){
-        return second.isAssignableFrom(first);
-    }
 }
