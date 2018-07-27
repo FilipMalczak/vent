@@ -74,13 +74,11 @@ public class EmbeddedReactiveQuery implements ReactiveVentQuery{
         Map<String, Object> prepared = mongoQueryPreparator.prepare(candidatePagesMongoQuery);
         return collectionService.mongoCollectionName(collectionName, queryAt).log("QUERY COLLECTION").flux().flatMap(r ->
             mongoOperations.find(new BasicQuery(new Document(prepared)), Page.class, r.getName()).
-                log("QUERY RAW FIND").
                 //todo it would be nice to use r.getNow() here, but queryAt saves us an additional stack frame; tough choice
                 //fixme I think that this is redundant
                 filter(p -> p.describesStateAt(queryAt)).
                 map(p -> snapshotService.render(p, queryAt)).
-                filter(x -> rootOperator.toRuntimeCriteria().test(x.getState())).
-                log("QUERY FINAL RESULT")
+                filter(x -> rootOperator.toRuntimeCriteria().test(x.getState()))
         );
     }
 }

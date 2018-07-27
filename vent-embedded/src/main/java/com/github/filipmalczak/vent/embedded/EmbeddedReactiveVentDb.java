@@ -35,9 +35,6 @@ public class EmbeddedReactiveVentDb implements ReactiveVentDb {
 
     private @NonNull ReactiveMongoOperations mongoOperations;
 
-    private static final String VENT_DESCRIPTOR_COLLECTION = "vent.descriptor";
-    private AtomicBoolean initialized = new AtomicBoolean(false);
-
     @Override
     public ReactiveVentCollection getCollection(String collectionName) {
         //fixme: ugly

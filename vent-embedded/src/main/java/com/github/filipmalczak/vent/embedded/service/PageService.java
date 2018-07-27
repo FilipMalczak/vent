@@ -68,7 +68,7 @@ public class PageService implements TemporallyEnabled {
     }
 
     /**
-     * Actually all undeleted pages. If this will become needed, I'll refactor.
+     * Actually all undeleted pages. If this distinction will become needed, I'll refactor.
      */
     public Flux<Page> allPages(@NonNull String collectionName, @NonNull LocalDateTime at){
         return query(

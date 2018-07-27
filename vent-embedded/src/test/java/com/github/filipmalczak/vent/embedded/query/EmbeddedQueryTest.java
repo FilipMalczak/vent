@@ -1,5 +1,6 @@
 package com.github.filipmalczak.vent.embedded.query;
 
+import com.github.filipmalczak.vent.TestConfiguration;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentDb;
 import com.github.filipmalczak.vent.embedded.EmbeddedReactiveVentFactory;
 import com.github.filipmalczak.vent.embedded.EmbeddedWithSpringDataConfiguration;
@@ -9,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-@SpringJUnitConfig(EmbeddedWithSpringDataConfiguration.class)
+@SpringJUnitConfig({TestConfiguration.class, EmbeddedWithSpringDataConfiguration.class})
 public class EmbeddedQueryTest extends VentQueryTck {
     @Autowired
     private ReactiveMongoTemplate operations;

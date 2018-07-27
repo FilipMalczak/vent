@@ -8,7 +8,12 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 
 @Configuration
 public class TestConfiguration {
-    private static final boolean EXTENSIVE_LOGGING = false;
+    private static final boolean EXTENSIVE_LOGGING = Boolean.parseBoolean(
+        System.getProperty(
+            "vent.testing.extensive-logging",
+            "false"
+        )
+    );
 
     public static class ExtensiveLoggingCondition implements Condition {
 
@@ -29,10 +34,4 @@ public class TestConfiguration {
         return new TestingTemporalService();
     }
 
-    //todo: rethink logging
-//    @Conditional(ExtensiveLoggingCondition.class)
-//    @Bean
-//    public ReactiveVentDb reactiveVentDb(ReactiveVentDb embeddedReactiveVentDb, StackTracer stackTracer){
-//        return LoggingDbWrapper.defaultWrapper(stackTracer, embeddedReactiveVentDb);
-//    }
 }

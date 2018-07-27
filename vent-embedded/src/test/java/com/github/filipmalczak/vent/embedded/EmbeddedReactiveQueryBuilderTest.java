@@ -1,5 +1,6 @@
 package com.github.filipmalczak.vent.embedded;
 
+import com.github.filipmalczak.vent.TestConfiguration;
 import com.github.filipmalczak.vent.VentSpringTest;
 import com.github.filipmalczak.vent.api.model.Success;
 import com.github.filipmalczak.vent.embedded.model.events.impl.EventFactory;
@@ -17,15 +18,17 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static reactor.core.publisher.Mono.just;
 
-@VentSpringTest
+@SpringJUnitConfig({TestConfiguration.class, EmbeddedWithSpringDataConfiguration.class})
 class EmbeddedReactiveQueryBuilderTest {
     @Mock
     private PageService pageService;
+    //this is unused explicitly, but is needed so that mockito can use it when creating ventDb field
     @Mock
     private EventFactory eventFactory;
     @Mock

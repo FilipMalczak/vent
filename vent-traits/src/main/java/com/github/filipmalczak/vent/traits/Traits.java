@@ -1,14 +1,15 @@
 package com.github.filipmalczak.vent.traits;
 
 import com.github.filipmalczak.vent.traits.utils.TypeHierarchy;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 
 import java.util.stream.Stream;
 
-public class Traits {
-    private Traits() {} //todo lombokize static-method-only classes
-
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class Traits {
     private static boolean isMarkedAsTrait(Class traitCandidate){
         try {
             if (traitCandidate.isInterface()) {

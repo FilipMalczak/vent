@@ -92,21 +92,21 @@ public class EmbeddedReactiveVentFactory {
 
     public EmbeddedReactiveVentDb newInstance(){
         ReactiveMongoOperations operations = nonNull(reactiveMongoOperations.get());
-        log.info("ReactiveMongoOperations: "+operations);
+        log.debug("ReactiveMongoOperations: "+operations);
         TemporalService temporal = nonNull(temporalService.get());
-        log.info("TemporalService: "+temporal);
+        log.debug("TemporalService: "+temporal);
         EventFactory evFactory = nonNull(eventFactory.get());
-        log.info("EventFactory: "+evFactory);
+        log.debug("EventFactory: "+evFactory);
         PageService page = nonNull(pageService.create(temporal, operations, evFactory));
-        log.info("PageService: "+page);
+        log.debug("PageService: "+page);
         SnapshotRenderer renderer = nonNull(snapshotRenderer.get());
-        log.info("SnapshotRenderer: "+renderer);
+        log.debug("SnapshotRenderer: "+renderer);
         SnapshotService snapshot = nonNull(snapshotService.apply(renderer, page));
-        log.info("SnapshotService: "+snapshot);
+        log.debug("SnapshotService: "+snapshot);
         CollectionService collection = nonNull(collectionService.apply(operations, temporal));
-        log.info("CollectionService: "+collection);
+        log.debug("CollectionService: "+collection);
         MongoQueryPreparator preparator = nonNull(mongoQueryPreparator.get());
-        log.info("MongoQueryPreparator: "+preparator);
+        log.debug("MongoQueryPreparator: "+preparator);
         return new EmbeddedReactiveVentDb(
             page,
             evFactory,

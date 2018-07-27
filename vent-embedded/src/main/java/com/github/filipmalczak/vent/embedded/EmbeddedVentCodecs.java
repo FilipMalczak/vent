@@ -13,18 +13,7 @@ import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-//@Configuration
-//@ComponentScan
-//@EnableAutoConfiguration
-//@EnableReactiveMongoRepositories
-//@ImportAutoConfiguration(MongoReactiveDataAutoConfiguration.class)//({MongoReactiveAutoConfiguration.class, MongoReactiveDataAutoConfiguration.class, MongoDataAutoConfiguration.class})
 public class EmbeddedVentCodecs {
-//    @Bean
-//    public ReactiveVentDb reactiveVentDb(EmbeddedReactiveVentDb embeddedReactiveVentDb){
-//        return embeddedReactiveVentDb;
-//    }
-
-//    @Bean
     public CodecRegistry codecRegistry(Codec<LocalDateTime> localDateTimeCodec, CodecRegistry... registries){
         return CodecRegistries.fromRegistries(
             Stream.concat(
@@ -32,13 +21,9 @@ public class EmbeddedVentCodecs {
                 Stream.of(registries)
             ).collect(Collectors.toList())
 
-//            mongoClient.getMongoClientOptions().getCodecRegistry()
-//            ,
-//            registries
         );
     }
 
-//    @Bean
     public Codec<LocalDateTime> localDateTimeCodec(TemporalService temporalService){
         return new Codec<LocalDateTime>() {
             @Override

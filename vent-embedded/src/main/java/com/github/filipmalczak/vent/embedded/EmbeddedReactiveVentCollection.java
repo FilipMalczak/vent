@@ -47,12 +47,12 @@ public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
     @Override
     public Mono<Success> drop() {
         //fixme this is ugly, it shouldnt be pageServices responsibility, but I don't want dependency on template
-        return collectionService.mongoCollectionName(ventCollectionName).log("DROP").flatMap(r -> pageService.drop(r.getName()));
+        return collectionService.mongoCollectionName(ventCollectionName).flatMap(r -> pageService.drop(r.getName()));
     }
 
     @Override
     public Mono<VentId> create(Map initialState) {
-        return collectionService.mongoCollectionName(ventCollectionName).log("CREATE").flatMap(r ->
+        return collectionService.mongoCollectionName(ventCollectionName).flatMap(r ->
             pageService.
                 createFirstPage(r.getName(), r.getNow(), initialState).
                 map(Page::getObjectId).
@@ -100,7 +100,7 @@ public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
 
     @Override
     public Mono<EventConfirmation> delete(@NonNull VentId id) {
-        return collectionService.mongoCollectionName(ventCollectionName).log("DELETE").flatMap(r ->
+        return collectionService.mongoCollectionName(ventCollectionName).flatMap(r ->
             pageService.
                 currentPage(r.getName(), id).
                 flatMap(p ->
@@ -115,7 +115,7 @@ public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
     }
 
     private Mono<EventConfirmation> addEventToNewPage(VentId id, Event event){
-        return collectionService.mongoCollectionName(ventCollectionName).log("NEW PAGE").flatMap(r ->
+        return collectionService.mongoCollectionName(ventCollectionName).flatMap(r ->
             pageService.
                 createEmptyNextPage(r.getName(), id, r.getNow()).
                 flatMap(p -> pageService.addEvent(r.getName(), p, r.align(event)))
@@ -123,7 +123,7 @@ public class EmbeddedReactiveVentCollection implements ReactiveVentCollection {
     }
 
     private Mono<EventConfirmation> addEventToCurrentPage(VentId id, Event event){
-        return collectionService.mongoCollectionName(ventCollectionName).log("CURRENT PAGE").flatMap(r ->
+        return collectionService.mongoCollectionName(ventCollectionName).flatMap(r ->
             pageService.
                 currentPage(r.getName(), id).
                 flatMap(p -> pageService.addEvent(r.getName(), p, r.align(event)))

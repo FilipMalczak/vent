@@ -38,11 +38,11 @@ public class CollectionService {
 
     public Mono<NameAndNow> mongoCollectionName(String ventCollectionName){
         LocalDateTime now = temporalService.now();
-        return just(1).log("COLLECTION "+ventCollectionName).flatMap(x -> mongoCollectionName(ventCollectionName, now));
+        return mongoCollectionName(ventCollectionName, now);
     }
     public Mono<NameAndNow> mongoCollectionName(String ventCollectionName, LocalDateTime at){
         //todo introduce archivization
-        return just(1).log("COLLECTION "+ventCollectionName+" at "+at).flatMap(x -> getMongoCollectionNameForCurrentPeriod(ventCollectionName).map(s -> NameAndNow.with(s, at)));
+        return getMongoCollectionNameForCurrentPeriod(ventCollectionName).map(s -> NameAndNow.with(s, at));
     }
 
     public Mono<String> getMongoCollectionNameForCurrentPeriod(String ventCollectionName){
@@ -51,21 +51,11 @@ public class CollectionService {
             map(CollectionPeriodDescriptor::getMongoCollectionName);
     }
 
-//    public Mono<String> getMongoCollectionNameForPeriodMatching(String ventCollectionName, LocalDateTime at){}
-
     public Flux<CollectionDescriptor> getAllCollections(){
         return operations.findAll(CollectionDescriptor.class, COLLECTIONS_MONGO_COLLECTION);
-//        return Flux.from(
-//            operations.
-//                getCollection(COLLECTIONS_MONGO_COLLECTION).
-//                find(CollectionDescriptor.class)
-//        );
     }
 
     public Flux<String> getAllCollectionNames(){
-//        return operations.find(Query.query(Criteria.byExample(new HashMap<>())), Page.class).log("pages EXAMPLE").thenMany(
-//            getAllCollections().map(CollectionDescriptor::getVentCollectionName)
-//        );
         return getAllCollections().map(CollectionDescriptor::getVentCollectionName);
     }
 
@@ -126,7 +116,7 @@ public class CollectionService {
     }
 
     public Mono<Success> manage(String ventCollectionName){
-        //between isManaged and optionally inserting there's a gap that is perfect for race conditions
+        //fixme between isManaged and optionally inserting there's a gap that is perfect for race conditions
         return isManaged(ventCollectionName).flatMap(isMngd ->
             isMngd ?
                 just(Success.NO_OP_SUCCESS):

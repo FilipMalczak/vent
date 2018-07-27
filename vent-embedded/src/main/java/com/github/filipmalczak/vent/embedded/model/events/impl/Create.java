@@ -16,7 +16,7 @@ public class Create extends TimestampedEvent<Create>{
     @Override
     public Map apply(Map map) {
         if (map != null)
-            throw new RuntimeException("Create must happen first!"); //todo
+            throw new IllegalStateException("Create must happen first!");
         return initialState;
     }
 

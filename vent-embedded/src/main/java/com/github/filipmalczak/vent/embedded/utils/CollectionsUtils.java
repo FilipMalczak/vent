@@ -28,6 +28,6 @@ public final class CollectionsUtils {
 
     @FunctionalInterface
     public interface MongoCollectionNameMapper {
-        public String toMongoCollectionName(String ventCollectionName, LocalDateTime from, Optional<LocalDateTime> to);
+        String toMongoCollectionName(String ventCollectionName, LocalDateTime from, Optional<LocalDateTime> to);
     }
 }

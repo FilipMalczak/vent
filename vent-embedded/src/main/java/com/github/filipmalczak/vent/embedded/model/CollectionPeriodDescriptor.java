@@ -25,7 +25,7 @@ public class CollectionPeriodDescriptor {
 
     public CollectionPeriodDescriptor asFinishedOn(String ventCollectionName, LocalDateTime end){
         if (!current())
-            throw new RuntimeException();//todo
+            throw new IllegalStateException("Only current period descriptor can be used to produce a finished one");
         return new CollectionPeriodDescriptor(
             from,
             end,

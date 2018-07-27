@@ -22,7 +22,7 @@ public class EmbeddedReactiveQueryBuilder implements ReactiveQueryBuilder<Embedd
     private @NonNull MongoQueryPreparator mongoQueryPreparator;
     private @NonNull ReactiveMongoOperations mongoOperations;
     private @NonNull SnapshotService snapshotService;
-    private @NonNull CollectionService collectionService; //todo
+    private @NonNull CollectionService collectionService;
     private @NonNull TemporalService temporalService;
 
 

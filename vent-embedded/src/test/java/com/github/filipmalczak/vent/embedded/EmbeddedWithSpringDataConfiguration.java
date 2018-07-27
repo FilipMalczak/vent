@@ -24,13 +24,7 @@ import java.time.LocalDateTime;
     MongoReactiveDataAutoConfiguration.class,
     MongoDataAutoConfiguration.class
 })
-//@ImportAutoConfiguration(MongoReactiveDataAutoConfiguration.class)
 public class EmbeddedWithSpringDataConfiguration extends EmbeddedVentCodecs {
-
-    @Bean
-    public TestingTemporalService temporalService(){
-        return new TestingTemporalService();
-    }
 
     @Bean
     public MongoClient mongoClient(){
@@ -38,11 +32,6 @@ public class EmbeddedWithSpringDataConfiguration extends EmbeddedVentCodecs {
         int port = Integer.parseInt(System.getProperty("project.mongo.port", "27017"));
         return new MongoClient("localhost", port);
     }
-
-//    @Bean
-//    public ReactiveMongoOperations reactiveMongoOperations(MongoClient client){
-//        return new ReactiveMongoTemplate(client, "test");
-//    }
 
     @Bean
     public CodecRegistry codecRegistry(Codec<LocalDateTime> localDateTimeCodec, ReactiveMongoTemplate template) {
