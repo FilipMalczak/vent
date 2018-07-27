@@ -30,5 +30,9 @@ public interface CommonPaths {
     //I know, I know, its RPC, while the other are trying to be RESTish; whoever has a better idea - speak up on gitter
     String QUERY = COLLECTION+"/query";
     String QUERY_WITH_TIME = QUERY+"?"+QUERY_TIME_PARAM;
-    //todo query
+
+    //todo: this should be somehow pluggable, but also deployable as a distinct service
+    String TEMPORAL = DB+"/temporal";
+    String TEMPORAL_NOW = TEMPORAL+"/now";
+    String TEMPORAL_TIMEZONE = TEMPORAL+"/timezone";
 }

@@ -1,4 +1,4 @@
-package com.github.filipmalczak.vent.web.client;
+package com.github.filipmalczak.vent.web.client.query;
 
 import com.github.filipmalczak.vent.api.general.query.CriteriaBuilder;
 import com.github.filipmalczak.vent.web.model.query.NodeType;

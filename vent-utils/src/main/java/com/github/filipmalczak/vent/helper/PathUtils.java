@@ -1,12 +1,16 @@
 package com.github.filipmalczak.vent.helper;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 
 import static java.util.Arrays.copyOfRange;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 
-public class PathUtils {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class PathUtils {
     //fixme a[0].b will not yield superpath a, just a[0]!
     public static List<String> superPaths(String path){
         String[] parts = path.split("[.]");

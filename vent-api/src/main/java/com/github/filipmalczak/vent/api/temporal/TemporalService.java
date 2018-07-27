@@ -6,7 +6,13 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 
-
+/**
+ * General abstraction of "what time is it now?" service. Usually, calling now() should yield time of
+ * calling that method, and not that method returning.
+ *
+ * E.g. implementation of now() takes 5 seconds to finish, because it uses some NTP server and connection is bad;
+ * when called at 12:00:00, it will return at 12:00:05 and should return datetime representing 12:00:00.
+ */
 public interface TemporalService {
     LocalDateTime now();
 

@@ -128,4 +128,4 @@ some transaction object)
 - "ensure path" ([a: [[x: 1]]] -> "a[1].x = 3" should add to list new object with single member x=3)
 - GET schema
 - views (GET with sublist of members/member tree)
- 
+- NTP-based temporal service

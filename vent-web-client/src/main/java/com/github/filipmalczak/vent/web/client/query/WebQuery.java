@@ -1,12 +1,13 @@
-package com.github.filipmalczak.vent.web.client;
+package com.github.filipmalczak.vent.web.client.query;
 
 import com.github.filipmalczak.vent.api.model.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.reactive.query.ReactiveVentQuery;
-import com.github.filipmalczak.vent.api.temporal.TemporalService;
+import com.github.filipmalczak.vent.web.client.temporal.NaiveWebTemporalService;
 import com.github.filipmalczak.vent.web.model.query.ExecuteQueryRequest;
 import com.github.filipmalczak.vent.web.model.query.Operation;
 import com.github.filipmalczak.vent.web.model.query.QueryNode;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
@@ -22,6 +23,8 @@ public class WebQuery implements ReactiveVentQuery {
     private WebClient webClient;
     private String ventCollectionName;
     private QueryNode rootNode;
+
+    @Getter(lazy = true) private final NaiveWebTemporalService temporalService = new NaiveWebTemporalService(webClient);
 
     private Mono<ClientResponse> exchange(Operation operation, LocalDateTime queryAt){
          return webClient.post().
@@ -47,11 +50,5 @@ public class WebQuery implements ReactiveVentQuery {
     public Mono<Boolean> exists(LocalDateTime queryAt) {
         return exchange(Operation.EXISTS, queryAt).
             flatMap(clientResponse -> clientResponse.bodyToMono(Boolean.class));
-    }
-
-    @Override
-    public TemporalService getTemporalService() {
-        //todo
-        return null;
     }
 }

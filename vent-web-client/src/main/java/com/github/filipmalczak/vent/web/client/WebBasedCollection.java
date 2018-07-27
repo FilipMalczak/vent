@@ -5,12 +5,16 @@ import com.github.filipmalczak.vent.api.model.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.model.Success;
 import com.github.filipmalczak.vent.api.model.VentId;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentCollection;
-import com.github.filipmalczak.vent.api.temporal.TemporalService;
+import com.github.filipmalczak.vent.web.client.query.WebCriteriaBuilder;
+import com.github.filipmalczak.vent.web.client.query.WebQueryBuilder;
+import com.github.filipmalczak.vent.web.client.temporal.NaiveWebTemporalService;
 import com.github.filipmalczak.vent.web.integration.Converters;
 import com.github.filipmalczak.vent.web.integration.DateFormat;
 import com.github.filipmalczak.vent.web.model.*;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -22,10 +26,14 @@ import static com.github.filipmalczak.vent.web.paths.CommonPaths.*;
 import static reactor.core.publisher.Mono.just;
 
 @AllArgsConstructor
+@EqualsAndHashCode(of = {"ventCollectionName", "webClient"})
+@ToString(of = {"ventCollectionName", "webClient"})
 public class WebBasedCollection implements ReactiveVentCollection {
     @Getter private String ventCollectionName;
     private WebClient webClient;
     private Converters converters;
+
+    @Getter(lazy = true) private final NaiveWebTemporalService temporalService = new NaiveWebTemporalService(webClient);
 
     @Override
     public Mono<Success> drop() {
@@ -111,10 +119,5 @@ public class WebBasedCollection implements ReactiveVentCollection {
             retrieve().
             bodyToFlux(ObjectView.class).
             map(converters::convert);
-    }
-
-    @Override
-    public TemporalService getTemporalService() {
-        return null;//todo delegating over HTTP
     }
 }

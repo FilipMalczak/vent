@@ -1,14 +1,16 @@
 package com.github.filipmalczak.vent.helper;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static java.util.Arrays.asList;
 
-public class Struct {
-    private Struct(){}
-
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class Struct {
     public static Map pair(Object k, Object v){
         Map out = new HashMap();
         out.put(k, v);
