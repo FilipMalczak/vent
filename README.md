@@ -46,8 +46,8 @@ where `master` is always a release version, while `dev` a snapshot version.
 
 Current versions (common for all modules) are:
 
-- `master` - `0.1.0`
-- `dev` - `0.2.0-SNAPSHOT`
+- `master` - `0.2.0`
+- `dev` - `0.3.0-SNAPSHOT`
 
 Following modules are available:
 
@@ -87,25 +87,11 @@ Vent-related.
 
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/vent-event-sourced-db/Lobby)
 
-## MVP
-
-> MVP is under development. I'm gonna try to keep done things ticked, but don't trust it 100%, better read the code.
-
-- [x] creating an object
-- [x] changing object state by single events (put value, delete value, update the whole object)
-- [x] getting object state at any moment in time
-- [x] compacting (creating new page)
-- [x] querying
-- [x] deleting an object
-- [x] full HTTP API with client
-- [x] TCK (Total Constraints Kit; basically, test suite for API, appliable to any client)
-- [ ] proper cleanup of TODOs, code smells, maybe some additional tests (WIP)
-- [ ] extract temporal service to dedicated module
-
-## Further features
+## Oncoming features
 
 ### Next version
 
+- extract temporal service to dedicated module
 - write a proper tutorial, its high time for that
 - rename "embedded" to "mongo"
 - strategy-based approach to optimization, scheduled with a plugin
@@ -118,7 +104,9 @@ basically ready to implement against an interface, but real locking may be trick
     - customizable for impl internals
     - wrapper for DB for public API
 - asynchronous trait
-- "trait chains"; e.g. if we have adapters for blocking -> async and async -> reactive, then we should be able to turn blocking -> reactive
+- "trait chains"; e.g. if we have adapters for blocking -> async and async -> reactive, then we should be able to turn 
+blocking -> reactive
+- fix Bintray
 
 ### Backlog
 
