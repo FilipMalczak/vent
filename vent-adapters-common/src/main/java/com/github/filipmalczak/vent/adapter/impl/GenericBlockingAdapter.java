@@ -12,6 +12,7 @@ import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Proxy;
 
+import static com.github.filipmalczak.vent.adapter.TypeUtils.firstExtendsSecond;
 import static com.github.filipmalczak.vent.adapter.TypeSupport.NONE;
 import static com.github.filipmalczak.vent.adapter.TypeSupport.TRAIT;
 
@@ -35,10 +36,9 @@ public class GenericBlockingAdapter implements Adapter {
     }
 
     protected OnClosure on(Class toCheckForExtending, Class toCheckAgainst){
-        return toYield -> Adapter.
-            firstExtendsSecond(toCheckForExtending, toCheckAgainst) ?
-                toYield :
-                NONE;
+        return toYield -> firstExtendsSecond(toCheckForExtending, toCheckAgainst) ?
+            toYield :
+            NONE;
     }
 
     protected  <T, S> T adaptWithGenerics(S source, Class<T> targetClass) {
