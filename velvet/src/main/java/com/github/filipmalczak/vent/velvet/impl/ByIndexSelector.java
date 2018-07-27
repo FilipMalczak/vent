@@ -3,7 +3,7 @@ package com.github.filipmalczak.vent.velvet.impl;
 
 import java.util.List;
 
-public class ByIndexSelector extends AbstractSelector<List>{
+public class ByIndexSelector extends AbstractSelector<List> {
     private int index;
 
     public ByIndexSelector(Selector parent, Selector child, int index) {
@@ -13,7 +13,7 @@ public class ByIndexSelector extends AbstractSelector<List>{
 
     @Override
     public String getUnparsedSelector() {
-        return "["+index+"]";
+        return "[" + index + "]";
     }
 
     @Override

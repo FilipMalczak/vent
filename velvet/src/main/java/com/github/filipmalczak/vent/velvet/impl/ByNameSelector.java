@@ -2,7 +2,7 @@ package com.github.filipmalczak.vent.velvet.impl;
 
 import java.util.Map;
 
-public class ByNameSelector extends AbstractSelector<Map>{
+public class ByNameSelector extends AbstractSelector<Map> {
     private String part;
 
     public ByNameSelector(Selector parent, Selector child, String part) {
@@ -12,7 +12,7 @@ public class ByNameSelector extends AbstractSelector<Map>{
 
     @Override
     public String getUnparsedSelector() {
-        return "."+part;
+        return "." + part;
     }
 
     @Override

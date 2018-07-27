@@ -6,11 +6,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class AbstractSelector<Applyable> implements Selector{
-    @Getter protected Selector parent;
-    @Getter @Setter protected Selector child;
+public abstract class AbstractSelector<Applyable> implements Selector {
+    @Getter
+    protected Selector parent;
+    @Getter
+    @Setter
+    protected Selector child;
 
-    protected void onlyApplyableTo(Class<Applyable> clazz, Object target){
+    protected void onlyApplyableTo(Class<Applyable> clazz, Object target) {
         if (target == null || !clazz.isInstance(target))
             throw new SelectorNotApplyableException(getUnparsedSelector(), target);
     }

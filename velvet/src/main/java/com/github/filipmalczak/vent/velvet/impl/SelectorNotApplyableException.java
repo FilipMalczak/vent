@@ -16,7 +16,7 @@ public class SelectorNotApplyableException extends RuntimeException {
         this.target = target;
     }
 
-    private static String getExceptionMessage(String unparsedSelector, Object target){
-        return "Selector target"+unparsedSelector+" cannot be applied to target="+target+(target == null ? "" : " of type "+target.getClass());
+    private static String getExceptionMessage(String unparsedSelector, Object target) {
+        return "Selector target" + unparsedSelector + " cannot be applied to target=" + target + (target == null ? "" : " of type " + target.getClass());
     }
 }

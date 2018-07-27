@@ -6,23 +6,26 @@ import com.github.filipmalczak.vent.velvet.impl.SelectorNotApplyableException;
 public interface UnboundPath {
     String getPath();
 
-    default boolean exists(Object target){
+    default boolean exists(Object target) {
         return bind(target).exists();
     }
-    default void set(Object target, Object value){
+
+    default void set(Object target, Object value) {
         bind(target).set(value);
     }
+
     //it just begs to return Optional from here, but we want to differentiate between missing path and null value
-    default Object get(Object target){
+    default Object get(Object target) {
         return bind(target).get();
     }
-    default void delete(Object target){
+
+    default void delete(Object target) {
         bind(target).delete();
     }
 
     Selector getRootSelector();
 
-    default BoundPath bind(Object target){
+    default BoundPath bind(Object target) {
         return new BoundPath() {
             Selector rootSelector = getRootSelector();
 
@@ -40,7 +43,7 @@ public interface UnboundPath {
             public boolean exists() {
                 Selector currentSelector = rootSelector;
                 Object currentTarget = target;
-                while (currentSelector != null){
+                while (currentSelector != null) {
                     if (!currentSelector.exists(currentTarget))
                         return false;
                     currentTarget = currentSelector.get(currentTarget);
@@ -73,7 +76,7 @@ public interface UnboundPath {
                     currentSelector = parentSelector;
                     currentTarget = parentTarget;
                     currentSelector.set(currentTarget, value);
-                } catch (SelectorNotApplyableException e){
+                } catch (SelectorNotApplyableException e) {
                     throw new UnresolvablePathException(e, getPath(), target);
                 }
             }
@@ -90,13 +93,13 @@ public interface UnboundPath {
                         currentSelector = currentSelector.getChild();
                     }
                     return currentTarget;
-                } catch (SelectorNotApplyableException e){
+                } catch (SelectorNotApplyableException e) {
                     throw new UnresolvablePathException(e, getPath(), target);
                 }
             }
 
             @Override
-            public void delete(){
+            public void delete() {
                 //fixme raw copypaste from set() - proper refactor is in place
                 //fixme delete for non-existent - what should happen?
                 //todo test delete
@@ -122,7 +125,7 @@ public interface UnboundPath {
                     currentSelector = parentSelector;
                     currentTarget = parentTarget;
                     currentSelector.delete(currentTarget);
-                } catch (SelectorNotApplyableException e){
+                } catch (SelectorNotApplyableException e) {
                     throw new UnresolvablePathException(e, getPath(), target);
                 }
             }

@@ -4,10 +4,10 @@ import com.github.filipmalczak.vent.velvet.impl.ByNameSelector;
 import com.github.filipmalczak.vent.velvet.impl.Selector;
 
 public class Velvet {
-    public static UnboundPath parse(String velvetPath){
+    public static UnboundPath parse(String velvetPath) {
         Selector firstSelector = null;
         Selector lastSelector = null;
-        for (String partWithIdxs: velvetPath.split("[.]")){
+        for (String partWithIdxs : velvetPath.split("[.]")) {
             int idxOfFirstLeftBracket = partWithIdxs.indexOf('[');
             String name = partWithIdxs;
             if (idxOfFirstLeftBracket >= 0)
@@ -18,7 +18,7 @@ public class Velvet {
                 firstSelector = lastSelector;
             if (idxOfFirstLeftBracket >= 0) {
                 String indexes = partWithIdxs.substring(idxOfFirstLeftBracket);
-                while (indexes.length() > 0){
+                while (indexes.length() > 0) {
                     if (indexes.charAt(0) != '[')
                         throw new RuntimeException("");//todo
                     int idxOfFirstRightbracket = indexes.indexOf(']');
@@ -27,7 +27,7 @@ public class Velvet {
                     String number = indexes.substring(1, idxOfFirstRightbracket);
                     int index = Integer.parseInt(number); //todo: rethrow properly
                     lastSelector = lastSelector.byIndex(index);
-                    indexes = indexes.substring(idxOfFirstRightbracket+1);
+                    indexes = indexes.substring(idxOfFirstRightbracket + 1);
                 }
             }
         }
