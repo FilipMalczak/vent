@@ -1,10 +1,10 @@
 package com.github.filipmalczak.vent.web.integration;
 
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentDb;
+import com.github.filipmalczak.vent.api.temporal.SimpleTemporalService;
 import com.github.filipmalczak.vent.api.temporal.TemporalService;
 import com.github.filipmalczak.vent.mongo.ReactiveMongoVentFactory;
 import com.github.filipmalczak.vent.mongo.RequiredCodecsForMongoVent;
-import com.github.filipmalczak.vent.mongo.service.SimpleTemporalService;
 import org.bson.codecs.Codec;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,6 @@ public class VentConfiguration extends RequiredCodecsForMongoVent {
 
     @Bean
     public CodecRegistry codecRegistry(Codec<LocalDateTime> localDateTimeCodec) {
-//        return super.codecRegistry(localDateTimeCodec, MongoClient.getDefaultCodecRegistry());
         return super.codecRegistry(localDateTimeCodec, template.getMongoDatabase().getCodecRegistry());
     }
 

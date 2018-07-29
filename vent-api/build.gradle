@@ -1,3 +1,4 @@
 dependencies {
     api project(":vent-traits")
+    api project(":vent-temporal")
 }

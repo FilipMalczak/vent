@@ -58,6 +58,9 @@ blocking); this module contains only the infrastructure and API
 a generic one for reactive->blocking
 - `vent-api` - Both generic and concrete **interfaces for Vent** database, collection, etc; also contains value
 object definitions
+- `vent-temporal` - **temporal service** API, simple (local) implementation and abstract base class for remote implementations;
+temporal service is a service that is able to answer questions "what time is it now?" and "what timezone are we in?",
+as well as provide translations between `java.util.time`, `java.util.Date` and timestamps
 - [`vent-mongo`](/vent-mongo/README.md) - **Vent-over-MongoDB implementation**, working aroung provided `ReactiveMongoTemplate`
 - `vent-testing` - Testing utilities
 - `vent-traits` - Reflection API for handling common type traits (like "reactive" or "asynchronous")
@@ -91,7 +94,7 @@ Vent-related.
 ### Version under construction
 
 - [x] rename "embedded" to "mongo"
-- [ ] extract temporal service to dedicated module
+- [x] extract temporal service to dedicated module
 - [ ] split read/write APIs (but provide utilities to merge them)
 - [ ] write a proper tutorial, its high time for that
 - [ ] strategy-based approach to optimization, scheduled with a plugin

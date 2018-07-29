@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 public abstract class AbstractRemoteTemporalService implements RemoteTemporalService {
-
     @Override
     public TemporalService accountingForTransmissionTime() {
         return new AccountingForTransmissionTimeTemporalService(this);

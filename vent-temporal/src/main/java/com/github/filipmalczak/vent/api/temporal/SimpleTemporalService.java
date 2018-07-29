@@ -1,4 +1,4 @@
-package com.github.filipmalczak.vent.mongo.service;
+package com.github.filipmalczak.vent.api.temporal;
 
 
 import com.github.filipmalczak.vent.api.temporal.TemporalService;
