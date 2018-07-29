@@ -8,7 +8,7 @@ dependencies {
     implementation('org.springframework.boot:spring-boot-starter-actuator')
     implementation('org.springframework.boot:spring-boot-starter-webflux')
     implementation project(":vent-web-common")
-    implementation project(":vent-embedded")
+    implementation project(":vent-mongo")
     implementation project(":vent-utils")
     implementation('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
     testImplementation "org.springframework:spring-test"

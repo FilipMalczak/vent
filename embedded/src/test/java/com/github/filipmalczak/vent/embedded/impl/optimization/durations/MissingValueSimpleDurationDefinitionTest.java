@@ -1,4 +1,4 @@
-package com.github.filipmalczak.vent.embedded.impl.optimization.durations;
+package com.github.filipmalczak.vent.mongo.impl.optimization.durations;
 
 import com.github.filipmalczak.vent.VentSpringTest;
 import com.github.filipmalczak.vent.helpers.Configured;

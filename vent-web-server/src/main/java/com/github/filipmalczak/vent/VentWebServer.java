@@ -1,7 +1,7 @@
 package com.github.filipmalczak.vent;
 
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentDb;
-import com.github.filipmalczak.vent.embedded.EmbeddedReactiveVentDb;
+import com.github.filipmalczak.vent.mongo.VentDb;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -15,12 +15,10 @@ import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRep
 
 import static java.util.Arrays.asList;
 
-@SpringBootApplication(scanBasePackageClasses = {VentWebServer.class, ReactiveVentDb.class, EmbeddedReactiveVentDb.class})
-//@Import(EmbeddedVentCodecs.class)
-//@ImportAutoConfiguration(EmbeddedVentConfiguration.class)
-//@ImportAutoConfiguration(MongoReactiveDataAutoConfiguration.class)
+@SpringBootApplication(scanBasePackageClasses = {VentWebServer.class, ReactiveVentDb.class, VentDb.class})
+
 @EnableAutoConfiguration
-@EnableReactiveMongoRepositories(basePackageClasses = EmbeddedReactiveVentDb.class)
+@EnableReactiveMongoRepositories(basePackageClasses = VentDb.class)
 @ImportAutoConfiguration({
     MongoReactiveAutoConfiguration.class,
     MongoReactiveDataAutoConfiguration.class,

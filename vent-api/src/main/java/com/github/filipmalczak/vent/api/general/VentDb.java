@@ -49,7 +49,7 @@ public interface VentDb<
         PARTIAL;
     }
 
-    //todo these will possibly move to some kind of exposed ventDbDescriptor concept; it may be related to embedded model class, but doesnt have to
+    //todo these will possibly move to some kind of exposed ventDbDescriptor concept; it may be related to mongo model class, but doesnt have to
     ManyStrings getManagedCollections();
     SingleBoolean isManaged(@NonNull String collectionName);
     SingleSuccess manage(String collectionName);

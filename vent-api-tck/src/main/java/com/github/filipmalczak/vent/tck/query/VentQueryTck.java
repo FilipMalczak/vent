@@ -452,7 +452,7 @@ public abstract class VentQueryTck {
             @Nested
             @DisplayName("Events are Update")
             public class UpdateRelated {
-                //todo more extensive tests of update; see c.g.f.v.embedded.EmbeddedReactiveVentDbTest
+                //todo more extensive tests of update; see c.g.f.v.tck.VentDbTck
 
                 @Test
                 public void createUpdate(){

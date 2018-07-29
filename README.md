@@ -58,8 +58,7 @@ blocking); this module contains only the infrastructure and API
 a generic one for reactive->blocking
 - `vent-api` - Both generic and concrete **interfaces for Vent** database, collection, etc; also contains value
 object definitions
-- `vent-embedded` - **Embedded Vent implementation**, working aroung provided ReactiveMongoTemplate; exposed as
-Spring 5 configuration to be imported
+- [`vent-mongo`](/vent-mongo/README.md) - **Vent-over-MongoDB implementation**, working aroung provided `ReactiveMongoTemplate`
 - `vent-testing` - Testing utilities
 - `vent-traits` - Reflection API for handling common type traits (like "reactive" or "asynchronous")
 - `vent-utils` - General utilities
@@ -91,16 +90,18 @@ Vent-related.
 
 ### Version under construction
 
+- [x] rename "embedded" to "mongo"
 - [ ] extract temporal service to dedicated module
 - [ ] write a proper tutorial, its high time for that
-- [ ] rename "embedded" to "mongo"
 - [ ] strategy-based approach to optimization, scheduled with a plugin
+- [ ] implement archivization in Mongo impl (optimization - storing older pages for each object; archivization - storing 
+older collection content)
 - [ ] better configurability (better pointing to underlying Mongo instance, working page optimization)
 - [ ] Vent plugins like optimization scheduler, but I guess transactions can be enabled this way too
 - [ ] proper abstraction for transactionality (optimistic, version-based locking can be done by "freezing time" and is 
 basically ready to implement against an interface, but real locking may be tricky)
 - [ ] NTP-based temporal service
-- [ ] some better logging for mongo/embedded impl
+- [ ] some better logging for mongo impl
     - [ ] customizable for impl internals
     - [ ] wrapper for DB for public API
 - [ ] asynchronous trait and accompanying adapters
