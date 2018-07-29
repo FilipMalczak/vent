@@ -46,8 +46,8 @@ where `master` is always a release version, while `dev` a snapshot version.
 
 Current versions (common for all modules) are:
 
-- [![master](https://img.shields.io/badge/master-0.2.0-blue.svg)](https://oss.jfrog.org/artifactory/webapp/#/artifacts/browse/tree/General/oss-release-local/com/github/filipmalczak)
-- [![dev](https://img.shields.io/badge/dev-0.3.0--SNAPSHOT-brightgreen.svg)](https://oss.jfrog.org/artifactory/webapp/#/artifacts/browse/tree/General/oss-snapshot-local/com/github/filipmalczak)
+- [![master](https://img.shields.io/badge/dynamic/json.svg?label=master&url=https%3A%2F%2Fraw.githubusercontent.com%2FFilipMalczak%2Fvent%2Fdev%2Fversions.json&query=%24.stable&colorB=blue)](https://oss.jfrog.org/artifactory/webapp/#/artifacts/browse/tree/General/oss-release-local/com/github/filipmalczak)
+- [![dev](https://img.shields.io/badge/dynamic/json.svg?label=dev&url=https%3A%2F%2Fraw.githubusercontent.com%2FFilipMalczak%2Fvent%2Fdev%2Fversions.json&query=%24.snapshot&colorB=brightgreen&suffix=-SNAPSHOT)](https://oss.jfrog.org/artifactory/webapp/#/artifacts/browse/tree/General/oss-snapshot-local/com/github/filipmalczak)
 
 Following modules are available:
 
@@ -92,6 +92,7 @@ Vent-related.
 
 - [x] rename "embedded" to "mongo"
 - [ ] extract temporal service to dedicated module
+- [ ] split read/write APIs (but provide utilities to merge them)
 - [ ] write a proper tutorial, its high time for that
 - [ ] strategy-based approach to optimization, scheduled with a plugin
 - [ ] implement archivization in Mongo impl (optimization - storing older pages for each object; archivization - storing 
@@ -113,7 +114,6 @@ blocking -> reactive
 ### Next version candidates
 
 - provide additional impl over GIT
-- split read/write APIs (but provide utilities to merge them)
 - RPC/RMI
 - factory for Spring Data-like repositories based on Vent
 
