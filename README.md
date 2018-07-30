@@ -95,7 +95,7 @@ Vent-related.
 
 - [x] rename "embedded" to "mongo"
 - [x] extract temporal service to dedicated module
-- [ ] split read/write APIs (but provide utilities to merge them)
+- [x] split read/write APIs (but provide utilities to merge them)
 - [ ] write a proper tutorial, its high time for that
 - [ ] strategy-based approach to optimization, scheduled with a plugin
 - [ ] implement archivization in Mongo impl (optimization - storing older pages for each object; archivization - storing 

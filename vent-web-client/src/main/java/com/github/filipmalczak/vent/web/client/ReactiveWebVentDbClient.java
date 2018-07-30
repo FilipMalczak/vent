@@ -33,11 +33,6 @@ public class ReactiveWebVentDbClient implements ReactiveVentDb {
     }
 
     @Override
-    public Mono<Success> optimizePages(SuggestionStrength strength, OptimizationType type) {
-        return webClient.post().uri(OPTIMIZE, strength, type).retrieve().bodyToMono(Success.class);
-    }
-
-    @Override
     public Flux<String> getManagedCollections() {
         return webClient.get().uri(COLLECTIONS).retrieve().bodyToFlux(String.class);
     }

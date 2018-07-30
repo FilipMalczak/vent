@@ -16,9 +16,15 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.toList;
 
 
-public interface BlockingVentCollection extends VentCollection<
-    Success, VentId, EventConfirmation, ObjectSnapshot, Stream<VentId>, Stream<ObjectSnapshot>, BlockingQueryBuilder<?, ? extends BlockingVentQuery>
-    >, Blocking {
+public interface BlockingVentCollection<
+            QueryBuilderImpl extends BlockingQueryBuilder<QueryBuilderImpl, QueryImpl>,
+            QueryImpl extends BlockingVentQuery
+        > extends VentCollection<
+            Success, VentId, EventConfirmation, ObjectSnapshot,
+            Stream<VentId>, Stream<ObjectSnapshot>,
+            Stream<ObjectSnapshot>, Long, Boolean,
+            QueryBuilderImpl, QueryImpl
+        >, Blocking {
     Success drop();
 
     default Stream<ObjectSnapshot> getAll(LocalDateTime queryAt){

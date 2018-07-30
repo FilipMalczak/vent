@@ -22,7 +22,7 @@ import static com.github.filipmalczak.vent.web.paths.CommonPaths.*;
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 @RestController
 public class CollectionController {
-    private ReactiveVentDb reactiveVentDb;
+    private ReactiveVentDb<?, ?, ?> reactiveVentDb;
     private Converters converters;
 
     @DeleteMapping(COLLECTION)

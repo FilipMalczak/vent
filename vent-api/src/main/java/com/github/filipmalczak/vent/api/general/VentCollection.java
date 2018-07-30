@@ -1,6 +1,11 @@
 package com.github.filipmalczak.vent.api.general;
 
+import com.github.filipmalczak.vent.api.general.defaults.CompositeFacade;
+import com.github.filipmalczak.vent.api.general.object.VentObjectFacade;
+import com.github.filipmalczak.vent.api.general.object.VentObjectReadFacade;
+import com.github.filipmalczak.vent.api.general.object.VentObjectWriteFacade;
 import com.github.filipmalczak.vent.api.general.query.QueryBuilder;
+import com.github.filipmalczak.vent.api.general.query.VentQuery;
 import com.github.filipmalczak.vent.api.model.VentId;
 import com.github.filipmalczak.vent.api.temporal.TemporallyEnabled;
 
@@ -9,35 +14,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 public interface VentCollection<
-    SingleSuccess, SingleId, SingleConfirmation, SingleSnapshot,
-    ManyIds, ManySnapshots,
-    QueryBuilderImpl extends QueryBuilder> extends TemporallyEnabled {
-    String getVentCollectionName();
+        SingleSuccess, SingleId, SingleConfirmation, SingleSnapshot,
+        ManyIds, ManySnapshots,
+        FindResult, CountResult, ExistsResult,
+        QueryBuilderImpl extends QueryBuilder<
+            FindResult, CountResult, ExistsResult,
+            QueryBuilderImpl, QueryImpl
+        >,
+        QueryImpl extends VentQuery<FindResult, CountResult, ExistsResult>
+    > extends
+        VentCollectionReadOperations<SingleSnapshot, ManyIds, ManySnapshots, QueryBuilderImpl>,
+        VentCollectionWriteOperations<SingleSuccess, SingleId, SingleConfirmation> {
 
-    SingleSuccess drop();
+    //todo create() is needed here (with default overload with empty map); probably should add createObject(collectionName) to db, and keep DB reference in CompositeCollection
 
-    // todo from here
-    SingleId create(Map initialState);
-
-    default SingleId create(){
-        return create(new HashMap());
+    default VentObjectFacade<SingleConfirmation, SingleSnapshot> getFacade(VentId ventId) {
+        return new CompositeFacade<>(ventId, getVentCollectionName(), getReadFacade(ventId), getWriteFacade(ventId));
     }
-
-    SingleConfirmation update(VentId id, Map newState);
-    SingleConfirmation delete(VentId id);
-
-    SingleSnapshot get(VentId id, LocalDateTime queryAt);
-
-    SingleConfirmation putValue(VentId id, String path, Object value);
-    SingleConfirmation deleteValue(VentId id, String path);
-
-    //todo to here should be extracted to VentObject facade
-    //todo figure out Query#delete()/deleteAll() without TemporalService
-
-    //todo: could use count()
-    ManyIds identifyAll(LocalDateTime queryAt);
-
-    ManySnapshots getAll(LocalDateTime queryAt);
-
-    QueryBuilderImpl queryBuilder();
 }

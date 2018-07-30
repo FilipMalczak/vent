@@ -7,8 +7,8 @@ import com.github.filipmalczak.vent.traits.paradigm.Blocking;
 import java.util.stream.Stream;
 
 
-public interface BlockingQueryBuilder
-    <This extends BlockingQueryBuilder<This, QueryImpl>, QueryImpl extends BlockingVentQuery>
-    extends
-    QueryBuilder<This, QueryImpl, Stream<ObjectSnapshot>, Long, Boolean>, Blocking {
+public interface BlockingQueryBuilder<
+            This extends BlockingQueryBuilder<This, QueryImpl>,
+            QueryImpl extends BlockingVentQuery
+        > extends QueryBuilder<Stream<ObjectSnapshot>, Long, Boolean, This, QueryImpl>, Blocking {
 }

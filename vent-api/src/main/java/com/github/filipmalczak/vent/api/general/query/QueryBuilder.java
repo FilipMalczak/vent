@@ -6,10 +6,11 @@ import java.time.LocalDateTime;
 import java.util.function.Consumer;
 
 
-public interface QueryBuilder
-    <This extends QueryBuilder<This, QueryImpl, FindResult, CountResult, ExistsResult>,
-        QueryImpl extends VentQuery<FindResult, CountResult, ExistsResult>,
-        FindResult, CountResult, ExistsResult> extends CriteriaBuilder {
+public interface QueryBuilder<
+        FindResult, CountResult, ExistsResult,
+        This extends QueryBuilder<FindResult, CountResult, ExistsResult, This, QueryImpl>,
+        QueryImpl extends VentQuery<FindResult, CountResult, ExistsResult>
+    > extends CriteriaBuilder {
 
     This and(Consumer<CriteriaBuilder> andScope);
 

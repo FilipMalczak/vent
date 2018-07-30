@@ -18,7 +18,7 @@ import java.util.Optional;
 @Service
 public class QueryExecutorService {
     @Autowired
-    private ReactiveVentDb reactiveVentDb;
+    private ReactiveVentDb<?, ?, ?> reactiveVentDb;
 
     private void applyNodesToBuilder(QueryNode rootNode, CriteriaBuilder builder){
         List<QueryNode> children = rootNode.getChildren();
@@ -40,7 +40,7 @@ public class QueryExecutorService {
     }
 
     private ReactiveVentQuery prepareQuery(String collectionName, QueryNode rootNode){
-        ReactiveQueryBuilder<?, ? extends ReactiveVentQuery> builder = reactiveVentDb.
+        ReactiveQueryBuilder<?, ?> builder = reactiveVentDb.
             getCollection(collectionName).
             queryBuilder();
         applyNodesToBuilder(rootNode, builder);

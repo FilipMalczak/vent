@@ -6,8 +6,8 @@ import com.github.filipmalczak.vent.traits.paradigm.Reactive;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public interface ReactiveQueryBuilder
-    <This extends ReactiveQueryBuilder<This, QueryImpl>, QueryImpl extends ReactiveVentQuery>
-    extends
-    QueryBuilder<This, QueryImpl, Flux<ObjectSnapshot>, Mono<Long>, Mono<Boolean>>, Reactive{
+public interface ReactiveQueryBuilder<
+        This extends ReactiveQueryBuilder<This, QueryImpl>,
+        QueryImpl extends ReactiveVentQuery
+    > extends QueryBuilder<Flux<ObjectSnapshot>, Mono<Long>, Mono<Boolean>, This, QueryImpl>, Reactive{
 }

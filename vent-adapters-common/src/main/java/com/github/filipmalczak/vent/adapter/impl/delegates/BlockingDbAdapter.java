@@ -11,16 +11,11 @@ import java.util.stream.Stream;
 
 @Value
 public class BlockingDbAdapter implements BlockingVentDb {
-    private final ReactiveVentDb ventDb;
+    private final ReactiveVentDb<?, ?, ?> ventDb;
 
     @Override
     public BlockingVentCollection getCollection(String collectionName) {
         return new BlockingCollectionAdapter(ventDb.getCollection(collectionName));
-    }
-
-    @Override
-    public Success optimizePages(SuggestionStrength strength, OptimizationType type) {
-        return ventDb.optimizePages(strength, type).block();
     }
 
     @Override

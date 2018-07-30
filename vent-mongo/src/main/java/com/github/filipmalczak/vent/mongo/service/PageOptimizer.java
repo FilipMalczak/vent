@@ -25,7 +25,7 @@ import java.util.function.Predicate;
 //todo move scheduling out of here
 //todo figure out some more flexible criteria for partial optimization; it would be nice to provide extension point for that
 public class PageOptimizer {
-    private ReactiveVentDb ventDb;
+    private ReactiveVentDb<?, ?, ?> ventDb;
     private TemporalService temporalService;
     private PageService pageService;
     private SnapshotService snapshotService;

@@ -18,18 +18,9 @@ import static com.github.filipmalczak.vent.web.paths.CommonPaths.*;
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 @RestController
 public class DbController {
-    private ReactiveVentDb reactiveVentDb;
-
-    //todo maybe success should also be mapped to DTO?
-    @PostMapping(OPTIMIZE)
-    public Mono<Success> optimizePages(@RequestParam VentDb.SuggestionStrength strength, @RequestParam VentDb.OptimizationType type){
-        return reactiveVentDb.optimizePages(strength, type);
-    }
+    private ReactiveVentDb<?, ?, ?> reactiveVentDb;
 
     @GetMapping(COLLECTIONS)
-//    public Mono<List<String>> getManagedCollections(){
-//        return reactiveVentDb.getManagedCollections().collectList();
-//    }
     public Flux<String> getManagedCollections(){
         return reactiveVentDb.getManagedCollections().log("collections");
     }

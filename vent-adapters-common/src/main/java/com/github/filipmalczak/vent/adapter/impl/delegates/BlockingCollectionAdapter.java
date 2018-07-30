@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 
 @Value
 public class BlockingCollectionAdapter implements BlockingVentCollection {
-    private ReactiveVentCollection ventCollection;
+    private ReactiveVentCollection<?, ?> ventCollection;
 
     @Override
     public String getVentCollectionName() {

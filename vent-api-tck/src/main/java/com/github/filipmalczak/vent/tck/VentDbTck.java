@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 //todo: test Delete
 @Slf4j
 public abstract class VentDbTck {
-    private ReactiveVentDb ventDb;
+    private ReactiveVentDb<?, ?, ?> ventDb;
     private TestingTemporalService temporalService;
 
     private Times times;
@@ -355,7 +355,7 @@ public abstract class VentDbTck {
         temporalService.withResults(times.after(0, 10), () -> {
             Map createState = map(pair("a", 1), pair("b", 2));
             Map updateState = map(pair("c", 3));
-            BlockingVentDb db = adapt(ventDb, BlockingVentDb.class);
+            BlockingVentDb<?, ?, ?> db = adapt(ventDb, BlockingVentDb.class);
             VentId id = db.getCollection(TEST_COLLECTION).create(createState);
             db.getCollection(TEST_COLLECTION).update(id, updateState);
             ObjectSnapshot past = db.getCollection(TEST_COLLECTION).get(id, times.after(1));
@@ -390,7 +390,7 @@ public abstract class VentDbTck {
             int putValue = 3;
             Map putState = map(createState, pair(putArg, putValue));
             Map updateState = map(pair("c", 4));
-            BlockingVentDb db = adapt(ventDb, BlockingVentDb.class);
+            BlockingVentDb<?, ?, ?> db = adapt(ventDb, BlockingVentDb.class);
             VentId id = db.getCollection(TEST_COLLECTION).create(createState);
             db.getCollection(TEST_COLLECTION).putValue(id, putArg, putValue);
             db.getCollection(TEST_COLLECTION).update(id, updateState);
@@ -437,7 +437,7 @@ public abstract class VentDbTck {
             String putArg = "x";
             int putValue = 4;
             Map putState = map(updateState, pair(putArg, putValue));
-            BlockingVentDb db = adapt(ventDb, BlockingVentDb.class);
+            BlockingVentDb<?, ?, ?> db = adapt(ventDb, BlockingVentDb.class);
             VentId id = db.getCollection(TEST_COLLECTION).create(createState);
             db.getCollection(TEST_COLLECTION).update(id, updateState);
             db.getCollection(TEST_COLLECTION).putValue(id, putArg, putValue);

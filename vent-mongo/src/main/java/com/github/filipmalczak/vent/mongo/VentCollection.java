@@ -12,6 +12,7 @@ import com.github.filipmalczak.vent.mongo.model.Page;
 import com.github.filipmalczak.vent.mongo.model.events.Event;
 import com.github.filipmalczak.vent.mongo.model.events.impl.EventFactory;
 import com.github.filipmalczak.vent.mongo.query.AndCriteriaBuilder;
+import com.github.filipmalczak.vent.mongo.query.VentQuery;
 import com.github.filipmalczak.vent.mongo.service.CollectionService;
 import com.github.filipmalczak.vent.mongo.service.MongoQueryPreparator;
 import com.github.filipmalczak.vent.mongo.service.PageService;
@@ -29,7 +30,7 @@ import java.util.Map;
 
 @AllArgsConstructor
 //todo builder?
-public class VentCollection implements ReactiveVentCollection {
+public class VentCollection implements ReactiveVentCollection<VentQueryBuilder, VentQuery> {
     @Getter private @NonNull String ventCollectionName;
 
     private @NonNull PageService pageService;
@@ -110,7 +111,7 @@ public class VentCollection implements ReactiveVentCollection {
     }
 
     @Override
-    public ReactiveQueryBuilder<?, ? extends ReactiveVentQuery> queryBuilder() {
+    public VentQueryBuilder queryBuilder() {
         return new VentQueryBuilder(ventCollectionName, new AndCriteriaBuilder(), mongoQueryPreparator, mongoOperations, snapshotService, collectionService, getTemporalService());
     }
 

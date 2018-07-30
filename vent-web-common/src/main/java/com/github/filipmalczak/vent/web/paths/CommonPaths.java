@@ -9,9 +9,6 @@ public interface CommonPaths {
 
     String DB = V1+"/db";
 
-    //fixme this s*it has to go from the API
-    String OPTIMIZE = DB+"/optimize/{strength}/{type}";
-
     String COLLECTIONS = DB+"/collection";
     String COLLECTION = COLLECTIONS+"/{name}";
     String COLLECTION_WITH_QUERY_TIME = COLLECTION+"?"+QUERY_TIME_PARAM;

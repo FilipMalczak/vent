@@ -32,9 +32,9 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 @Slf4j
 public abstract class VentQueryTck {
     private TestingTemporalService temporalService;
-    private ReactiveVentDb reactiveVentDb;
+    private ReactiveVentDb<?, ?, ?> reactiveVentDb;
 
-    private BlockingVentDb blockingVentDb;
+    private BlockingVentDb<?, ?, ?> blockingVentDb;
 
     private String collectionName = "collection"+Instant.now().toEpochMilli();
     private final static Times times = Times.defaultFromMilleniumBreak();
