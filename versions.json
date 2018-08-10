@@ -1,4 +1,8 @@
 {
   "stable": "0.2.0",
-  "snapshot": "0.3.0"
+  "snapshot": "0.3.0",
+  "codenames": {
+    "stable": "Baxter",
+    "snapshot": "Chiang"
+  }
 }

@@ -14,26 +14,38 @@
 > Until I fix it, use JFrog OSS Artifactory.
 > https://docs.travis-ci.com/user/deployment/bintray/ will probably be the way to do this
  
-_Vent - evented DB_
+_Vent - temporally-enabled DB_
+
+Vent is a NoSQL database with similiar abstraction as MongoDB (meaning, it's a document/object database) that not only 
+allows for handling current state of objects, but also keeps full history of them. You can execute atomic write actions
+like "create an object", "put value `x` under path `a.b.c`", "update object to state `{a: 1, b: {c: 2}}`" or "delete 
+value under path `x.y.z`", but when it comes to reading you can ask "give me current state of the object" as well as 
+"give me state of the object at 1st of May 2018". That also works with querying ("find all objects that were matching 
+some criteria on some date")!
+
+In the future you'll also be able to fetch changes from some period, so you don't have to ask for every quantum of time
+from that period.
 
 Status:
 * master [![Build Status](https://travis-ci.org/FilipMalczak/vent.svg?branch=master)](https://travis-ci.org/FilipMalczak/vent) [![CodeFactor](https://www.codefactor.io/repository/github/filipmalczak/vent/badge/master)](https://www.codefactor.io/repository/github/filipmalczak/vent/overview/master) [![codecov](https://codecov.io/gh/FilipMalczak/vent/branch/master/graph/badge.svg)](https://codecov.io/gh/FilipMalczak/vent/branch/master)
 * dev [![Build Status](https://travis-ci.org/FilipMalczak/vent.svg?branch=dev)](https://travis-ci.org/FilipMalczak/vent) [![CodeFactor](https://www.codefactor.io/repository/github/filipmalczak/vent/badge/dev)](https://www.codefactor.io/repository/github/filipmalczak/vent/overview/dev) [![codecov](https://codecov.io/gh/FilipMalczak/vent/branch/dev/graph/badge.svg)](https://codecov.io/gh/FilipMalczak/vent/branch/dev) 
 
-This is very early stage of development. No need for a proper README.
+First-class implementations are reactive (backed with [Project Reactor](https://projectreactor.io/)), but thanks to 
+[`traits`](/vent-traits) and [`adapters`](/vent-adapters) modules, it's pretty easy to turn reactive implementation to 
+a blocking one. If you ever wonder why general API looks like a wet dream/nightmare of creator of Java generics, that is 
+exactly the reason (so that interface shape is the same, but returned and consumed types are different).
+
+At this point there is a MongoDB-backed implementation ready, as well as a server/client pair (where client implements 
+Vent API) that can expose any implementation over HTTP, so you can use Vent from any machine or share a single DB 
+instance between many client program instances.
+
+In the future there will also be a GIT-based implementation.
 
 I'm doing my best to comply with Semver, but until I reach at least v0.5.0 (or better yet, 1.0.0), I allow
 myself to evolve the API. I don't intend to make any drastic changes though - mostly they will be package
-structure changes.
+structure changes, or (nearly) backwards-compatible stuff (like breaking full read-write API to read and write operations,
+while keeping previous interface ).
 
-Long story short - this will be an event sourcing wrapper over MongoDB that will allow for querying DB with timestamp,
-in which case result will correspond to object (document) at that moment in time.
-
-General idea for deployment is that the user should provide MongoDB instance and wrap it with Vent - either
-with embedded instance (used in-memory) or exposed via some protocol (e.g. HTTP) - which enables usage
-of Vent in other languages. It would be best if it could be horizontally-scalable (if you need more efficiency, spawn
-more Vent servers and load-balance around them) and as of now it is (though once I start poking the transactionality,
-it may get a bit messy).
 
 ## Get Vent
 
@@ -46,8 +58,16 @@ where `master` is always a release version, while `dev` a snapshot version.
 
 Current versions (common for all modules) are:
 
-- [![master](https://img.shields.io/badge/dynamic/json.svg?label=master&url=https%3A%2F%2Fraw.githubusercontent.com%2FFilipMalczak%2Fvent%2Fdev%2Fversions.json&query=%24.stable&colorB=blue)](https://oss.jfrog.org/artifactory/webapp/#/artifacts/browse/tree/General/oss-release-local/com/github/filipmalczak)
-- [![dev](https://img.shields.io/badge/dynamic/json.svg?label=dev&url=https%3A%2F%2Fraw.githubusercontent.com%2FFilipMalczak%2Fvent%2Fdev%2Fversions.json&query=%24.snapshot&colorB=brightgreen&suffix=-SNAPSHOT)](https://oss.jfrog.org/artifactory/webapp/#/artifacts/browse/tree/General/oss-snapshot-local/com/github/filipmalczak)
+- [![master](https://img.shields.io/badge/dynamic/json.svg?label=master&url=https%3A%2F%2Fraw.githubusercontent.com%2FFilipMalczak%2Fvent%2Fdev%2Fversions.json&query=%24.stable&colorB=blue)](https://oss.jfrog.org/artifactory/webapp/#/artifacts/browse/tree/General/oss-release-local/com/github/filipmalczak) ![stable-codename](https://img.shields.io/badge/dynamic/json.svg?label=codename&url=https%3A%2F%2Fraw.githubusercontent.com%2FFilipMalczak%2Fvent%2Fdev%2Fversions.json&query=%24.codenames.stable&colorB=lightgrey&logo=github)
+- [![dev](https://img.shields.io/badge/dynamic/json.svg?label=dev&url=https%3A%2F%2Fraw.githubusercontent.com%2FFilipMalczak%2Fvent%2Fdev%2Fversions.json&query=%24.snapshot&colorB=brightgreen&suffix=-SNAPSHOT)](https://oss.jfrog.org/artifactory/webapp/#/artifacts/browse/tree/General/oss-snapshot-local/com/github/filipmalczak) ![snapshot-codename](https://img.shields.io/badge/dynamic/json.svg?label=codename&url=https%3A%2F%2Fraw.githubusercontent.com%2FFilipMalczak%2Fvent%2Fdev%2Fversions.json&query=%24.codenames.snapshot&colorB=lightgrey&logo=github)
+
+> You can find full list of releases [here](https://github.com/FilipMalczak/vent/releases).
+
+> Codenames are given after writers that I either like or would like to give some kind of tribute to (patch versions 
+> won't change the codename).
+> When choosing them, I'm looking at [this](https://en.wikipedia.org/wiki/List_of_science-fiction_authors) list.
+> I don't want to cause any legal problems because of that, so if you think that usage of some name conflicts with your
+> copyright, just contact me and I'll change it.  
 
 Following modules are available:
 
