@@ -2,7 +2,7 @@ package com.github.filipmalczak.vent.mongo.query.operator;
 
 import com.github.filipmalczak.vent.mongo.model.events.impl.PutValue;
 import com.github.filipmalczak.vent.mongo.model.events.impl.Update;
-import com.github.filipmalczak.vent.helper.PathUtils;
+import com.github.filipmalczak.vent.mongo.utils.PathUtils;
 import com.github.filipmalczak.vent.velvet.UnresolvablePathException;
 import com.github.filipmalczak.vent.velvet.Velvet;
 import lombok.Value;
@@ -29,7 +29,6 @@ public class EqualsOperator implements Operator {
     public Map<String, Object> toMongoInitialStateCriteria() {
         String[] parts = path.split("[.]");
         return initialStateQueryLevel(parts, 0);
-//        return pair(path, value);
     }
 
     // https://docs.spring.io/spring-data/mongodb/docs/current/reference/html/#mongo-template.type-mapping

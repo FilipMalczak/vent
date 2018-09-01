@@ -2,12 +2,11 @@ package com.github.filipmalczak.vent.web.client.temporal;
 
 
 import com.github.filipmalczak.vent.api.temporal.AbstractRemoteTemporalService;
-import com.github.filipmalczak.vent.api.temporal.RemoteTemporalService;
 import com.github.filipmalczak.vent.web.client.utils.GetHelper;
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 

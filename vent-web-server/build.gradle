@@ -4,6 +4,14 @@ apply plugin: "org.springframework.boot"
 test.dependsOn startManagedMongoDb
 bootRun.dependsOn startManagedMongoDb
 
+jar {
+    enabled = true
+}
+
+bootJar {
+    classifier = "boot"
+}
+
 dependencies {
     implementation('org.springframework.boot:spring-boot-starter-actuator')
     implementation('org.springframework.boot:spring-boot-starter-webflux')

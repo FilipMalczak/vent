@@ -13,8 +13,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static com.github.filipmalczak.vent.mongo.utils.MongoTranslator.fromMongo;
 import static com.github.filipmalczak.vent.helper.Cloning.deepClone;
+import static com.github.filipmalczak.vent.mongo.utils.MongoTranslator.fromMongo;
 import static java.util.stream.Collectors.toList;
 
 @Document

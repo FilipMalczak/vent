@@ -2,16 +2,9 @@ package com.github.filipmalczak.vent.api.general;
 
 import com.github.filipmalczak.vent.api.general.defaults.CompositeFacade;
 import com.github.filipmalczak.vent.api.general.object.VentObjectFacade;
-import com.github.filipmalczak.vent.api.general.object.VentObjectReadFacade;
-import com.github.filipmalczak.vent.api.general.object.VentObjectWriteFacade;
 import com.github.filipmalczak.vent.api.general.query.QueryBuilder;
 import com.github.filipmalczak.vent.api.general.query.VentQuery;
 import com.github.filipmalczak.vent.api.model.VentId;
-import com.github.filipmalczak.vent.api.temporal.TemporallyEnabled;
-
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
 public interface VentCollection<
         SingleSuccess, SingleId, SingleConfirmation, SingleSnapshot,

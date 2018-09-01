@@ -1,8 +1,6 @@
 package com.github.filipmalczak.vent.adapter.impl.delegates;
 
 import com.github.filipmalczak.vent.api.blocking.BlockingVentCollection;
-import com.github.filipmalczak.vent.api.blocking.query.BlockingQueryBuilder;
-import com.github.filipmalczak.vent.api.blocking.query.BlockingVentQuery;
 import com.github.filipmalczak.vent.api.model.EventConfirmation;
 import com.github.filipmalczak.vent.api.model.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.model.Success;
@@ -11,12 +9,12 @@ import com.github.filipmalczak.vent.api.reactive.ReactiveVentCollection;
 import com.github.filipmalczak.vent.api.temporal.TemporalService;
 import lombok.Value;
 
-import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 @Value
-public class BlockingCollectionAdapter implements BlockingVentCollection {
+public class BlockingCollectionAdapter implements BlockingVentCollection<BlockingQueryBuilderAdapter, BlockingQueryAdapter> {
     private ReactiveVentCollection<?, ?> ventCollection;
 
     @Override
@@ -45,12 +43,12 @@ public class BlockingCollectionAdapter implements BlockingVentCollection {
     }
 
     @Override
-    public ObjectSnapshot get(VentId id, LocalDateTime queryAt) {
-        return ventCollection.get(id, queryAt).block();
+    public ObjectSnapshot get(VentId id, Supplier queryAt) {
+        return (ObjectSnapshot) ventCollection.get(id, queryAt).block();
     }
 
     @Override
-    public Stream<VentId> identifyAll(LocalDateTime queryAt) {
+    public Stream<ObjectSnapshot> identifyAll(Supplier queryAt) {
         return ventCollection.identifyAll(queryAt).toStream();
     }
 
@@ -65,7 +63,7 @@ public class BlockingCollectionAdapter implements BlockingVentCollection {
     }
 
     @Override
-    public BlockingQueryBuilder<?, ? extends BlockingVentQuery> queryBuilder() {
+    public BlockingQueryBuilderAdapter queryBuilder() {
         return new BlockingQueryBuilderAdapter(ventCollection.queryBuilder());
     }
 

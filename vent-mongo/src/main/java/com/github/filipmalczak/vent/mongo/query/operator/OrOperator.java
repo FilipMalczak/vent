@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import static com.github.filipmalczak.vent.helper.Struct.pair;
+import static java.util.stream.Collectors.toList;
 
 @Value
 @Builder
@@ -17,12 +18,12 @@ public class OrOperator implements Operator {
 
     @Override
     public Map<String, Object> toMongoInitialStateCriteria() {
-        return pair("$or", operands.stream().map(Operator::toMongoInitialStateCriteria));
+        return pair("$or", operands.stream().map(Operator::toMongoInitialStateCriteria).collect(toList()));
     }
 
     @Override
     public Map<String, Object> toMongoEventCriteria() {
-        return pair("$or", operands.stream().map(Operator::toMongoEventCriteria));
+        return pair("$or", operands.stream().map(Operator::toMongoEventCriteria).collect(toList()));
     }
 
     @Override

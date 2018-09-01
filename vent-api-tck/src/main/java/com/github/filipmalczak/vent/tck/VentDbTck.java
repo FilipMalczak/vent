@@ -4,12 +4,14 @@ import com.github.filipmalczak.vent.api.blocking.BlockingVentDb;
 import com.github.filipmalczak.vent.api.model.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.model.VentId;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentDb;
+import com.github.filipmalczak.vent.testing.ExpectedAndActualDiffExtension;
 import com.github.filipmalczak.vent.testing.TestingTemporalService;
 import com.github.filipmalczak.vent.testing.Times;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
@@ -25,6 +27,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 //todo: test DeleteValue
 //todo: test Delete
 @Slf4j
+@ExtendWith(ExpectedAndActualDiffExtension.class)
 public abstract class VentDbTck {
     private ReactiveVentDb<?, ?, ?> ventDb;
     private TestingTemporalService temporalService;

@@ -12,9 +12,9 @@ import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Proxy;
 
-import static com.github.filipmalczak.vent.adapter.TypeUtils.firstExtendsSecond;
 import static com.github.filipmalczak.vent.adapter.TypeSupport.NONE;
 import static com.github.filipmalczak.vent.adapter.TypeSupport.TRAIT;
+import static com.github.filipmalczak.vent.adapter.TypeUtils.firstExtendsSecond;
 
 //todo: test me
 @AutoService(Adapter.class)

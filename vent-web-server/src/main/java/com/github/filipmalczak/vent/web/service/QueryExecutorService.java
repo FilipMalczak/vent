@@ -1,10 +1,11 @@
 package com.github.filipmalczak.vent.web.service;
 
 import com.github.filipmalczak.vent.api.general.query.CriteriaBuilder;
-import com.github.filipmalczak.vent.api.model.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentDb;
 import com.github.filipmalczak.vent.api.reactive.query.ReactiveQueryBuilder;
 import com.github.filipmalczak.vent.api.reactive.query.ReactiveVentQuery;
+import com.github.filipmalczak.vent.web.integration.Converters;
+import com.github.filipmalczak.vent.web.model.ObjectView;
 import com.github.filipmalczak.vent.web.model.query.QueryNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,9 @@ import java.util.Optional;
 public class QueryExecutorService {
     @Autowired
     private ReactiveVentDb<?, ?, ?> reactiveVentDb;
+
+    @Autowired
+    private Converters converters;
 
     private void applyNodesToBuilder(QueryNode rootNode, CriteriaBuilder builder){
         List<QueryNode> children = rootNode.getChildren();
@@ -55,8 +59,8 @@ public class QueryExecutorService {
         return prepareQuery(collectionName, rootNode).count(effective(queryAt));
     }
 
-    public Flux<ObjectSnapshot> find(String collectionName, QueryNode rootNode, Optional<LocalDateTime> queryAt) {
-        return prepareQuery(collectionName, rootNode).find(effective(queryAt));
+    public Flux<ObjectView> find(String collectionName, QueryNode rootNode, Optional<LocalDateTime> queryAt) {
+        return prepareQuery(collectionName, rootNode).find(effective(queryAt)).map(converters::convert);
     }
 
     public Mono<Boolean> exists(String collectionName, QueryNode rootNode, Optional<LocalDateTime> queryAt) {

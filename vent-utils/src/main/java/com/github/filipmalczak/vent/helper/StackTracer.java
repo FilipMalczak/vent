@@ -1,4 +1,4 @@
-package com.github.filipmalczak.vent.testing;
+package com.github.filipmalczak.vent.helper;
 
 import lombok.*;
 

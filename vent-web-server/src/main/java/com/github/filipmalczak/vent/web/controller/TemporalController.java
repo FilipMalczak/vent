@@ -10,9 +10,7 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
-import static com.github.filipmalczak.vent.web.paths.CommonPaths.TEMPORAL;
-import static com.github.filipmalczak.vent.web.paths.CommonPaths.TEMPORAL_NOW;
-import static com.github.filipmalczak.vent.web.paths.CommonPaths.TEMPORAL_TIMEZONE;
+import static com.github.filipmalczak.vent.web.paths.CommonPaths.*;
 
 @RestController
 public class TemporalController {

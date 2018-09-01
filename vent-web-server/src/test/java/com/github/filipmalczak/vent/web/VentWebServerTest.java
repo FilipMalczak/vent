@@ -1,12 +1,12 @@
 package com.github.filipmalczak.vent.web;
 
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentDb;
-import com.github.filipmalczak.vent.web.orchestration.TestServerManager;
-import com.github.filipmalczak.vent.web.orchestration.WithServerTrait;
 import com.github.filipmalczak.vent.tck.VentDbTck;
 import com.github.filipmalczak.vent.testing.TestingTemporalService;
 import com.github.filipmalczak.vent.web.client.ReactiveWebVentDbClient;
 import com.github.filipmalczak.vent.web.integration.Converters;
+import com.github.filipmalczak.vent.web.orchestration.TestServerManager;
+import com.github.filipmalczak.vent.web.orchestration.WithServerTrait;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.TestPropertySource;

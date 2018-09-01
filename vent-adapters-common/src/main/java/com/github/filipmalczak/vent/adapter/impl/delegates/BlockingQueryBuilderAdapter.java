@@ -1,7 +1,6 @@
 package com.github.filipmalczak.vent.adapter.impl.delegates;
 
 import com.github.filipmalczak.vent.api.blocking.query.BlockingQueryBuilder;
-import com.github.filipmalczak.vent.api.blocking.query.BlockingVentQuery;
 import com.github.filipmalczak.vent.api.general.query.CriteriaBuilder;
 import com.github.filipmalczak.vent.api.reactive.query.ReactiveQueryBuilder;
 import lombok.Value;
@@ -9,7 +8,7 @@ import lombok.Value;
 import java.util.function.Consumer;
 
 @Value
-public class BlockingQueryBuilderAdapter implements BlockingQueryBuilder<BlockingQueryBuilderAdapter, BlockingVentQuery> {
+public class BlockingQueryBuilderAdapter implements BlockingQueryBuilder<BlockingQueryBuilderAdapter, BlockingQueryAdapter> {
     private ReactiveQueryBuilder<?, ?> builder;
 
     @Override
@@ -37,7 +36,7 @@ public class BlockingQueryBuilderAdapter implements BlockingQueryBuilder<Blockin
     }
 
     @Override
-    public BlockingVentQuery build() {
+    public BlockingQueryAdapter build() {
         return new BlockingQueryAdapter(builder.build());
     }
 }

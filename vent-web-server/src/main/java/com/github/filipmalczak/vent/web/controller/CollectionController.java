@@ -12,10 +12,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
-import static com.github.filipmalczak.vent.helper.Struct.map;
 import static com.github.filipmalczak.vent.helper.Struct.pair;
 import static com.github.filipmalczak.vent.web.paths.CommonPaths.*;
 
@@ -79,6 +78,7 @@ public class CollectionController {
     }
 
     @GetMapping(OBJECT)
+    //todo optional queryAt, same with most of read stack
     public Mono<ObjectView> get(@PathVariable String name, @PathVariable String id, @RequestParam LocalDateTime queryAt){
         return reactiveVentDb.getCollection(name).
             get(new VentId(id), queryAt).
@@ -86,9 +86,9 @@ public class CollectionController {
     }
 
     @GetMapping(OBJECTS)
-    public Flux<ObjectView> getAll(@PathVariable String name, @RequestParam LocalDateTime queryAt){
+    public Flux<ObjectView> getAll(@PathVariable String name, @RequestParam(required = false) Optional<LocalDateTime> queryAt){
         return reactiveVentDb.getCollection(name).
-            getAll(queryAt).
-            map(converters::convert);
+                    getAll(queryAt.orElse(reactiveVentDb.getTemporalService().now())).
+                    map(converters::convert);
     }
 }

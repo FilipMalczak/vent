@@ -1,7 +1,6 @@
 package com.github.filipmalczak.vent.api.reactive;
 
 import com.github.filipmalczak.vent.api.general.VentCollection;
-import com.github.filipmalczak.vent.api.general.VentCollectionReadOperations;
 import com.github.filipmalczak.vent.api.model.EventConfirmation;
 import com.github.filipmalczak.vent.api.model.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.model.Success;
@@ -14,6 +13,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.function.Supplier;
 
 
 public interface ReactiveVentCollection<
@@ -29,7 +29,7 @@ public interface ReactiveVentCollection<
         return create(new HashMap());
     }
 
-    default Flux<ObjectSnapshot> getAll(LocalDateTime queryAt){
+    default Flux<ObjectSnapshot> getAll(Supplier<LocalDateTime> queryAt){
         return identifyAll(queryAt).flatMap(id -> get(id, queryAt));
     }
 }

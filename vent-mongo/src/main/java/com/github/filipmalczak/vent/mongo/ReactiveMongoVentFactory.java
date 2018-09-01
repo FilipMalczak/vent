@@ -4,6 +4,7 @@ import com.github.filipmalczak.vent.api.temporal.SimpleTemporalService;
 import com.github.filipmalczak.vent.api.temporal.TemporalService;
 import com.github.filipmalczak.vent.mongo.model.events.impl.EventFactory;
 import com.github.filipmalczak.vent.mongo.service.*;
+import com.github.filipmalczak.vent.mongo.service.query.preparator.MongoQueryPreparator;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;

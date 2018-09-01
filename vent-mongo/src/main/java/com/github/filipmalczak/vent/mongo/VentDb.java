@@ -1,15 +1,14 @@
 package com.github.filipmalczak.vent.mongo;
 
 import com.github.filipmalczak.vent.api.model.Success;
-import com.github.filipmalczak.vent.api.reactive.ReactiveVentCollection;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentDb;
 import com.github.filipmalczak.vent.api.temporal.TemporalService;
 import com.github.filipmalczak.vent.mongo.model.events.impl.EventFactory;
 import com.github.filipmalczak.vent.mongo.query.VentQuery;
 import com.github.filipmalczak.vent.mongo.service.CollectionService;
-import com.github.filipmalczak.vent.mongo.service.MongoQueryPreparator;
 import com.github.filipmalczak.vent.mongo.service.PageService;
 import com.github.filipmalczak.vent.mongo.service.SnapshotService;
+import com.github.filipmalczak.vent.mongo.service.query.preparator.MongoQueryPreparator;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

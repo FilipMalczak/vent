@@ -16,7 +16,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import static com.github.filipmalczak.vent.web.paths.CommonPaths.*;
+import static com.github.filipmalczak.vent.web.paths.CommonPaths.COLLECTION;
+import static com.github.filipmalczak.vent.web.paths.CommonPaths.COLLECTIONS;
 
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 @EqualsAndHashCode(of = {"webClient"})

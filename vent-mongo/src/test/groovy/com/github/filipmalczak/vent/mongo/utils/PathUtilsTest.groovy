@@ -1,9 +1,9 @@
-package com.github.filipmalczak.vent.helper
+package com.github.filipmalczak.vent.mongo.utils
 
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import static com.github.filipmalczak.vent.helper.PathUtils.superPaths
+import static PathUtils.superPaths
 
 class PathUtilsTest extends Specification {
     //this may not be the best spec, as we shouldn't care that much for order of superpaths, but screw it

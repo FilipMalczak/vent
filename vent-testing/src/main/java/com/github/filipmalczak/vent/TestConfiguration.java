@@ -1,7 +1,7 @@
 package com.github.filipmalczak.vent;
 
 import com.github.filipmalczak.vent.api.temporal.TemporalService;
-import com.github.filipmalczak.vent.testing.StackTracer;
+import com.github.filipmalczak.vent.helper.StackTracer;
 import com.github.filipmalczak.vent.testing.TestingTemporalService;
 import org.springframework.context.annotation.*;
 import org.springframework.core.type.AnnotatedTypeMetadata;

@@ -2,6 +2,7 @@ package com.github.filipmalczak.vent.web.client.query;
 
 import com.github.filipmalczak.vent.api.general.query.CriteriaBuilder;
 import com.github.filipmalczak.vent.api.reactive.query.ReactiveQueryBuilder;
+import com.github.filipmalczak.vent.web.integration.Converters;
 import com.github.filipmalczak.vent.web.model.query.NodeType;
 import com.github.filipmalczak.vent.web.model.query.QueryNode;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,7 @@ public class WebQueryBuilder  implements ReactiveQueryBuilder<WebQueryBuilder, W
     private WebClient webClient;
     private String ventCollectionName;
     private WebCriteriaBuilder criteriaBuilder;
+    private Converters converters;
 
     @Override
     public WebQueryBuilder and(Consumer<CriteriaBuilder> andScope) {
@@ -43,6 +45,6 @@ public class WebQueryBuilder  implements ReactiveQueryBuilder<WebQueryBuilder, W
 
     @Override
     public WebQuery build() {
-        return new WebQuery(webClient, ventCollectionName, new QueryNode(NodeType.ROOT, criteriaBuilder.nodes, list()));
+        return new WebQuery(webClient, ventCollectionName, new QueryNode(NodeType.ROOT, criteriaBuilder.nodes, list()), converters);
     }
 }

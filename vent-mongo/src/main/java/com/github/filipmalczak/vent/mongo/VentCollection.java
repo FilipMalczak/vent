@@ -5,8 +5,6 @@ import com.github.filipmalczak.vent.api.model.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.model.Success;
 import com.github.filipmalczak.vent.api.model.VentId;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentCollection;
-import com.github.filipmalczak.vent.api.reactive.query.ReactiveQueryBuilder;
-import com.github.filipmalczak.vent.api.reactive.query.ReactiveVentQuery;
 import com.github.filipmalczak.vent.api.temporal.TemporalService;
 import com.github.filipmalczak.vent.mongo.model.Page;
 import com.github.filipmalczak.vent.mongo.model.events.Event;
@@ -14,9 +12,9 @@ import com.github.filipmalczak.vent.mongo.model.events.impl.EventFactory;
 import com.github.filipmalczak.vent.mongo.query.AndCriteriaBuilder;
 import com.github.filipmalczak.vent.mongo.query.VentQuery;
 import com.github.filipmalczak.vent.mongo.service.CollectionService;
-import com.github.filipmalczak.vent.mongo.service.MongoQueryPreparator;
 import com.github.filipmalczak.vent.mongo.service.PageService;
 import com.github.filipmalczak.vent.mongo.service.SnapshotService;
+import com.github.filipmalczak.vent.mongo.service.query.preparator.MongoQueryPreparator;
 import com.github.filipmalczak.vent.mongo.utils.MongoTranslator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,6 +25,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.function.Supplier;
 
 @AllArgsConstructor
 //todo builder?
@@ -73,19 +72,19 @@ public class VentCollection implements ReactiveVentCollection<VentQueryBuilder, 
 
 
     @Override
-    public Mono<ObjectSnapshot> get(VentId id, LocalDateTime queryAt) {
+    public Mono<ObjectSnapshot> get(VentId id, Supplier<LocalDateTime> queryAt) {
         return collectionService.mongoCollectionName(ventCollectionName, queryAt).flatMap(r ->
             snapshotService.
-                getSnapshot(r.getName(), id, queryAt)
+                getSnapshot(r.getName(), id, r.getNow())
         );
     }
 
     @Override
-    public Flux<VentId> identifyAll(LocalDateTime queryAt) {
+    public Flux<VentId> identifyAll(Supplier<LocalDateTime> queryAt) {
         return collectionService.mongoCollectionName(ventCollectionName, queryAt).flux().flatMap(r ->
             pageService.allPages(
                     r.getName(),
-                    queryAt
+                    r.getNow()
                 ).
                 map(Page::getObjectId).
                 map(MongoTranslator::fromMongo)

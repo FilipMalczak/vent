@@ -3,8 +3,18 @@ package com.github.filipmalczak.vent.velvet;
 import com.github.filipmalczak.vent.velvet.impl.Selector;
 import com.github.filipmalczak.vent.velvet.impl.SelectorNotApplyableException;
 
+import java.util.List;
+
 public interface UnboundPath {
+    /**
+     * Full path and not the last part
+     */
     String getPath();
+
+    /**
+     * Last element of this will be the same as getPath()
+     */
+    List<String> getSuperPaths();
 
     default boolean exists(Object target) {
         return bind(target).exists();

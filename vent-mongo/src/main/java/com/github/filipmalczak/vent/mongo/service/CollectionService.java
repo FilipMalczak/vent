@@ -15,10 +15,11 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.function.Supplier;
 
+import static com.github.filipmalczak.vent.helper.Struct.list;
 import static com.github.filipmalczak.vent.mongo.utils.CollectionsUtils.COLLECTIONS_MONGO_COLLECTION;
 import static com.github.filipmalczak.vent.mongo.utils.CollectionsUtils.MONGO_COLLECTION_NAME_MAPPER;
-import static com.github.filipmalczak.vent.helper.Struct.list;
 import static reactor.core.publisher.Mono.just;
 
 @AllArgsConstructor
@@ -37,12 +38,12 @@ public class CollectionService {
     }
 
     public Mono<NameAndNow> mongoCollectionName(String ventCollectionName){
-        LocalDateTime now = temporalService.now();
-        return mongoCollectionName(ventCollectionName, now);
+        return mongoCollectionName(ventCollectionName, temporalService);
     }
-    public Mono<NameAndNow> mongoCollectionName(String ventCollectionName, LocalDateTime at){
+    public Mono<NameAndNow> mongoCollectionName(String ventCollectionName, Supplier<LocalDateTime> at){
         //todo introduce archivization
-        return getMongoCollectionNameForCurrentPeriod(ventCollectionName).map(s -> NameAndNow.with(s, at));
+        //make sure that supplier is called in reactive context (and not outside of some publisher)
+        return getMongoCollectionNameForCurrentPeriod(ventCollectionName).map(s -> NameAndNow.with(s, at.get()));
     }
 
     public Mono<String> getMongoCollectionNameForCurrentPeriod(String ventCollectionName){
@@ -93,7 +94,6 @@ public class CollectionService {
     private Mono<CollectionDescriptor> createManaged(String ventCollectionName){
         return Mono.
             fromCallable(temporalService::now).
-            log("MANAGING").
             flatMap( now ->
                 operations.insert(
                     new CollectionDescriptor(

@@ -2,11 +2,8 @@ package com.github.filipmalczak.vent.api.general;
 
 import com.github.filipmalczak.vent.api.general.defaults.ObjectWriteFacade;
 import com.github.filipmalczak.vent.api.general.object.VentObjectWriteFacade;
-import com.github.filipmalczak.vent.api.general.query.QueryBuilder;
 import com.github.filipmalczak.vent.api.model.VentId;
-import com.github.filipmalczak.vent.api.temporal.TemporallyEnabled;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 

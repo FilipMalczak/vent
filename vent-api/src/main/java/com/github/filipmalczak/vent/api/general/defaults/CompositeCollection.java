@@ -15,6 +15,7 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.function.Supplier;
 
 @AllArgsConstructor
 public class CompositeCollection<
@@ -52,17 +53,17 @@ public class CompositeCollection<
     }
 
     @Override
-    public SingleSnapshot get(VentId id, LocalDateTime queryAt) {
+    public SingleSnapshot get(VentId id, Supplier<LocalDateTime> queryAt) {
         return readOperations.get(id, queryAt);
     }
 
     @Override
-    public ManyIds identifyAll(LocalDateTime queryAt) {
+    public ManyIds identifyAll(Supplier<LocalDateTime> queryAt) {
         return readOperations.identifyAll(queryAt);
     }
 
     @Override
-    public ManySnapshots getAll(LocalDateTime queryAt) {
+    public ManySnapshots getAll(Supplier<LocalDateTime> queryAt) {
         return readOperations.getAll(queryAt);
     }
 

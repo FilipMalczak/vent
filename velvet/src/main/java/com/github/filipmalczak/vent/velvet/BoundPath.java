@@ -1,5 +1,7 @@
 package com.github.filipmalczak.vent.velvet;
 
+import java.util.function.Function;
+
 public interface BoundPath {
     String getPath();
 
@@ -10,6 +12,12 @@ public interface BoundPath {
     void set(Object value);
 
     Object get();
+
+    default Object modify(Function function){
+        Object newVal = function.apply(get());
+        set(newVal);
+        return newVal;
+    }
 
     void delete();
 }

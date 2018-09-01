@@ -3,7 +3,6 @@ package com.github.filipmalczak.vent.web.client.utils;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)

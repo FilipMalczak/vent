@@ -1,7 +1,7 @@
 package com.github.filipmalczak.vent.mongo;
 
 import com.github.filipmalczak.vent.api.temporal.TemporalService;
-import com.github.filipmalczak.vent.testing.StackTracer;
+import com.github.filipmalczak.vent.helper.StackTracer;
 import com.mongodb.MongoClient;
 import org.bson.codecs.Codec;
 import org.bson.codecs.configuration.CodecRegistry;

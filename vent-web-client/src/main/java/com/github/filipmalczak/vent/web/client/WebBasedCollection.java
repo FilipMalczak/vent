@@ -6,6 +6,7 @@ import com.github.filipmalczak.vent.api.model.Success;
 import com.github.filipmalczak.vent.api.model.VentId;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentCollection;
 import com.github.filipmalczak.vent.web.client.query.WebCriteriaBuilder;
+import com.github.filipmalczak.vent.web.client.query.WebQuery;
 import com.github.filipmalczak.vent.web.client.query.WebQueryBuilder;
 import com.github.filipmalczak.vent.web.client.temporal.NaiveWebTemporalService;
 import com.github.filipmalczak.vent.web.integration.Converters;
@@ -21,6 +22,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static com.github.filipmalczak.vent.web.paths.CommonPaths.*;
 import static reactor.core.publisher.Mono.just;
@@ -28,7 +30,7 @@ import static reactor.core.publisher.Mono.just;
 @AllArgsConstructor
 @EqualsAndHashCode(of = {"ventCollectionName", "webClient"})
 @ToString(of = {"ventCollectionName", "webClient"})
-public class WebBasedCollection implements ReactiveVentCollection {
+public class WebBasedCollection implements ReactiveVentCollection<WebQueryBuilder, WebQuery> {
     @Getter private String ventCollectionName;
     private WebClient webClient;
     private Converters converters;
@@ -89,18 +91,18 @@ public class WebBasedCollection implements ReactiveVentCollection {
     }
 
     @Override
-    public Flux<VentId> identifyAll(LocalDateTime queryAt) {
+    public Flux<VentId> identifyAll(Supplier<LocalDateTime> queryAt) {
         return webClient.get().
-            uri(IDS_WITH_QUERY_TIME, ventCollectionName, queryAt).
+            uri(IDS_WITH_QUERY_TIME, ventCollectionName, queryAt.get()).
             retrieve().
             bodyToFlux(IdView.class).
             map(converters::convert);
     }
 
     @Override
-    public Mono<ObjectSnapshot> get(VentId id, LocalDateTime queryAt) {
+    public Mono<ObjectSnapshot> get(VentId id, Supplier<LocalDateTime> queryAt) {
         return webClient.get().
-            uri(OBJECT_WITH_QUERY_TIME, ventCollectionName, id.getValue(), DateFormat.QUERY_AT.format(queryAt)).
+            uri(OBJECT_WITH_QUERY_TIME, ventCollectionName, id.getValue(), DateFormat.QUERY_AT.format(queryAt.get())).
             retrieve().
             bodyToMono(ObjectView.class).
             map(converters::convert);
@@ -108,13 +110,13 @@ public class WebBasedCollection implements ReactiveVentCollection {
 
     @Override
     public WebQueryBuilder queryBuilder() {
-        return new WebQueryBuilder(webClient, ventCollectionName, new WebCriteriaBuilder());
+        return new WebQueryBuilder(webClient, ventCollectionName, new WebCriteriaBuilder(), converters);
     }
 
     @Override
-    public Flux<ObjectSnapshot> getAll(LocalDateTime queryAt) {
+    public Flux<ObjectSnapshot> getAll(Supplier<LocalDateTime> queryAt) {
         return webClient.get().
-            uri(OBJECTS_WITH_QUERY_TIME, ventCollectionName, DateFormat.QUERY_AT.format(queryAt)).
+            uri(OBJECTS_WITH_QUERY_TIME, ventCollectionName, DateFormat.QUERY_AT.format(queryAt.get())).
             retrieve().
             bodyToFlux(ObjectView.class).
             map(converters::convert);

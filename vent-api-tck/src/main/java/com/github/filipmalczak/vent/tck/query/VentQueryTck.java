@@ -5,6 +5,7 @@ import com.github.filipmalczak.vent.api.model.ObjectSnapshot;
 import com.github.filipmalczak.vent.api.model.VentId;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentDb;
 import com.github.filipmalczak.vent.api.reactive.query.ReactiveVentQuery;
+import com.github.filipmalczak.vent.testing.ExpectedAndActualDiffExtension;
 import com.github.filipmalczak.vent.testing.TestingTemporalService;
 import com.github.filipmalczak.vent.testing.Times;
 import com.github.filipmalczak.vent.traits.paradigm.Blocking;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import reactor.test.StepVerifier;
 
 import java.time.Instant;
@@ -30,6 +32,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 //fixme these tests need a total refactor, but for now I'm just checking whether the approach will work at all
 @Slf4j
+@ExtendWith(ExpectedAndActualDiffExtension.class)
 public abstract class VentQueryTck {
     private TestingTemporalService temporalService;
     private ReactiveVentDb<?, ?, ?> reactiveVentDb;
@@ -94,12 +97,14 @@ public abstract class VentQueryTck {
     @Nested
     @DisplayName("Test equals operator")
     public class Equals {
+        //todo: query by top level/nested int/float/bool/string field from initial state/after put/after update
+
         @Nested
         @DisplayName("Test querying of objects in their initial state")
         public class InitialState {
             @Test
-            @DisplayName("Query by top level field")
-            public void byTopLevelField() {
+            @DisplayName("Query by top level integer field")
+            public void byTopLevelIntField() {
                 temporalService.withResults(times.byInterval(3), () -> {
                     Map aData = person(
                         "A1", "A2",
@@ -140,6 +145,56 @@ public abstract class VentQueryTck {
                 });
 
             }
+
+            @Test
+            @DisplayName("Query by top level boolean field")
+            public void byTopLevelBoolField() {
+                temporalService.withResults(times.byInterval(3), () -> {
+                    Map aData = map(
+                        person(
+                            "A1", "A2",
+                            20,
+                            "S1", "C1",
+                            list(
+                                account("AA1", 100),
+                                account("AA2", 200),
+                                account("AA3", 300)
+                            )
+                        ),
+                        pair("happy", false)
+                    );
+                    VentId a = blockingVentDb.getCollection(collectionName).create(aData);
+                    Map bData = map(
+                        person(
+                            "B1", "B2",
+                            25,
+                            "S2", "C1",
+                            list(
+                                account("AB1", 200),
+                                account("AB2", 500),
+                                account("AB3", 30)
+                            )
+                        ),
+                        pair("happy", true)
+                    );
+                    VentId b = blockingVentDb.getCollection(collectionName).create(bData);
+
+                    ReactiveVentQuery query = reactiveVentDb.getCollection(collectionName).queryBuilder().equals("happy", true).build();
+                    List<ObjectSnapshot> results = query.find(temporalService.now()).toStream().collect(toList());
+                    assertEquals(
+                        list(
+                            ObjectSnapshot.builder().
+                                ventId(b).
+                                state(bData).
+                                lastUpdate(times.after(1)).
+                                queryTime(times.after(2)).
+                                version(0).build()
+                        ),
+                        results
+                    );
+                });
+            }
+
             @Test
             @DisplayName("Query by nested field")
             public void byNestedField() {

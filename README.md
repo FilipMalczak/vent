@@ -1,10 +1,9 @@
-# vent
+# Vent
 
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/vent-event-sourced-db/Lobby)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[![Insight.io](https://www.insight.io/repoBadge/github.com/FilipMalczak/vent)](https://insight.io/github.com/FilipMalczak/vent)
 [![Dependabot enabled](https://img.shields.io/badge/dependabot-enabled-yellow.svg)](https://dependabot.com)
 [![BCH compliance](https://bettercodehub.com/edge/badge/FilipMalczak/vent?branch=dev)](https://bettercodehub.com/)
 
@@ -88,6 +87,8 @@ as well as provide translations between `java.util.time`, `java.util.Date` and t
 - `vent-web-common` - HTTP API request and response objects, as well as endpoint paths String constants 
 - `vent-web-server` - Webflux-enabled **web server** configuration **that exposes VentDb over HTTP**
 - `vent-web-client` - **Client for aforementioned server**, implementing VentDb API
+- `ventrello` - Simple Trello-like app using Vent as a persistence layer (with jQuery and bootstrap on frontend, with 
+fat client); PoC that Vent can be useful in real-life solutions
 
 Artifactory Maven repositories are:
 

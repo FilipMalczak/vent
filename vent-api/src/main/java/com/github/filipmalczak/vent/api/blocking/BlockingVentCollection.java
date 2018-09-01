@@ -11,6 +11,7 @@ import com.github.filipmalczak.vent.traits.paradigm.Blocking;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -27,15 +28,17 @@ public interface BlockingVentCollection<
         >, Blocking {
     Success drop();
 
-    default Stream<ObjectSnapshot> getAll(LocalDateTime queryAt){
+    default Stream<ObjectSnapshot> getAll(Supplier<LocalDateTime> queryAt){
         return identifyAll(queryAt).map(id -> get(id, queryAt));
     }
 
-    default List<VentId> listAllIds(LocalDateTime queryAt){
+    //todo add non-supplier variants of methods below
+
+    default List<VentId> listAllIds(Supplier<LocalDateTime> queryAt){
         return identifyAll(queryAt).collect(toList());
     }
 
-    default List<ObjectSnapshot> listAll(LocalDateTime queryAt){
+    default List<ObjectSnapshot> listAll(Supplier<LocalDateTime> queryAt){
         return getAll(queryAt).collect(toList());
     }
 }

@@ -7,6 +7,7 @@ import com.github.filipmalczak.vent.api.temporal.TemporalService;
 import lombok.Value;
 
 import java.time.LocalDateTime;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 @Value
@@ -14,7 +15,7 @@ public class BlockingQueryAdapter implements BlockingVentQuery {
     private ReactiveVentQuery query;
 
     @Override
-    public Stream<ObjectSnapshot> find(LocalDateTime queryAt) {
+    public Stream<ObjectSnapshot> find(Supplier<LocalDateTime> queryAt) {
         return query.find(queryAt).toStream();
     }
 
