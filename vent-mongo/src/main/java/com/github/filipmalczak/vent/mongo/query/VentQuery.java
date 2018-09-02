@@ -65,6 +65,7 @@ public class VentQuery implements ReactiveVentQuery{
     }
 
     private Map<String, Object> getCandidatePagesQuery(LocalDateTime queryAt){
+        //todo we should check whether events match time criteria too
         return map(
             pair("startingFrom", pair("$lte", queryAt)),
             pair("$or", list(

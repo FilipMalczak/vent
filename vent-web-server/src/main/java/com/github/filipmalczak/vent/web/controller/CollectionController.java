@@ -64,7 +64,7 @@ public class CollectionController {
     }
 
     @DeleteMapping(OBJECT)
-    public Mono<EventConfirmationView> update(@PathVariable String name, @PathVariable String id){
+    public Mono<EventConfirmationView> delete(@PathVariable String name, @PathVariable String id){
         return reactiveVentDb.getCollection(name).
             delete(new VentId(id)).
             map(converters::convert);

@@ -1,0 +1,41 @@
+apply plugin: "com.sourcemuse.mongo"
+apply plugin: "org.springframework.boot"
+
+bootRun.dependsOn startManagedMongoDb
+
+dependencies {
+    implementation project(":vent-web-server")
+    implementation project(":vent-api")
+    implementation project(":vent-utils")
+    implementation('org.springframework.boot:spring-boot-starter-actuator')
+    implementation('org.springframework.boot:spring-boot-starter-webflux')
+}
+
+ext {
+    projectRoot = project(":ventrello").projectDir
+    staticResourcesDir = new File(projectRoot, "/src/main/resources/public-web-resources")
+    staticResourcesPath = staticResourcesDir.absolutePath
+    mongoStorageDir = new File(projectRoot, "/mongo")
+    mongoStoragePath = mongoStorageDir.absolutePath
+}
+
+bootRun {
+    systemProperty 'spring.profiles.active', "mockData"
+    doFirst {
+        println "Static resources served from: $staticResourcesPath"
+    }
+    systemProperty 'spring.resources.static-locations', "file://$staticResourcesPath"
+}
+
+mongo {
+    storageLocation = mongoStoragePath
+}
+
+task cleanMongo {
+    doFirst {
+        println "Ensuring empty DB by removing $mongoStoragePath"
+        mongoStorageDir.deleteDir()
+    }
+}
+
+startManagedMongoDb.dependsOn cleanMongo

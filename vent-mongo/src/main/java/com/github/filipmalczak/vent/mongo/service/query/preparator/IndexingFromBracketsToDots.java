@@ -18,7 +18,6 @@ public class IndexingFromBracketsToDots implements Traversal {
     private Object normalizePath(Object key){
         if (key instanceof String){
             String result = ((String) key).replaceAll("\\[", ".").replaceAll("\\]", "");
-            log.info("Normalizing "+key+" to "+result);
             return result;
         }
         return key;

@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker.css" integrity="sha256-9w7XtQnqRDvThmsQHfLmXdDbGasYsSjF6FSXrDh7F6g=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" integrity="sha256-NuCn4IvuZXdBaFKJOAcsU2Q3ZpwbdFisd5dux4jkQ5w=" crossorigin="anonymous" />
+
+    <script
+            src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>
+
+    <script type="text/javascript" src="/js/temporal.js"></script>
+    <script type="text/javascript" src="/js/tasks.js"></script>
+
+    <title>Ventrello</title>
+</head>
+<body>
+
+
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+        <a class="nav-link" href="/index.html">Ventrello</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link active" href="#">Tasks</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/boards.html">Boards</a>
+    </li>
+    <li class="nav-item ml-auto">
+        <div class="form-group">
+            <div class="input-group date" id="date-now" data-target-input="nearest">
+                <input type="text" class="form-control datetimepicker-input" data-target="#date-now"/>
+                <div class="input-group-append" data-target="#date-now" data-toggle="datetimepicker">
+                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                </div>
+                <script>
+                    $(function () {
+                        $('#date-now').datetimepicker();
+                    });
+                </script>
+                <div class="input-group-append form-check form-check-inline">
+                    <div class="input-group-text">
+                        <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2" checked>
+                        <label class="form-check-label" for="inlineCheckbox2">
+                            <span class="badge badge-pill badge-primary">NOW</span>
+                            <span class="badge badge-pill badge-secondary" id="timezone"></span>
+                            <span class="badge badge-pill badge-warning">Not working yet!</span>
+                        </label>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </li>
+</ul>
+
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm">
+            <h1>Tasks</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm">
+            <div class="form-check form-check-inline">
+                <input id="edited-task-number" class="form-control" type="text" placeholder="Task #"/>
+                <button type="button"
+                        id="edit-chosen-task-button" class="form-control btn btn-primary">
+                    Edit task
+                </button>
+                <button type="button"
+                        id="add-task-button" class="form-control btn btn-primary"
+                        data-toggle="modal" data-target="#taskModal"
+                        data-ok-text="Create new task" data-task-id="" data-ok-action="create">
+                    Add task
+                </button>
+            </div>
+        </div>
+        <div class="col-sm">
+            <div class="form-check form-check-inline float-right">
+                <label class="form-check-label" for="main-task-filter">
+                        Show:
+                </label>
+                <select id="main-task-filter" class="form-control">
+                    <option selected value="ALL">All</option>
+                    <option value="UNRESOLVED">Unresolved</option>
+                    <option value="RESOLVED">Resolved</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm">
+            <hr/>
+        </div>
+    </div>
+</div>
+
+<div class="container" id="tasks-container">
+</div>
+
+<script>
+    $(function(){
+        function setUpModal(modal, okText, okAction, taskId){
+            modal.find('#modal-ok-button').text(okText).data("ok-action", okAction).data("task-id", taskId);
+            $("#taskModalTitle").empty();
+            if (taskId) {
+                $("#taskModalTitle").
+                    text("Edit task").
+                    prepend(
+                        $("<span>").attr("id", "vent-edited-task-number").addClass("badge").addClass("badge-primary")
+                    );
+                tasksController.loadTaskToModal(taskId);
+            } else {
+                $("#taskModalTitle").
+                    text("Add task");
+                tasksController.clearModal();
+            }
+        }
+
+        $("#edit-chosen-task-button").click(function(){
+            var number = parseInt($("#edited-task-number").val());
+            tasksController.fetchTaskWithNumber(number, function(id){
+                $('#taskModal').modal("show");
+                setUpModal($('#taskModal'), "Save task", "edit", id);
+            });
+        })
+
+        $('#taskModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var okText = button.data('ok-text'); // Extract info from data-* attributes
+            var okAction = button.data('ok-action'); // Extract info from data-* attributes
+            var taskId = button.data('task-id');
+            var modal = $(this);
+            setUpModal(modal, okText, okAction, taskId);
+        });
+    });
+</script>
+
+<!-- Modal -->
+<div class="modal fade" id="taskModal" tabindex="-1" role="dialog" aria-labelledby="taskModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="taskModalTitle"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="taskName">Task name</label>
+                        <input type="text" class="form-control" id="taskName" aria-describedby="taskNameHelp" placeholder="Name">
+                        <small id="taskNameHelp" class="form-text text-muted">Short description of the task</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="taskDescription">Task description</label>
+                        <input type="text" class="form-control" id="taskDescription" aria-describedby="taskDescriptionHelp" placeholder="Description">
+                        <small id="taskDescriptionHelp" class="form-text text-muted">More detailed description of the task</small>
+                    </div>
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" id="taskResolved">
+                        <label class="form-check-label" for="taskResolved">Resolved</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="modal-ok-button"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function(){
+        $("#modal-ok-button").click(function(){
+            var action = $(this).data("ok-action");
+            var taskId = $(this).data('task-id');
+            tasksController.actions[action](taskId);
+            $("#taskModal").modal("hide");
+        });
+    });
+
+    $(tasksController.fetchAndRenderTasks);
+
+    $("#main-task-filter").change(tasksController.fetchAndRenderTasks);
+</script>
+
+</body>
+</html>

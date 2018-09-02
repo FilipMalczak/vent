@@ -1,0 +1,5 @@
+spring:
+  webflux:
+    static-path-pattern: "/**"
+  resources:
+    static-locations: "classpath:/public-web-resources/"
