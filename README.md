@@ -117,6 +117,7 @@ Vent-related.
 - [x] rename "embedded" to "mongo"
 - [x] extract temporal service to dedicated module
 - [x] split read/write APIs (but provide utilities to merge them)
+- [ ] provide PoC application using Vent for persistence (Ventrello - Vent-enabled simplified Trello clone) (WIP)
 - [ ] write a proper tutorial, its high time for that
 - [ ] strategy-based approach to optimization, scheduled with a plugin
 - [ ] implement archivization in Mongo impl (optimization - storing older pages for each object; archivization - storing 

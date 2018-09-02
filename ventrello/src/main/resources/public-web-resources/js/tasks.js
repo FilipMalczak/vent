@@ -16,23 +16,51 @@ var tasksController = (function(){
 
     function renderTask(task){
         return $("<div>").addClass("row").addClass("vent-task-row").data("vent-id", task.ventId.id).append(
-            $("<div>").addClass("col-sm").
-                append(
-                    $("<button>").addClass("btn").addClass(task.view.resolved ? "btn-secondary" : "btn-primary").
-                        append(
-                            $("<span>").
-                                addClass("badge").addClass("badge-light").
-                                text("#"+task.view.number),
-                            $("<span>").text(task.view.name)
-                        )
-                ),
-            $("<div>").addClass("col-sm").
-                append($("<span>").addClass("badge").addClass("badge-sm").addClass("badge-light").text("This will show boards that the task is on.")),
-            $("<div>").addClass("col-sm").
-                append(
-                    taskButtons(task)
+            $("<div>").addClass("col-sm").append(
+                $("<div>").addClass("card").append(
+                    $("<div>").addClass("card-header").append(
+                        $("<span>").
+                            addClass("badge").addClass(task.view.resolved ? "badge-secondary" : "badge-primary").
+                            text("#"+task.view.number),
+                        $("<span>").
+                            addClass("badge").addClass("badge-pill").
+                            addClass(task.view.resolved ? "badge-secondary" : "badge-primary").
+                            text(task.view.resolved ? "Resolved" : "Unresolved"),
+                        taskButtons(task)
+                    ),
+                    $("<div>").addClass("card-body").append(
+                        $("<h5>").attr("id", "task-name-"+task.ventId.id).
+                            attr("href", "#").
+                            attr("aria-expanded", "false").
+                            attr("aria-controls", "#task-name-"+task.ventId.id).
+                            attr("data-toggle", "collapse").
+                            attr("data-target", "#task-description-"+task.ventId.id).
+                            text(task.view.name),
+                        $("<p>").attr("id", "task-description-"+task.ventId.id).
+                            addClass("collapse").
+                            text(task.view.description)
+                    )
                 )
+            )
         );
+//        return $("<div>").addClass("row").addClass("vent-task-row").data("vent-id", task.ventId.id).append(
+//            $("<div>").addClass("col-sm").
+//                append(
+//                    $("<button>").addClass("btn").addClass(task.view.resolved ? "btn-secondary" : "btn-primary").
+//                        append(
+//                            $("<span>").
+//                                addClass("badge").addClass("badge-light").
+//                                text("#"+task.view.number),
+//                            $("<span>").text(task.view.name)
+//                        )
+//                ),
+//            $("<div>").addClass("col-sm").
+//                append($("<span>").addClass("badge").addClass("badge-sm").addClass("badge-light").text("This will show boards that the task is on.")),
+//            $("<div>").addClass("col-sm").
+//                append(
+//                    taskButtons(task)
+//                )
+//        );
     }
 
     function taskButtons(task){
@@ -50,6 +78,7 @@ var tasksController = (function(){
     function editTaskButton(task){
         return $("<button>").
             addClass("btn").
+            addClass("btn-sm").
             addClass("btn-success").
             addClass("vent-task-edit").
             prop("type", "button").
@@ -67,6 +96,7 @@ var tasksController = (function(){
         return $("<button>").
             prop("type", "button").
             addClass("btn").
+            addClass("btn-sm").
             addClass("btn-danger").
             append(
                 $("<i>").addClass("fas").addClass("fa-trash-alt")
@@ -198,6 +228,7 @@ var tasksController = (function(){
     function updateTask(id, callback){
         var newState = gatherTaskForm();
         var oldState = tasks[id].view;
+        var wasDescUncollapsed = $("#task-description-"+id).hasClass("show");
 
         function compareFieldFoo(field, cb){
             return function() {
@@ -213,6 +244,8 @@ var tasksController = (function(){
                 compareFieldFoo("resolved", function(){
                     tasks[id].view = Object.assign(oldState, newState);
                     findTaskRow(id).replaceWith(renderTask(tasks[id]));
+                    if (wasDescUncollapsed)
+                        $("#task-description-"+id).addClass("show")
                     callback();
                 })
             )
