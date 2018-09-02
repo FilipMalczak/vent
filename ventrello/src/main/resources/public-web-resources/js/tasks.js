@@ -22,10 +22,7 @@ var tasksController = (function(){
                         $("<span>").
                             addClass("badge").addClass(task.view.resolved ? "badge-secondary" : "badge-primary").
                             text("#"+task.view.number),
-                        $("<span>").
-                            addClass("badge").addClass("badge-pill").
-                            addClass(task.view.resolved ? "badge-secondary" : "badge-primary").
-                            text(task.view.resolved ? "Resolved" : "Unresolved"),
+                        resolveBadge(task),
                         taskButtons(task)
                     ),
                     $("<div>").addClass("card-body").append(
@@ -52,6 +49,19 @@ var tasksController = (function(){
                 )
             )
         );
+    }
+
+    function resolveBadge(task){
+        return $("<span>").
+            addClass("badge").addClass("badge-pill").
+            addClass(task.view.resolved ? "badge-secondary" : "badge-primary").
+            text(task.view.resolved ? "Resolved" : "Unresolved").
+            click(function(){
+                ventPutValue(task.ventId.id, "resolved", !(task.view.resolved), function(){
+                    tasks[task.ventId.id].view.resolved = !(tasks[task.ventId.id].view.resolved);
+                    reRenderTask(tasks[task.ventId.id]);
+                });
+            });
     }
 
     function taskButtons(task){
@@ -190,7 +200,7 @@ var tasksController = (function(){
                         view: body
                     };
                     console.log("Task: "+JSON.stringify(task))
-                    tasks[id] = task;
+                    tasks[id.id] = task;
                     if (shouldRender(task))
                         $("#tasks-container").append(renderTask(task));
                     callback();
@@ -219,7 +229,6 @@ var tasksController = (function(){
     function updateTask(id, callback){
         var newState = gatherTaskForm();
         var oldState = tasks[id].view;
-        var wasDescUncollapsed = $("#task-description-"+id).hasClass("show");
 
         function compareFieldFoo(field, cb){
             return function() {
@@ -234,13 +243,22 @@ var tasksController = (function(){
             compareFieldFoo("description",
                 compareFieldFoo("resolved", function(){
                     tasks[id].view = Object.assign(oldState, newState);
-                    findTaskRow(id).replaceWith(renderTask(tasks[id]));
-                    if (wasDescUncollapsed)
-                        $("#task-description-"+id).addClass("show")
+                    reRenderTask(tasks[id]);
                     callback();
                 })
             )
         )();
+    }
+
+    function reRenderTask(task){
+        var wasDescUncollapsed = $("#task-description-"+task.ventId.id).hasClass("show");
+        if (shouldRender(task)) {
+            findTaskRow(task.ventId.id).replaceWith(renderTask(task));
+            if (wasDescUncollapsed)
+                $("#task-description-"+id).addClass("show")
+        } else {
+            findTaskRow(task.ventId.id).remove();
+        }
     }
 
     function fetchTaskWithNumber(number, callbackForId){
