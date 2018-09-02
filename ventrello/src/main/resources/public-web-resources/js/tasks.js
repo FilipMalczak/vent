@@ -29,38 +29,29 @@ var tasksController = (function(){
                         taskButtons(task)
                     ),
                     $("<div>").addClass("card-body").append(
-                        $("<h5>").attr("id", "task-name-"+task.ventId.id).
+                        $("<span>").attr("id", "task-name-"+task.ventId.id).
                             attr("href", "#").
                             attr("aria-expanded", "false").
                             attr("aria-controls", "#task-name-"+task.ventId.id).
                             attr("data-toggle", "collapse").
                             attr("data-target", "#task-description-"+task.ventId.id).
+                            addClass("card-title").
                             text(task.view.name),
                         $("<p>").attr("id", "task-description-"+task.ventId.id).
                             addClass("collapse").
+                            addClass("card-text").
                             text(task.view.description)
+                    ),
+                    $("<div>").addClass("card-footer").append(
+                        $("<span>").
+                            addClass("badge").addClass("badge-pill").
+                            addClass("badge-dark").
+                            addClass("pull-right").
+                            text("This will show boards on which the task can be found")
                     )
                 )
             )
         );
-//        return $("<div>").addClass("row").addClass("vent-task-row").data("vent-id", task.ventId.id).append(
-//            $("<div>").addClass("col-sm").
-//                append(
-//                    $("<button>").addClass("btn").addClass(task.view.resolved ? "btn-secondary" : "btn-primary").
-//                        append(
-//                            $("<span>").
-//                                addClass("badge").addClass("badge-light").
-//                                text("#"+task.view.number),
-//                            $("<span>").text(task.view.name)
-//                        )
-//                ),
-//            $("<div>").addClass("col-sm").
-//                append($("<span>").addClass("badge").addClass("badge-sm").addClass("badge-light").text("This will show boards that the task is on.")),
-//            $("<div>").addClass("col-sm").
-//                append(
-//                    taskButtons(task)
-//                )
-//        );
     }
 
     function taskButtons(task){
