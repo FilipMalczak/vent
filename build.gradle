@@ -133,7 +133,7 @@ subprojects {
 //            dependency group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
 //            dependency group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
 
-            dependency 'org.projectlombok:lombok:1.16.20'
+            dependency 'org.projectlombok:lombok:1.18.2'
         }
     }
 
