@@ -14,6 +14,8 @@ var tasksController = (function(){
         $("#tasks-container").empty();
     }
 
+    //todo its easy to miss that description is collapes - add an animated arrow
+    // https://codepen.io/nhembram/pen/XKEJJp
     function renderTask(task){
         return $("<div>").addClass("row").addClass("vent-task-row").data("vent-id", task.ventId.id).append(
             $("<div>").addClass("col-sm").append(
@@ -57,10 +59,12 @@ var tasksController = (function(){
             addClass(task.view.resolved ? "badge-secondary" : "badge-primary").
             text(task.view.resolved ? "Resolved" : "Unresolved").
             click(function(){
-                ventPutValue(task.ventId.id, "resolved", !(task.view.resolved), function(){
-                    tasks[task.ventId.id].view.resolved = !(tasks[task.ventId.id].view.resolved);
-                    reRenderTask(tasks[task.ventId.id]);
-                });
+                //fixme everything else is controller with only-when-time-is-now, without this kind of JS-based check
+                if (temporalService.currentDateRepr().allowWrite())
+                    ventPutValue(task.ventId.id, "resolved", !(task.view.resolved), function(){
+                        tasks[task.ventId.id].view.resolved = !(tasks[task.ventId.id].view.resolved);
+                        reRenderTask(tasks[task.ventId.id]);
+                    });
             });
     }
 
@@ -99,6 +103,7 @@ var tasksController = (function(){
             addClass("btn").
             addClass("btn-sm").
             addClass("btn-danger").
+            addClass("only-when-time-is-now").
             append(
                 $("<i>").addClass("fas").addClass("fa-trash-alt")
             ).click(function(){
@@ -121,12 +126,12 @@ var tasksController = (function(){
     }
 
     function fetchAllTasks(callback){
-        $.get("/api/v1/db/collection/tasks/object", callback);
+        $.get(temporalService.currentDateRepr().modifyUrl("/api/v1/db/collection/tasks/object"), callback);
     }
 
     function findTasks(path, val, callback){
         $.post({
-            url: "/api/v1/db/collection/tasks/query",
+            url: temporalService.currentDateRepr().modifyUrl("/api/v1/db/collection/tasks/query"),
             data: JSON.stringify({
                 operation: "FIND",
                 rootNode: {
@@ -170,12 +175,14 @@ var tasksController = (function(){
     }
 
     function fetchAndRenderTasks(){
+        console.log("fetchAndRenderTasks START");
         fetchTasks(function(d){
             clearTasks();
             d.forEach(function(o){
                 tasks[o.ventId.id] = o;
             });
             renderTasks();
+            console.log("fetchAndRenderTasks STOP");
         });
     }
 

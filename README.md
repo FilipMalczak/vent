@@ -1,6 +1,7 @@
 # Vent
 
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/vent-event-sourced-db/Lobby)
+[![Project Stats](https://www.openhub.net/p/vent-db/widgets/project_thin_badge.gif)](https://www.openhub.net/p/vent-db)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 

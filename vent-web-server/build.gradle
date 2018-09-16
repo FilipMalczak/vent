@@ -18,6 +18,12 @@ dependencies {
     implementation project(":vent-web-common")
     implementation project(":vent-mongo")
     implementation project(":vent-utils")
+
+//    api group: 'io.springfox', name: 'springfox-swagger2'
+//    api group: 'io.springfox', name: 'springfox-swagger-ui'
+//    //fixme just for swagger - provide something like a profile to enable/disable these dependencies
+//    api group: 'org.springframework.boot', name: 'spring-boot-starter-web'
+
     implementation('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
     testImplementation "org.springframework:spring-test"
     testImplementation project(":vent-api")

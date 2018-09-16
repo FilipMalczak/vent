@@ -128,6 +128,11 @@ subprojects {
 
             dependency "com.github.sbrannen:spring-test-junit5:1.2.0"
 
+
+            //todo figure out if swagger is useful here
+//            dependency group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+//            dependency group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
+
             dependency 'org.projectlombok:lombok:1.16.20'
         }
     }
