@@ -20,11 +20,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>
 
     <!-- flatpickr -->
-    <style>
-        .flatpickr-input {
-            width: 300px;
-        }
-    </style>
+    <link rel="stylesheet" href="css/temporal.css">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -36,6 +32,43 @@
 </head>
 <body>
 
+
+<ul id="date-range-row" class="nav nav-tabs">
+
+    <li class="nav-item ml-auto">
+        <form>
+            <div class="form-row">
+                <div class="col">
+                    <input id="date-range" type="text" class="form-control">
+                </div>
+                <div class="col-xs">
+                    <label for="step-size">Step:</label>
+                </div>
+                <div class="col" style="display: inline-block;">
+                    <input id="step-size" type="number" class="form-control" value="10000">
+                </div>
+                <div class="col-xs">
+                    <label for="step-size">ms</label>
+                </div>
+                <div class="col-xs">
+                    <label for="frame-length">Every:</label>
+                </div>
+                <div class="col">
+                    <input id="frame-length" type="number" class="form-control" value="1000">
+                </div>
+                <div class="col-xs">
+                    <label for="frame-length">ms</label>
+                </div>
+                <div class="col-xs">
+                    <button id="play-animation" type="button" class="form-control">
+                        <span id="play-icon" class="fa fa-play"></span>
+                        <span id="pause-icon" class="fa fa-pause"></span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </li>
+</ul>
 
 <ul class="nav nav-tabs">
     <li class="nav-item">
@@ -57,6 +90,7 @@
                     <select id="temporal-approach" class="form-control">
                         <option selected value="NOW">Now</option>
                         <option value="FIXED">Fixed</option>
+                        <option value="RANGE">Range</option>
                     </select>
                 </div>
                 <div class="col">

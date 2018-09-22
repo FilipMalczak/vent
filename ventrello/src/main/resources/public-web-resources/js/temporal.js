@@ -32,28 +32,33 @@ function fixedInstantRepresentation(date){
 var temporalService = (function(){
     var nowUpdateIntervalHandle = null;
     var openable = true;
-    var flatpickrConfig = {
+    var currentDateConfig = {
         enableTime: true,
+        enableSeconds: true,
         dateFormat: "Y-m-dTH:i:S.000",
         altFormat: "Y.m.d H:i:S",
         altInput: true,
         onChange: function() { changeDateCallback(currentTimeForVent()); }
     };
 
+    var dateRangeConfig = Object.assign(currentDateConfig, {mode: "range"})
+
     var changeDateCallback = function(){}
 
     var chooser = null;
+    var rangeChooser = null;
 
     function currentConfig(obj){
         obj = obj || {};
-        return Object.assign(flatpickrConfig, {clickOpens: openable}, obj);
+        return Object.assign(currentDateConfig, {clickOpens: openable}, obj);
     }
 
-    function initChooser(){
-        chooser = $("#current-date").flatpickr(flatpickrConfig);
+    function initChoosers(){
+        chooser = $("#current-date").flatpickr(currentDateConfig);
+        rangeChooser = $("#date-range").flatpickr(dateRangeConfig);
     }
 
-    function startUpdates(){
+    function startNowUpdates(){
         if (!nowUpdateIntervalHandle){
             nowUpdateIntervalHandle = setInterval(function(){
                 $.get("/api/v1/db/temporal/now", function(date){
@@ -63,7 +68,7 @@ var temporalService = (function(){
         }
     }
 
-    function stopUpdates(){
+    function stopNowUpdates(){
         if (nowUpdateIntervalHandle) {
             clearInterval(nowUpdateIntervalHandle);
             nowUpdateIntervalHandle = null;
@@ -85,24 +90,36 @@ var temporalService = (function(){
     }
 
     return {
-        initChooser: initChooser,
+        initChoosers: initChoosers,
         setNowApproach: function() {
             openable = false;
-            startUpdates();
+            startNowUpdates();
             changeDateCallback = function() {};
             currentDateRepr = nowInstantRepresentation;
 
             triggerRefresh();
+            $("#date-range-row").hide();
             $(".only-when-time-is-now").prop("disabled", false);
         },
         setFixedApproach: function(){
             openable = true;
             chooser.set("openable", false);
-            stopUpdates();
+            stopNowUpdates();
             changeDateCallback = function(dateStr) {
                 currentDateRepr = fixedInstantRepresentation(dateStr);
                 triggerRefresh();
             };
+            $("#date-range-row").hide();
+            $(".only-when-time-is-now").prop("disabled", true);
+        },
+        setRangeApproach: function(){
+            openable  = false;
+            chooser.set("openable", false);
+            stopNowUpdates();
+            changeDateCallback = function() {};
+            currentDateRepr = fixedInstantRepresentation(currentDateRepr.currentDate());
+            rangeChooser.setDate([currentDateRepr.currentDate(), currentDateRepr.currentDate()]);
+            $("#date-range-row").show();
             $(".only-when-time-is-now").prop("disabled", true);
         },
         currentTimeForVent: currentTimeForVent,
@@ -120,7 +137,7 @@ $(function(){
         $("#timezone").text(d);
     });
 
-    temporalService.initChooser();
+    temporalService.initChoosers();
 
     $("#current-date").val()
 
@@ -130,11 +147,16 @@ $(function(){
             temporalService.setNowApproach();
         } else if (value == "FIXED") {
             temporalService.setFixedApproach();
-        } else
+        } else if (value == "RANGE") {
+            temporalService.setRangeApproach();
+         } else
             alert("Unknown temporal approach (the way we handle current time on the page)! The page won't work properly!");
     });
 
     $("#temporal-approach").trigger("change");
+
+    $("#date-range-row").hide();
+    $("#pause-icon").toggle();
 });
 
 //todo: save current date and approach to local storage, load it from there on startup, to make it stay between pages
