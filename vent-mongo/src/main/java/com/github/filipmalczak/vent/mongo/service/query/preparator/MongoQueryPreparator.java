@@ -23,16 +23,16 @@ public class MongoQueryPreparator {
         new CollapseOrOperator(),
         new PullOrOperatorUp(),
         new PullNotOperatorUp(),
-        new NotOrToOr(),
+        new NotOrToNor(),
         new NotEqualsToNe()
     );
     private static List<Traversal> singleShotTraversals = list(new IndexingFromBracketsToDots());
 
     @SneakyThrows
     public Map prepare(Map query){
-        log.info("Unprepared query: {}", query);
+        log.debug("Unprepared query: {}", query);
         Map result = processMap(query);
-        log.info("Prepared query: {}", result);
+        log.debug("Prepared query: {}", result);
         return result;
     }
 
@@ -43,16 +43,16 @@ public class MongoQueryPreparator {
         return result;
     }
 
-    @SneakyThrows//todo only for json dump
+    @SneakyThrows
     private Map processMap(Map arg){
         int i = 0;
         Map result = arg;
         int previousHashCode = result.hashCode()+1;
         while (result.hashCode() != previousHashCode) {
-            log.info("Processing #"+(i++)+" ; #result="+(result.hashCode())+"; #prev="+previousHashCode);
+            log.debug("Processing #"+(i++)+" ; #result="+(result.hashCode())+"; #prev="+previousHashCode);
             previousHashCode = result.hashCode();
             result = applyTraversals(result, recurringTraversals);
-            log.info("Processing #"+(i++)+"; result: "+result);
+            log.debug("Processing #"+(i++)+"; result: "+result);
         }
         result = applyTraversals(result, singleShotTraversals);
         return result;

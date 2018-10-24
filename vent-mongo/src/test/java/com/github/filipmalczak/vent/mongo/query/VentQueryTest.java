@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
+import static com.github.filipmalczak.vent.mongo.ReactiveMongoVentFactory.VentServiceCreators.configure;
+
 @SpringJUnitConfig({TestConfiguration.class, MongoVentWithSpringDataConfiguration.class})
 public class VentQueryTest extends VentQueryTck {
     @Autowired
@@ -21,9 +23,10 @@ public class VentQueryTest extends VentQueryTck {
     @Override
     protected ReactiveVentDb provideClient() {
         ReactiveMongoVentFactory factory = new ReactiveMongoVentFactory();
-        factory.
-            temporalService(() -> temporalService).
-            reactiveMongoOperations(() -> operations);
-        return factory.newInstance();
+        return factory.create(configure()
+            .temporalService(() -> temporalService)
+            .reactiveMongoOperations(() -> operations)
+            .build()
+        );
     }
 }

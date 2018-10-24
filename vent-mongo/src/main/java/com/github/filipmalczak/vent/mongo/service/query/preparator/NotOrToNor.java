@@ -7,7 +7,7 @@ import static com.github.filipmalczak.vent.helper.Struct.pair;
 import static com.github.filipmalczak.vent.helper.Struct.set;
 import static com.github.filipmalczak.vent.mongo.service.query.preparator.OperatorsConstants.*;
 
-public class NotOrToOr implements Traversal {
+public class NotOrToNor implements Traversal {
     @Override
     public Map processMap(Map arg) {
         if (arg.keySet().equals(set(notOperator)) &&

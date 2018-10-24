@@ -1,6 +1,7 @@
 package com.github.filipmalczak.ventrello.impl;
 
 import com.github.filipmalczak.vent.api.model.Success;
+import com.github.filipmalczak.vent.api.model.VentId;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentDb;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +30,14 @@ public class InitializeMockData {
             flatMap(b ->
                 b ?
                     just(Success.NO_OP_SUCCESS) :
-                    createTask("First task", "Stuff to be done").
+                    createTask("First task", "Stuff to be done with ugly prefix").
+                        flatMap((VentId id) -> reactiveVentDb.getCollection("tasks").
+                            putValue(id, "description", "Stuff to be done")
+                        ).
                         then(createTask("Another task", "More stuff to be done")).
+                        flatMap((VentId id) -> reactiveVentDb.getCollection("tasks").
+                            putValue(id, "name", "Awesome task")
+                        ).
                         then(just(Success.SUCCESS))
                 ).
                 flatMapMany(x -> reactiveVentDb.getCollection("tasks").getAll()).
@@ -38,11 +45,11 @@ public class InitializeMockData {
                 then(just(Success.SUCCESS));
     }
 
-    private Mono<?> createTask(String name, String description){
+    private Mono<VentId> createTask(String name, String description){
         return createTask(name, description, false);
     }
 
-    private Mono<?> createTask(String name, String description, boolean resolved){
+    private Mono<VentId> createTask(String name, String description, boolean resolved){
         return countersManager.increment("tasks").
             map(i -> map(
                 pair("number", i),
@@ -53,7 +60,7 @@ public class InitializeMockData {
             flatMap(b ->
             reactiveVentDb.
                 getCollection("tasks").
-                create(b).flatMap(id -> reactiveVentDb.getCollection("tasks").get(id))
+                create(b)
         );
     }
 }

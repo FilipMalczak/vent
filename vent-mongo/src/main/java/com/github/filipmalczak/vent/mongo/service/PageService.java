@@ -38,7 +38,7 @@ public class PageService implements TemporallyEnabled {
 
     private @NonNull EventFactory eventFactory;
 
-    public Mono<Page> createFirstPage(@NonNull String collectionName, @NonNull LocalDateTime now, @NonNull Map initialState){
+    public Mono<Page> createFirstPage(@NonNull String mongoCollectionName, @NonNull LocalDateTime now, @NonNull Map initialState){
         Event create = eventFactory.create(initialState).withOccuredOn(now);
         Page page = new Page(
             null,
@@ -52,27 +52,31 @@ public class PageService implements TemporallyEnabled {
             asList(create),
             null
         );
-        return mongoOperations.insert(page, collectionName);
+        return mongoOperations.insert(page, mongoCollectionName);
     }
 
-    private Flux<Page> query(String collectionName, Query query){
+    private Flux<Page> query(@NonNull String mongoCollectionName, @NonNull Query query){
         return mongoOperations.find(
             query,
             Page.class,
-            collectionName
+            mongoCollectionName
         );
     }
 
-    private Flux<Page> query(String collectionName, Criteria criteria){
-        return query(collectionName, Query.query(criteria));
+    private Flux<Page> query(@NonNull String mongoCollectionName, @NonNull Criteria criteria){
+        return query(mongoCollectionName, Query.query(criteria));
+    }
+
+    public Flux<Page> allPages(@NonNull String mongoCollectionName){
+        return mongoOperations.findAll(Page.class, mongoCollectionName);
     }
 
     /**
      * Actually all undeleted pages. If this distinction will become needed, I'll refactor.
      */
-    public Flux<Page> allPages(@NonNull String collectionName, @NonNull LocalDateTime at){
+    public Flux<Page> allPages(@NonNull String mongoCollectionName, @NonNull LocalDateTime at){
         return query(
-            collectionName,
+            mongoCollectionName,
             Criteria.where(null).orOperator(
                 Criteria.where("objectDeletedOn").gt(at),
                 Criteria.where("objectDeletedOn").is(null)
@@ -80,16 +84,16 @@ public class PageService implements TemporallyEnabled {
         );
     }
 
-    public Flux<Page> allPages(@NonNull String collectionName, @NonNull VentId id){
+    public Flux<Page> allPages(@NonNull String mongoCollectionName, @NonNull VentId id){
         return query(
-            collectionName,
+            mongoCollectionName,
             Criteria.where("objectId").is(toMongo(id))
         );
     }
 
-    public Mono<Page> pageAtTimestamp(@NonNull String collectionName, @NonNull VentId id, @NonNull LocalDateTime at){
+    public Mono<Page> pageAtTimestamp(@NonNull String mongoCollectionName, @NonNull VentId id, @NonNull LocalDateTime at){
         return query(
-                collectionName,
+                mongoCollectionName,
                 Criteria.where("objectId").is(toMongo(id)).
                     and("startingFrom").lte(at).
                     andOperator(
@@ -107,11 +111,11 @@ public class PageService implements TemporallyEnabled {
             next();
     }
 
-    public Mono<Page> createEmptyNextPage(@NonNull String collectionName, @NonNull VentId id, @NonNull LocalDateTime startingFrom){
-        return currentPage(collectionName, id).flatMap(p -> createEmptyNextPage(collectionName, p, startingFrom));
+    public Mono<Page> createEmptyNextPage(@NonNull String mongoCollectionName, @NonNull VentId id, @NonNull LocalDateTime startingFrom){
+        return currentPage(mongoCollectionName, id).flatMap(p -> createEmptyNextPage(mongoCollectionName, p, startingFrom));
     }
 
-    public Mono<Page> createEmptyNextPage(@NonNull String collectionName, @NonNull Page previousPage, @NonNull LocalDateTime startingFrom){
+    public Mono<Page> createEmptyNextPage(@NonNull String mongoCollectionName, @NonNull Page previousPage, @NonNull LocalDateTime startingFrom){
         Page newPage = new Page(
             null,
             previousPage.getObjectId(),
@@ -125,38 +129,38 @@ public class PageService implements TemporallyEnabled {
             null
         );
         return mongoOperations.
-            insert(newPage, collectionName).
+            insert(newPage, mongoCollectionName).
             flatMap(p -> {
                 previousPage.setNextPageFrom(p.getStartingFrom());
                 previousPage.setNextPageId(p.getPageId());
                 return mongoOperations.
-                    save(previousPage, collectionName).
+                    save(previousPage, mongoCollectionName).
                     then(just(p));
             });
     }
 
-    public Mono<Page> currentPage(@NonNull String collectionName, @NonNull VentId id){
+    public Mono<Page> currentPage(@NonNull String mongoCollectionName, @NonNull VentId id){
         return query(
-            collectionName,
+            mongoCollectionName,
             Criteria.where("objectId").is(toMongo(id)).
                 and("nextPageFrom").is(null)
         ).next();
     }
 
-    public Mono<EventConfirmation> addEvent(@NonNull String collectionName, @NonNull Page page, @NonNull Event event){
+    public Mono<EventConfirmation> addEvent(@NonNull String mongoCollectionName, @NonNull Page page, @NonNull Event event){
         EventConfirmation confirmation = page.addEvent(event);
-        return mongoOperations.save(page, collectionName).then(just(confirmation));
+        return mongoOperations.save(page, mongoCollectionName).then(just(confirmation));
     }
 
-    public Mono<EventConfirmation> delete(@NonNull String collectionName, @NonNull LocalDateTime now, @NonNull Page page){
+    public Mono<EventConfirmation> delete(@NonNull String mongoCollectionName, @NonNull LocalDateTime now, @NonNull Page page){
         Delete delete = eventFactory.delete().withOccuredOn(now);
         EventConfirmation confirmation = page.addEvent(delete);
-        page.setObjectDeletedOn(now);
-        return mongoOperations.save(page, collectionName).then(just(confirmation));
+        page.markAsDeleted(now);
+        return mongoOperations.save(page, mongoCollectionName).then(just(confirmation));
     }
 
     //fixme doesnt fit the responsibility, see VentCollection.drop
-    public Mono<Success> drop(String collectionName){
-        return Mono.from(mongoOperations.getCollection(collectionName).drop()).map(MongoTranslator::fromMongo);
+    public Mono<Success> drop(String mongoCollectionName){
+        return Mono.from(mongoOperations.getCollection(mongoCollectionName).drop()).map(MongoTranslator::fromMongo);
     }
 }

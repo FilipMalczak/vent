@@ -14,6 +14,8 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 
 import java.time.LocalDateTime;
 
+import static com.github.filipmalczak.vent.mongo.ReactiveMongoVentFactory.VentServiceCreators.*;
+
 @Configuration
 public class VentConfiguration extends RequiredCodecsForMongoVent {
     @Autowired
@@ -32,10 +34,12 @@ public class VentConfiguration extends RequiredCodecsForMongoVent {
 
     @Bean
     public ReactiveVentDb reactiveVentDb(TemporalService temporalService){
-        return new ReactiveMongoVentFactory().
-            reactiveMongoOperations(() -> template).
-            temporalService(() -> temporalService).
-            newInstance();
+        ReactiveMongoVentFactory factory = new ReactiveMongoVentFactory();
+        return factory.create(configure()
+            .temporalService(() -> temporalService)
+            .reactiveMongoOperations(() -> template)
+            .build()
+        );
     }
 
     //todo figure out where to put this

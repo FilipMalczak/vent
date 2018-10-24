@@ -2,6 +2,7 @@ package com.github.filipmalczak.vent.mongo.model;
 
 import com.github.filipmalczak.vent.api.model.EventConfirmation;
 import com.github.filipmalczak.vent.mongo.model.events.Event;
+import com.github.filipmalczak.vent.mongo.model.events.impl.Create;
 import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -43,11 +44,23 @@ public class Page {
         return (at.isAfter(startingFrom) || at.isEqual(startingFrom)) && (nextPageFrom == null || nextPageFrom.isAfter(at));
     }
 
-    public boolean finished(){
+    public boolean firstPageOfHistory(){
+        return !events.isEmpty() && events.get(0) instanceof Create;
+    }
+
+    public boolean currentPage(){
+        return nextPageId == null;
+    }
+
+    public boolean lastPageOfHistory(){
+        return currentPage() || endsWithDelete();
+    }
+
+    public boolean endsWithDelete(){
         return objectDeletedOn != null;
     }
 
-    public void finish(LocalDateTime at){
+    public void markAsDeleted(LocalDateTime at){
         objectDeletedOn = at;
     }
 

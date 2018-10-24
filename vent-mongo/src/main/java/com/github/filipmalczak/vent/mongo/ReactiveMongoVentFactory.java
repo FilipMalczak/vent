@@ -2,11 +2,13 @@ package com.github.filipmalczak.vent.mongo;
 
 import com.github.filipmalczak.vent.api.temporal.SimpleTemporalService;
 import com.github.filipmalczak.vent.api.temporal.TemporalService;
+import com.github.filipmalczak.vent.mongo.extension.optimization.Defaults;
+import com.github.filipmalczak.vent.mongo.factory.PluggableFactory;
+import com.github.filipmalczak.vent.mongo.factory.ResultWithAPI;
 import com.github.filipmalczak.vent.mongo.model.events.impl.EventFactory;
 import com.github.filipmalczak.vent.mongo.service.*;
 import com.github.filipmalczak.vent.mongo.service.query.preparator.MongoQueryPreparator;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 
@@ -15,7 +17,55 @@ import java.util.function.Supplier;
 
 @NoArgsConstructor
 @Slf4j
-public class ReactiveMongoVentFactory {
+public class ReactiveMongoVentFactory extends PluggableFactory<ReactiveMongoVentFactory, VentDb, ReactiveMongoVentFactory.VentServiceCreators, VentServices> {
+    private boolean useDefaultOptimization = true;
+
+    public ReactiveMongoVentFactory withDefaultOptimization(boolean val){
+        useDefaultOptimization = val;
+        return this;
+    }
+
+    public ReactiveMongoVentFactory withDefaultOptimization(){
+        return withDefaultOptimization(true);
+    }
+
+    public ReactiveMongoVentFactory withoutDefaultOptimization(){
+        return withDefaultOptimization(false);
+    }
+
+    @Override
+    public ResultWithAPI<VentDb, VentServices> prepare(VentServiceCreators creators) {
+        if (useDefaultOptimization){
+            plugins(Defaults.defaultOptimizations);
+        } else {
+            //todo property to disable warning/scan plugins to see if optimization is enabled
+            log.warn("Default Vent optimizations are turned off! Make sure that you take care of that manually!");
+        }
+        ReactiveMongoOperations operations = nonNull(creators.reactiveMongoOperations.get());
+        log.debug("ReactiveMongoOperations: " + operations);
+        TemporalService temporal = nonNull(creators.temporalService.get());
+        log.debug("TemporalService: " + temporal);
+        EventFactory evFactory = nonNull(creators.eventFactory.get());
+        log.debug("EventFactory: " + evFactory);
+        PageService page = nonNull(creators.pageService.create(temporal, operations, evFactory));
+        log.debug("PageService: " + page);
+        SnapshotRenderer renderer = nonNull(creators.snapshotRenderer.get());
+        log.debug("SnapshotRenderer: " + renderer);
+        SnapshotService snapshot = nonNull(creators.snapshotService.apply(renderer, page));
+        log.debug("SnapshotService: " + snapshot);
+        CollectionService collection = nonNull(creators.collectionService.apply(operations, temporal));
+        log.debug("CollectionService: " + collection);
+        MongoQueryPreparator preparator = nonNull(creators.mongoQueryPreparator.get());
+        log.debug("MongoQueryPreparator: " + preparator);
+        VentServices services = new VentServices(operations, temporal, evFactory, page, renderer, snapshot, collection, preparator);
+        VentDb ventDb = new VentDb(services);
+        return ResultWithAPI.of(ventDb, services);
+    }
+
+    private <T> T nonNull(@NonNull T val) {
+        return val;
+    }
+
     @FunctionalInterface
     public interface PageServiceCreator {
         PageService create(TemporalService temporalService, ReactiveMongoOperations reactiveMongoOperations,
@@ -23,101 +73,67 @@ public class ReactiveMongoVentFactory {
     }
 
     @FunctionalInterface
-    public interface EventFactoryCreator extends Supplier<EventFactory> {}
+    public interface EventFactoryCreator extends Supplier<EventFactory> {
+    }
 
     @FunctionalInterface
-    public interface SnapshotServiceCreator extends BiFunction<SnapshotRenderer, PageService, SnapshotService> {}
+    public interface SnapshotServiceCreator extends BiFunction<SnapshotRenderer, PageService, SnapshotService> {
+    }
 
     @FunctionalInterface
-    public interface MongoQueryPreparatorCreator extends Supplier<MongoQueryPreparator> {}
+    public interface MongoQueryPreparatorCreator extends Supplier<MongoQueryPreparator> {
+    }
 
     @FunctionalInterface
-    public interface TemporalServiceCreator extends Supplier<TemporalService> {}
+    public interface TemporalServiceCreator extends Supplier<TemporalService> {
+    }
 
     @FunctionalInterface
-    public interface SnapshotRendererCreator extends Supplier<SnapshotRenderer> {}
+    public interface SnapshotRendererCreator extends Supplier<SnapshotRenderer> {
+    }
 
     @FunctionalInterface
-    public interface CollectionServiceCreator extends BiFunction<ReactiveMongoOperations, TemporalService, CollectionService> {}
+    public interface CollectionServiceCreator extends BiFunction<ReactiveMongoOperations, TemporalService, CollectionService> {
+    }
 
     @FunctionalInterface
-    public interface ReactiveMongoOperationsCreator extends Supplier<ReactiveMongoOperations> {}
-
-    private PageServiceCreator pageService = PageService::new;
-    private EventFactoryCreator eventFactory = EventFactory::new;
-    private SnapshotServiceCreator snapshotService = SnapshotService::new;
-    private MongoQueryPreparatorCreator mongoQueryPreparator = MongoQueryPreparator::new;
-    private TemporalServiceCreator temporalService = SimpleTemporalService::new;
-    private SnapshotRendererCreator snapshotRenderer =  NaiveSnapshotRenderer::new;
-    private CollectionServiceCreator collectionService =  CollectionService::new;
-    private ReactiveMongoOperationsCreator reactiveMongoOperations;
-
-    public ReactiveMongoVentFactory pageService(@NonNull PageServiceCreator pageService) {
-        this.pageService = pageService;
-        return this;
+    public interface ReactiveMongoOperationsCreator extends Supplier<ReactiveMongoOperations> {
     }
 
-    public ReactiveMongoVentFactory eventFactory(@NonNull EventFactoryCreator eventFactory) {
-        this.eventFactory = eventFactory;
-        return this;
-    }
+    /**
+     * Most of fields are not a public API. Package-private visibility is intended.
+     */
+    @Builder(builderMethodName = "configure")
+    @Getter
+    @EqualsAndHashCode
+    @ToString
+    public static class VentServiceCreators {
+        @Builder.Default
+        @NonNull
+        PageServiceCreator pageService = PageService::new;
+        @Builder.Default
+        @NonNull
+        EventFactoryCreator eventFactory = EventFactory::new;
+        @Builder.Default
+        @NonNull
+        SnapshotServiceCreator snapshotService = SnapshotService::new;
+        @Builder.Default
+        @NonNull
+        MongoQueryPreparatorCreator mongoQueryPreparator = MongoQueryPreparator::new;
+        @Builder.Default
+        @NonNull
+        SnapshotRendererCreator snapshotRenderer = NaiveSnapshotRenderer::new;
+        @Builder.Default
+        @NonNull
+        CollectionServiceCreator collectionService = CollectionService::new;
 
-    public ReactiveMongoVentFactory snapshotService(@NonNull SnapshotServiceCreator snapshotService) {
-        this.snapshotService = snapshotService;
-        return this;
-    }
+        //the only really customizable field
+        @Builder.Default
+        @NonNull
+        TemporalServiceCreator temporalService = SimpleTemporalService::new;
 
-    public ReactiveMongoVentFactory mongoQueryPreparator(@NonNull MongoQueryPreparatorCreator mongoQueryPreparator) {
-        this.mongoQueryPreparator = mongoQueryPreparator;
-        return this;
+        //the only truly required field
+        @NonNull
+        ReactiveMongoOperationsCreator reactiveMongoOperations;
     }
-
-    public ReactiveMongoVentFactory temporalService(@NonNull TemporalServiceCreator temporalService) {
-        this.temporalService = temporalService;
-        return this;
-    }
-
-    public ReactiveMongoVentFactory snapshotRenderer(@NonNull SnapshotRendererCreator snapshotRenderer) {
-        this.snapshotRenderer = snapshotRenderer;
-        return this;
-    }
-
-    public ReactiveMongoVentFactory collectionService(CollectionServiceCreator collectionService) {
-        this.collectionService = collectionService;
-        return this;
-    }
-
-    public ReactiveMongoVentFactory reactiveMongoOperations(@NonNull ReactiveMongoOperationsCreator reactiveMongoOperations) {
-        this.reactiveMongoOperations = reactiveMongoOperations;
-        return this;
-    }
-
-    public VentDb newInstance(){
-        ReactiveMongoOperations operations = nonNull(reactiveMongoOperations.get());
-        log.debug("ReactiveMongoOperations: "+operations);
-        TemporalService temporal = nonNull(temporalService.get());
-        log.debug("TemporalService: "+temporal);
-        EventFactory evFactory = nonNull(eventFactory.get());
-        log.debug("EventFactory: "+evFactory);
-        PageService page = nonNull(pageService.create(temporal, operations, evFactory));
-        log.debug("PageService: "+page);
-        SnapshotRenderer renderer = nonNull(snapshotRenderer.get());
-        log.debug("SnapshotRenderer: "+renderer);
-        SnapshotService snapshot = nonNull(snapshotService.apply(renderer, page));
-        log.debug("SnapshotService: "+snapshot);
-        CollectionService collection = nonNull(collectionService.apply(operations, temporal));
-        log.debug("CollectionService: "+collection);
-        MongoQueryPreparator preparator = nonNull(mongoQueryPreparator.get());
-        log.debug("MongoQueryPreparator: "+preparator);
-        return new VentDb(
-            page,
-            evFactory,
-            snapshot,
-            preparator,
-            collection,
-            operations
-        );
-    }
-
-    private <T> T nonNull(@NonNull T val){return val;}
 }

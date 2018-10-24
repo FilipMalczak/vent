@@ -8,6 +8,7 @@ import com.github.filipmalczak.vent.mongo.query.VentQuery;
 import com.github.filipmalczak.vent.mongo.service.CollectionService;
 import com.github.filipmalczak.vent.mongo.service.PageService;
 import com.github.filipmalczak.vent.mongo.service.SnapshotService;
+import com.github.filipmalczak.vent.mongo.service.VentServices;
 import com.github.filipmalczak.vent.mongo.service.query.preparator.MongoQueryPreparator;
 import lombok.AccessLevel;
 import lombok.NonNull;
@@ -32,6 +33,17 @@ public class VentDb implements ReactiveVentDb<VentCollection, VentQueryBuilder, 
     private @NonNull CollectionService collectionService;
 
     private @NonNull ReactiveMongoOperations mongoOperations;
+
+    public VentDb(VentServices ventServices) {
+        this(
+            ventServices.getPageService(),
+            ventServices.getEventFactory(),
+            ventServices.getSnapshotService(),
+            ventServices.getQueryPreparator(),
+            ventServices.getCollectionService(),
+            ventServices.getMongoOperations()
+        );
+    }
 
     @Override
     public VentCollection getCollection(String collectionName) {

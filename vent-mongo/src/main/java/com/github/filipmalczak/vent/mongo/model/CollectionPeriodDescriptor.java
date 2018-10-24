@@ -7,7 +7,6 @@ import java.util.Optional;
 
 import static com.github.filipmalczak.vent.mongo.utils.CollectionsUtils.MONGO_COLLECTION_NAME_MAPPER;
 
-//@Document
 @Data
 @AllArgsConstructor
 @RequiredArgsConstructor
@@ -16,6 +15,9 @@ public class CollectionPeriodDescriptor {
     @NonNull
     private LocalDateTime from;
     private LocalDateTime to;
+    /**
+     * MongoDB collection name. Many MongoDB collections map to single Vent collection.
+     */
     @NonNull private String mongoCollectionName;
 
     //no isCurrent to avoid serializing this "property"
@@ -25,7 +27,7 @@ public class CollectionPeriodDescriptor {
 
     public CollectionPeriodDescriptor asFinishedOn(String ventCollectionName, LocalDateTime end){
         if (!current())
-            throw new IllegalStateException("Only current period descriptor can be used to produce a finished one");
+            throw new IllegalStateException("Only current period descriptor can be used to produce a endsWithDelete one");
         return new CollectionPeriodDescriptor(
             from,
             end,
