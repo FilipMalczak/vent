@@ -4,6 +4,7 @@ package com.github.filipmalczak.vent.api.temporal;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.function.Supplier;
 
@@ -16,6 +17,10 @@ import java.util.function.Supplier;
  */
 public interface TemporalService extends Supplier<LocalDateTime> {
     LocalDateTime now();
+
+    default ZonedDateTime zonedNow(){
+        return ZonedDateTime.of(now(), getTimezone());
+    }
 
     default ZoneId getTimezone(){
         return ZoneId.systemDefault();

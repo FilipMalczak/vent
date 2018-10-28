@@ -1,6 +1,8 @@
 apply plugin: "com.sourcemuse.mongo"
 apply plugin: "org.springframework.boot"
 
+publishing.publications.clear()
+
 bootRun.dependsOn startManagedMongoDb
 
 dependencies {

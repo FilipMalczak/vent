@@ -4,7 +4,7 @@ buildscript {
 	ext {
 		springBootVersion  = '2.0.3.RELEASE'
         gitversionVersion  = '0.10.0'
-        buildInfoVersion   = '4.7.5'
+        buildInfoVersion   = '4.8.1'
         gradleMongoVersion = '1.0.6'
 	}
 	repositories {
@@ -118,13 +118,13 @@ subprojects {
 
             dependency group: 'ma.glasnost.orika', name: 'orika-core', version: '1.5.2'
 
-            dependency 'org.junit.jupiter:junit-jupiter-api:5.2.0'
-            dependency group: 'org.mockito', name: 'mockito-junit-jupiter', version: '2.18.3'
-            dependency 'org.junit.jupiter:junit-jupiter-engine:5.2.0'
+            dependency 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+            dependency group: 'org.mockito', name: 'mockito-junit-jupiter', version: '2.23.0'
+            dependency 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
 
             dependency group: 'org.spockframework', name: 'spock-core', version: '1.1-groovy-2.4'
-            dependency 'org.junit.vintage:junit-vintage-engine:5.2.0' //required for Spock
-            dependency group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.2.0'
+            dependency 'org.junit.vintage:junit-vintage-engine:5.3.1' //required for Spock
+            dependency group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.3.1'
 
             dependency "com.github.sbrannen:spring-test-junit5:1.2.0"
 
@@ -133,7 +133,7 @@ subprojects {
 //            dependency group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
 //            dependency group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
 
-            dependency 'org.projectlombok:lombok:1.16.20'
+            dependency 'org.projectlombok:lombok:1.18.2'
         }
     }
 
@@ -189,10 +189,16 @@ subprojects {
                 System.getenv("ARTIFACTORY_URL")
     }
 
+    task sourceJar(type: Jar) {
+        classifier 'sources'
+        from sourceSets.main.allJava
+    }
+
     publishing {
         publications {
             VentPublication(MavenPublication) {
                 from components.java
+                artifact tasks.sourceJar
             }
         }
     }
