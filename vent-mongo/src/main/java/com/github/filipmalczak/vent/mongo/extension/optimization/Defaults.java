@@ -63,25 +63,34 @@ public class Defaults {
      * Full optimization is happening for every page with non-empty event list that wasn't optimized during last partial
      * optimization.
      */
-    public static Optimization[] defaultOptimizations = new Optimization[] {
-        Optimization
-            .plan(
-                "Partial",
-                SimplePeriodicScheduler.shared().every(partialOptimizationInterval)
-            )
-            .withAction((stream, opt) ->
-                stream.ofCurrentPages(p -> p.getEventCount() > minEventsNumber).flatMap(opt::optimize)
-            )
-            .endPlan(),
-        Optimization
-            .plan(
-                "Full",
-                SimplePeriodicScheduler.shared().every(fullOptimizationInterval)
-            )
-            .withAction((stream, opt) -> stream.ofCurrentPages(p ->
-                    p.getEventCount() > 0 && p.getTimeSpan().compareTo(partialOptimizationInterval) > 0
-                ).flatMap(opt::optimize)
-            )
-            .endPlan()
-    };
+    //todo customizable minEventCount for full
+    static {
+        log.info("Default optimizations:");
+        log.info("Partial: every "+partialOptimizationInterval+" ; min event count: "+minEventsNumber);
+        log.info("Full:    every "+fullOptimizationInterval);
+        defaultOptimizations = new Optimization[] {
+            Optimization
+                .plan(
+                    "Partial",
+                    SimplePeriodicScheduler.shared().every(partialOptimizationInterval)
+                )
+                .withAction((stream, opt) ->
+                    stream.ofCurrentPages(p -> p.getEventCount() > minEventsNumber).flatMap(opt::optimize)
+                )
+                .endPlan(),
+            Optimization
+                .plan(
+                    "Full",
+                    SimplePeriodicScheduler.shared().every(fullOptimizationInterval)
+                )
+                .withAction((stream, opt) -> stream.ofCurrentPages(p ->
+                        p.getEventCount() > 0 && p.getTimeSpan().compareTo(partialOptimizationInterval) > 0
+                    ).flatMap(opt::optimize)
+                )
+                .endPlan()
+        };
+    }
+
+
+    public static Optimization[] defaultOptimizations;
 }

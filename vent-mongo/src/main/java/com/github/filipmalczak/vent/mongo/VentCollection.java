@@ -6,6 +6,7 @@ import com.github.filipmalczak.vent.api.model.Success;
 import com.github.filipmalczak.vent.api.model.VentId;
 import com.github.filipmalczak.vent.api.reactive.ReactiveVentCollection;
 import com.github.filipmalczak.vent.api.temporal.TemporalService;
+import com.github.filipmalczak.vent.mongo.extension.scan.model.IdentifiablePage;
 import com.github.filipmalczak.vent.mongo.model.Page;
 import com.github.filipmalczak.vent.mongo.model.events.Event;
 import com.github.filipmalczak.vent.mongo.model.events.impl.EventFactory;
@@ -26,6 +27,8 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.function.Supplier;
+
+import static reactor.core.publisher.Mono.fromCallable;
 
 @AllArgsConstructor
 //todo builder?
@@ -81,13 +84,21 @@ public class VentCollection implements ReactiveVentCollection<VentQueryBuilder, 
 
     @Override
     public Flux<VentId> identifyAll(Supplier<LocalDateTime> queryAt) {
-        return collectionService.mongoCollectionName(ventCollectionName, queryAt).flux().flatMap(r ->
-            pageService.allPages(
-                    r.getName(),
-                    r.getNow()
-                ).
-                map(Page::getObjectId).
-                map(MongoTranslator::fromMongo)
+        return pageService
+            .getPageStream()
+            .ofCurrentPages(ventCollectionName)
+            .map(IdentifiablePage::getPage)
+            .map(Page::getObjectId)
+            .map(MongoTranslator::fromMongo);
+    }
+
+    @Override
+    public Flux<ObjectSnapshot> getAll(TemporalService temporalService) {
+        return fromCallable(temporalService::now).flatMapMany(now ->
+                pageService
+                .getPageStream()
+                .ofCurrentPages(ventCollectionName)
+                .map(ip -> snapshotService.render(ip.getPage(), now))
         );
     }
 

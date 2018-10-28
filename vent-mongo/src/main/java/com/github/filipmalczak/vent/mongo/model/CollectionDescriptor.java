@@ -5,6 +5,7 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static com.github.filipmalczak.vent.mongo.utils.CollectionsUtils.MONGO_COLLECTION_NAME_MAPPER;
@@ -32,7 +34,7 @@ public class CollectionDescriptor {
     @NonNull private CollectionPeriodDescriptor currentPeriod;
     @NonNull private List<CollectionPeriodDescriptor> previousPeriods;
 
-    public CollectionDescriptor asFinishedOn(LocalDateTime end){
+    public CollectionDescriptor asArchivedOn(LocalDateTime end){
         List<CollectionPeriodDescriptor> newPeriods = new ArrayList<>();
         newPeriods.add(currentPeriod.asFinishedOn(ventCollectionName, end));
         newPeriods.addAll(previousPeriods);
@@ -63,5 +65,7 @@ public class CollectionDescriptor {
             min(Comparator.comparing(Function.<LocalDateTime>identity()).reversed());
     }
 
-
+    public Duration duration(Supplier<LocalDateTime> now){
+        return Duration.between(getOldestFrom(), now.get());
+    }
 }

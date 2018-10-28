@@ -4,6 +4,7 @@ import com.github.filipmalczak.vent.api.general.defaults.ObjectReadFacade;
 import com.github.filipmalczak.vent.api.general.object.VentObjectReadFacade;
 import com.github.filipmalczak.vent.api.general.query.QueryBuilder;
 import com.github.filipmalczak.vent.api.model.VentId;
+import com.github.filipmalczak.vent.api.temporal.TemporalService;
 import com.github.filipmalczak.vent.api.temporal.TemporallyEnabled;
 
 import java.time.LocalDateTime;
@@ -37,6 +38,10 @@ public interface VentCollectionReadOperations<
     }
 
     ManySnapshots getAll(Supplier<LocalDateTime> queryAt);
+
+    default ManySnapshots getAll(TemporalService temporalService){
+        return getAll((Supplier<LocalDateTime>) temporalService);
+    }
 
     default ManySnapshots getAll(){
         return getAll(getTemporalService()::now);

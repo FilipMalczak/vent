@@ -5,14 +5,13 @@ import com.github.filipmalczak.vent.api.model.Success;
 import com.github.filipmalczak.vent.api.model.VentId;
 import com.github.filipmalczak.vent.api.temporal.TemporalService;
 import com.github.filipmalczak.vent.api.temporal.TemporallyEnabled;
+import com.github.filipmalczak.vent.mongo.extension.scan.PageStream;
 import com.github.filipmalczak.vent.mongo.model.Page;
 import com.github.filipmalczak.vent.mongo.model.events.Event;
 import com.github.filipmalczak.vent.mongo.model.events.impl.Delete;
 import com.github.filipmalczak.vent.mongo.model.events.impl.EventFactory;
 import com.github.filipmalczak.vent.mongo.utils.MongoTranslator;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NonNull;
+import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -30,6 +29,7 @@ import static java.util.Arrays.asList;
 import static reactor.core.publisher.Mono.just;
 
 @AllArgsConstructor
+@RequiredArgsConstructor
 public class PageService implements TemporallyEnabled {
     @Getter private @NonNull TemporalService temporalService;
 
@@ -37,6 +37,17 @@ public class PageService implements TemporallyEnabled {
     ReactiveMongoOperations mongoOperations;
 
     private @NonNull EventFactory eventFactory;
+
+    @Getter private PageStream pageStream = null;
+
+    public PageService(VentServices ventServices) {
+        this(
+            ventServices.getTemporalService(),
+            ventServices.getMongoOperations(),
+            ventServices.getEventFactory(),
+            new PageStream(ventServices)
+        );
+    }
 
     public Mono<Page> createFirstPage(@NonNull String mongoCollectionName, @NonNull LocalDateTime now, @NonNull Map initialState){
         Event create = eventFactory.create(initialState).withOccuredOn(now);
