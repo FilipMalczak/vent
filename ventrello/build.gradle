@@ -20,11 +20,22 @@ ext {
 }
 
 bootRun {
-    systemProperty 'spring.profiles.active', "mockData"
-    doFirst {
-        println "Static resources served from: $staticResourcesPath"
+    if (currentState != "RELEASE") {
+        systemProperty 'spring.profiles.active', "mockData"
+        doFirst {
+            println "Static resources served from: $staticResourcesPath"
+        }
+        systemProperty 'spring.resources.static-locations', "file://$staticResourcesPath"
+
+        systemProperty 'vent.mongo.extension.optimization.partial.value', "15"
+        systemProperty 'vent.mongo.extension.optimization.partial.unit', "SECONDS"
+        systemProperty 'vent.mongo.extension.optimization.partial.eventCount.min', "5"
+
+        systemProperty 'vent.mongo.extension.optimization.full.value', "1"
+        systemProperty 'vent.mongo.extension.optimization.full.unit', "MINUTES"
+
+        systemProperty '--logging.level.com.github.filipmalczak.vent.mongo.extension.optimization.Defaults', "DEBUG"
     }
-    systemProperty 'spring.resources.static-locations', "file://$staticResourcesPath"
 }
 
 mongo {
@@ -38,4 +49,7 @@ task cleanMongo {
     }
 }
 
-startManagedMongoDb.dependsOn cleanMongo
+clean.dependsOn cleanMongo
+
+if (currentState != "FEATURE")
+    startManagedMongoDb.dependsOn cleanMongo
