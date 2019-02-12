@@ -114,7 +114,7 @@ subprojects {
         }
         dependencies {
             dependency group: 'com.google.auto.service', name: 'auto-service', version: '1.0-rc4'
-            dependency 'uk.com.robust-it:cloning:1.9.10'
+            dependency 'uk.com.robust-it:cloning:1.9.12'
 
             dependency group: 'ma.glasnost.orika', name: 'orika-core', version: '1.5.2'
 
