@@ -123,7 +123,7 @@ subprojects {
             dependency 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
 
             dependency group: 'org.spockframework', name: 'spock-core', version: '1.1-groovy-2.4'
-            dependency 'org.junit.vintage:junit-vintage-engine:5.3.1' //required for Spock
+            dependency 'org.junit.vintage:junit-vintage-engine:5.5.1' //required for Spock
             dependency group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.3.1'
 
             dependency "com.github.sbrannen:spring-test-junit5:1.2.0"
